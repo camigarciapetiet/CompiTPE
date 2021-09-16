@@ -11,3 +11,20 @@ BREAK
 INT
 SINGLE
 REPEAT
+
+
+
+:=
+%%
+||
+&&
+
+<>
+==
+<=
+>=
+
+	
+faltan un par creo
+
+

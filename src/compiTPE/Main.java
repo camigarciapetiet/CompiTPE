@@ -26,6 +26,22 @@ public class Main {
 		}
 	}
 	
+	public boolean getToken(File file, FileReader fr, int index) {
+		int content;
+	    try {
+		while ((content = fr.read()) != -1) {
+				
+		      	System.out.print((char) content); //ACA VA LO Q HACEMOS CON CADA CHAR
+		      	
+		      	index+= 1; // En vez de 1 seria el int de retorno de la accion semantica que 
+		    }
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return true;
+	}
+	
 	public static void main(String[] args) {
 		accionSemantica[] a = new accionSemantica[9];
 		AS1 as1=new AS1();
@@ -48,6 +64,7 @@ public class Main {
 	    	   int content;
 	           while ((content = fr.read()) != -1) {
 	               System.out.print((char) content); //ACA VA LO Q HACEMOS CON CADA CHAR
+	               
 	            }
 	        } catch (IOException e) {
 	            e.printStackTrace();
