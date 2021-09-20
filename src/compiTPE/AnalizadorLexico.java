@@ -16,12 +16,14 @@ public class AnalizadorLexico {
 	public int contadorLineas;
 	public Map<String, Integer> palabras_predefinidas; //palabras predefeinidas = Palabras Reservadas + Operadores de mas de 1 Caracter (asignacion, and, etc)
 	//TABLA SIMBOLOS. No alcanza con key + value // puede ser con LISTA // puede ser con Map<String,Dictionary<String,String>>
+	public Map<String, HashMap<String, String>> tabla_simbolos;
 	public ErrorHandler error_handler;
 	
 	public AnalizadorLexico(String filename, int matriztransicionestados[][], accionSemantica matrizaccionsemantica[][]) { // filename = TXT con las palabras predefinidas
 		this.codigoIndex = 257;
 		this.contadorLineas = 1;
 		this.palabras_predefinidas = new HashMap<String,Integer>();
+		this.tabla_simbolos = new HashMap<String,HashMap<String,String>>();
 		BufferedReader reader;
 		try {
 			reader = new BufferedReader(new FileReader(filename));
@@ -73,8 +75,8 @@ public class AnalizadorLexico {
 		accionSemantica as;
 		boolean eot = false; //end of token
 		char ch;
-		int estado_actual = 0;
-		int index_simbolo;
+		int estado_actual = 0; // FILA de la matriz de transicion de estados y AS
+		int index_simbolo; // COLUMNA de la matriz de transicion de estados y AS
 		int tipo_token = 0; //esto se asigna en las AS asi que tambien se manda por parametro
 		
 		if (!this.programa.isEmpty()) {
@@ -90,6 +92,7 @@ public class AnalizadorLexico {
 					if (this.matrizTransicionEstados[estado_actual][index_simbolo] == -1) {
 						//error handling
 					}
+					
 				}
 				
 				if (!eot) {

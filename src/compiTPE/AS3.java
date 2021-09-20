@@ -1,5 +1,7 @@
 package compiTPE;
 
+import java.util.HashMap;
+
 public class AS3 extends accionSemantica {
 
 	@Override
@@ -14,6 +16,10 @@ public class AS3 extends accionSemantica {
 			}
 			tipo_token = 2;
 			//Aca va la parte de buscar en la tabla de simbolos si esta o no
+			// www.geeksforgeeks.org/how-to-check-if-a-key-exists-in-a-hashmap-in-java/
+			
+			//SI NO ESTA:
+			analizadorLexico.tabla_simbolos.put(cadena, new HashMap<String,String>()); //Por ahora no guardamos ningun atributo!
 		}
 		return null;
 	}
