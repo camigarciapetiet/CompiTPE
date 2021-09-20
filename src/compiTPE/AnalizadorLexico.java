@@ -15,11 +15,10 @@ public class AnalizadorLexico {
 	public accionSemantica matrizAccionSemantica[][];
 	public int contadorLineas;
 	public Map<String, Integer> palabras_predefinidas; //palabras predefeinidas = Palabras Reservadas + Operadores de mas de 1 Caracter (asignacion, and, etc)
-	//TABLA SIMBOLOS. No alcanza con key + value // puede ser con LISTA // puede ser con Map<String,Dictionary<String,String>>
 	public Map<String, HashMap<String, String>> tabla_simbolos;
 	public ErrorHandler error_handler;
 	
-	public AnalizadorLexico(String filename, int matriztransicionestados[][], accionSemantica matrizaccionsemantica[][]) { // filename = TXT con las palabras predefinidas
+	public AnalizadorLexico(String filename, int matriztransicionestados[][], accionSemantica matrizaccionsemantica[][], ErrorHandler error_handler) { // filename = TXT con las palabras predefinidas
 		this.codigoIndex = 257;
 		this.contadorLineas = 1;
 		this.palabras_predefinidas = new HashMap<String,Integer>();
@@ -43,20 +42,39 @@ public class AnalizadorLexico {
 		this.codigoIndex +=1;
 		this.matrizAccionSemantica = matrizaccionsemantica;
 		this.matrizTransicionEstados = matriztransicionestados;
+		this.error_handler = error_handler;
 	}
 	
 	private int convertirSimbolo(char ch) {
-		int retorno = 0;
-		// CASE IF MAS GRANDE Q UNA CASA
-		// PRIMERO LOS OPERADORES, NL, TAB, ESPACIO
-		// DESPUES DIGITOS
-		// DESPUES LA S MAYUSCULA
-		// DESPUES LETRAS MAYUSCULAS
-		// DESPUES LETRAS MINUSCULAS
-		
-		return retorno;	
+		if ((int) ch == 43) return 7; // *
+		else if ((int) ch == 46) return 3; // .
+		else if ((int) ch == 58) return 4; // :
+		else if ((int) ch == 43) return 5; // +
+		else if ((int) ch == 45) return 6; // -
+		else if ((int) ch == 40) return 7; // (
+		else if ((int) ch == 41) return 7; // )
+		else if ((int) ch == 44) return 7; // ,
+		else if ((int) ch == 59) return 7; // ;
+		else if ((int) ch == 42) return 7; // *
+		else if ((int) ch == 47) return 8; // /
+		else if ((int) ch == 60) return 9; // <
+		else if ((int) ch == 62) return 10; // >
+		else if ((int) ch == 61) return 11; // =
+		else if ((int) ch == 95) return 12; // _
+		else if ((int) ch == 37) return 13; // %
+		else if ((int) ch == 38) return 14; // &
+		else if ((int) ch == 124) return 15; // |
+		else if ((int) ch == 42) return 16; // espacio
+		else if ((int) ch == 9) return 16; // tab
+		else if ((int) ch == 10) return 17; // ln
+		else if (ch == 'S') return 18; // S
+		else if (Character.isDigit(ch)) return 2;
+		else if (Character.isUpperCase(ch)) return 1;
+		else if (Character.isLowerCase(ch)) return 0;
+		else return 19;
 	}
 	
+	@SuppressWarnings("resource")
 	public void setPrograma(String filename) { // filename = TXT con el programa a compilar
 		try {
 			this.programa = new Scanner(new File(filename)).useDelimiter("\\Z").next();
@@ -90,9 +108,8 @@ public class AnalizadorLexico {
 				}
 				else {
 					if (this.matrizTransicionEstados[estado_actual][index_simbolo] == -1) {
-						//error handling
+						this.error_handler.handle(this, eot, tipo_token, token_actual, ch);
 					}
-					
 				}
 				
 				if (!eot) {
@@ -115,6 +132,6 @@ public class AnalizadorLexico {
 				}
 			}
 		}
-		return null; // En analisis sintactico: si esta funciona retorna null es porque no hay mas programa para compilar!
+		return null; // En analisis sintactico: si esta funcion retorna null es porque no hay mas programa para compilar!
 	}
 }
