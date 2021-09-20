@@ -46,10 +46,9 @@ public class AnalizadorLexico {
 	}
 	
 	private int convertirSimbolo(char ch) {
-		if ((int) ch == 43) return 7; // *
+		if ((int) ch == 43) return 5; // +
 		else if ((int) ch == 46) return 3; // .
 		else if ((int) ch == 58) return 4; // :
-		else if ((int) ch == 43) return 5; // +
 		else if ((int) ch == 45) return 6; // -
 		else if ((int) ch == 40) return 7; // (
 		else if ((int) ch == 41) return 7; // )
