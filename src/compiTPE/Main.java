@@ -32,33 +32,41 @@ public class Main {
 		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
 		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2}
 		    };
+		accionSemantica AS1= new AS1();
+		accionSemantica AS2= new AS2();
+		accionSemantica AS3= new AS3();
+		accionSemantica AS4= new AS4();
+		accionSemantica AS5= new AS5();
+		accionSemantica AS6= new AS6();
+		accionSemantica ASX= new ASX();
+		accionSemantica ASZ= new ASZ();
 		
-		/*accionSemantica matrizAS[][]= {
-				{,,,,,,,,,,,,,,,,null,  ,  ,null},
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,},
-				{null,null,null,null,null,null,null,null,null,null,null,   ,null,null,null,null,null,null,null,null},
-				{,,,,,,,,,,,,,,,,,,,},
-				{null,null,null,null,null,null,null,null,null,null,null,null,null,null,   ,null,null,null,null,null},
-				{null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,   ,null,null,null,null},
-				{null,null,null,null,null,null,null,null,null,null,null,   ,null,null,null,null,null,null,null,null},
-				{,,,,,,,,,,,,,,,,,null,  ,  },
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,},
-				{null,null,  ,null,null,  ,  ,null,null,null,null,null,null,null,null,null,null,null,null,null},
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,},
-				{,,,,,,,,,,,,,,,,,,,}
+		accionSemantica matrizAS[][]= {
+				{AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,null,ASX,AS1,null},
+				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS2,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
+				{AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2},
+				{AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,ASZ,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2},
+				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS2,AS2,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
+				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS2,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
+				{null,null,null,null,null,null,null,null,null,null,null,AS2,null,null,null,null,null,null,null,null},
+				{AS2,AS2,AS2,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS2,AS3,AS3,AS3,AS3,AS3,AS2,AS3},
+				{null,null,null,null,null,null,null,null,null,null,null,null,null,null,AS2,null,null,null,null,null},
+				{null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,AS2,null,null,null,null},
+				{null,null,null,null,null,null,null,null,null,null,null,AS2,null,null,null,null,null,null,null,null},
+				{AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,null,AS2,AS2},
+				{AS4,AS4,AS2,AS2,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4},
+				{AS5,AS5,AS2,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS2,AS5},
+				{null,null,AS2,null,null,AS2,AS2,null,null,null,null,null,null,null,null,null,null,null,null,null},
+				{AS5,AS5,AS2,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5},
+				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
+				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
+				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
+				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
+				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
+				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
+				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
+				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
+				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3}
 		};
 		*/
 		
