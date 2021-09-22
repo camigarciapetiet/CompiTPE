@@ -1,5 +1,7 @@
 package compiTPE;
 
+import java.util.*;
+
 public class AS3 extends accionSemantica {
 
 	@Override
@@ -10,10 +12,27 @@ public class AS3 extends accionSemantica {
 		}
 		else {
 			if (cadena.length() < 22) {
-				//aca hace la marca de warning si se pasa del rango
+				//aca hace la marca de warning si se pasa del rango ???
 			}
 			tipo_token = 2;
-			//Aca va la parte de buscar en la tabla de simbolos si esta o no
+
+			
+			Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();
+	        boolean isKeyPresent = false;
+	        while (iterator.hasNext()) {
+	            Map.Entry<String, HashMap<String,String>> entry = iterator.next();
+	            if (cadena == entry.getKey()) {
+	                isKeyPresent = true;
+	                return null;
+	            }
+	        }
+	        
+	        
+	        if (isKeyPresent == false) {
+	        	analizadorLexico.tabla_simbolos.put(cadena, new HashMap<String,String>()); //Por ahora no guardamos ningun atributo!
+	        	analizadorLexico.tabla_simbolos.get(cadena).put("linea",String.valueOf(analizadorLexico.contadorLineas)); //EJEMPLO
+	        }
+			
 		}
 		return null;
 	}
