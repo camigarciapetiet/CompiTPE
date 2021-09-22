@@ -44,13 +44,7 @@ public class AnalizadorLexico {
 	}
 	
 	private int convertirSimbolo(char ch) {
-		int retorno = 0;
-		// CASE IF MAS GRANDE Q UNA CASA
-		// PRIMERO LOS OPERADORES, NL, TAB, ESPACIO
-		// DESPUES DIGITOS
-		// DESPUES LA S MAYUSCULA
-		// DESPUES LETRAS MAYUSCULAS
-		// DESPUES LETRAS MINUSCULAS
+		int retorno =0;
 		
 		return retorno;	
 	}
