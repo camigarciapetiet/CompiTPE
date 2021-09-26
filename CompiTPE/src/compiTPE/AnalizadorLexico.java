@@ -20,6 +20,10 @@ public class AnalizadorLexico {
 	
 	public AnalizadorLexico(String filename, int matriztransicionestados[][], accionSemantica matrizaccionsemantica[][], ErrorHandler error_handler) { // filename = TXT con las palabras predefinidas
 		this.codigoIndex = 257;
+		this.codigoIdentificador = this.codigoIndex;
+		this.codigoIndex +=1;
+		this.codigoCTE = this.codigoIndex;
+		this.codigoIndex +=1;
 		this.contadorLineas = 1;
 		this.palabras_predefinidas = new HashMap<String,Integer>();
 		this.tabla_simbolos = new HashMap<String,HashMap<String,String>>();
@@ -36,10 +40,6 @@ public class AnalizadorLexico {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.codigoIdentificador = this.codigoIndex;
-		this.codigoIndex +=1;
-		this.codigoCTE = this.codigoIndex;
-		this.codigoIndex +=1;
 		this.matrizAccionSemantica = matrizaccionsemantica;
 		this.matrizTransicionEstados = matriztransicionestados;
 		this.error_handler = error_handler;

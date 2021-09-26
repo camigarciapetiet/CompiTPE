@@ -30,5 +30,8 @@ public class ErrorHandler {
 			token_actual.valor.substring(0, token_actual.valor.length()-1);//Directamente le sacamos la parte exponencial y seguimos con el siguiente token
 			tipo_token.valor = 3;
 		}
+		else if (((int) ch == 13) || ((int) ch == 10)) { //El automata estaba en el estado 11 y leyo un nl, lo reemplazamos por un espacio.
+			ch = ' ';
+		}
 	}
 }
