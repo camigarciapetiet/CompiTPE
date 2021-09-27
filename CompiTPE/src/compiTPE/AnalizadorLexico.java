@@ -54,6 +54,7 @@ public class AnalizadorLexico {
 		else if ((int) ch == 41) return 7; // )
 		else if ((int) ch == 44) return 7; // ,
 		else if ((int) ch == 59) return 7; // ;
+		else if ((int) ch == 57) return 7; // : agregado por el TP2 tema 17
 		else if ((int) ch == 42) return 7; // *
 		else if ((int) ch == 47) return 8; // /
 		else if ((int) ch == 60) return 9; // <
