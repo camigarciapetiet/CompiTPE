@@ -2,14 +2,15 @@
 import compiTPE;
 %}
 
-%left '||'
-%left '&&'
-%left '>' '<' '>=' '<=' '==' '<>'
+%left ||
+%left &&
+%left '>' '<' >= <= == <>
 %left '+' '-'
 %left '*' '/'
 
 // si se deja a los operadores en el %left, hay que sacarlos de los tokens
-%token ID CTE IF THEN ELSE ENDIF PRINT FUNC RETURN BEGIN END BREAK INT SINGLE REPEAT := || && <> == <= >=
+
+%token ID CTE IF THEN ELSE ENDIF PRINT FUNC RETURN BEGIN END BREAK INT SINGLE REPEAT PRE := || && <> == <= >=
 
 %%
 
