@@ -93,7 +93,7 @@ public class AnalizadorLexico {
 		return retorno;
 	}
 	
-	public Tuple<String,Integer> getToken(){
+	public int yylex(StringHolder yylval){
 		StringHolder token_actual = new StringHolder();
 		accionSemantica as;
 		BooleanHolder eot = new BooleanHolder(false); //end of token
@@ -122,24 +122,30 @@ public class AnalizadorLexico {
 				}
 				else {
 					if (tipo_token.valor == 1) { //es una palabra predefinida
-						return new Tuple<String,Integer>(null,this.getCodigoPP(token_actual.valor));
+						yylval.set(null);
+						return this.getCodigoPP(token_actual.valor); //nll
 					}
-					else if (tipo_token.valor == 2) { //es un IDENTIFICADOR 
-						return new Tuple<String,Integer>(token_actual.valor,this.codigoIdentificador);
+					else if (tipo_token.valor == 2) { //es un IDENTIFICADOR
+						yylval.set(token_actual.valor);
+						return this.codigoIdentificador;//(token_actual.valor
 					}
 					else if (tipo_token.valor == 3) { //es una CTE
-						return new Tuple<String,Integer>(token_actual.valor,this.codigoCTE);
+						yylval.set(token_actual.valor);
+						return this.codigoCTE;//token_actual.valor
 					}
 					else if (tipo_token.valor == 4) { //hay que devolver codigo ascii
 						int ch_retorno = (int) token_actual.valor.charAt(0);
-						return new Tuple<String,Integer>(null,ch_retorno);
+						yylval.set(null);
+						return ch_retorno;//null
 					}		
 					else if (tipo_token.valor == 5) {
-						return new Tuple<String,Integer>(token_actual.valor, this.codigoCADENA);
+						yylval.set(token_actual.valor);
+						return this.codigoCADENA; //token_actual.valor
 					}
 				}
 			}
 		}
-		return null; // En analisis sintactico: si esta funcion retorna null es porque no hay mas programa para compilar!
+		return 0; // En analisis sintactico: si esta funcion retorna null es porque no hay mas programa para compilar!
+		//cuando llega al final retorna 0 porque no llego al eof
 	}
 }
