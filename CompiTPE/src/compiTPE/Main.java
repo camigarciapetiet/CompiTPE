@@ -43,6 +43,7 @@ public class Main {
 		accionSemantica AS6= new AS6();
 		accionSemantica ASX= new ASX();
 		accionSemantica ASZ= new ASZ();
+		accionSemantica AS7 = new AS7();
 		
 		accionSemantica matrizAS[][]= {
 				{AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,null,ASX,AS1,null},
@@ -69,7 +70,7 @@ public class Main {
 				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
 				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
 				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
-				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3}
+				{AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7}
 		};
 		
 		ErrorHandler e_h = new ErrorHandler();

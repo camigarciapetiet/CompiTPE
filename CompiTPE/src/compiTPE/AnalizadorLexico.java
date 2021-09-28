@@ -11,6 +11,7 @@ public class AnalizadorLexico {
 	public int codigoIndex;
 	public int codigoIdentificador;
 	public int codigoCTE;
+	public int codigoCADENA;
 	public int matrizTransicionEstados[][];
 	public accionSemantica matrizAccionSemantica[][];
 	public int contadorLineas;
@@ -23,6 +24,8 @@ public class AnalizadorLexico {
 		this.codigoIdentificador = this.codigoIndex;
 		this.codigoIndex +=1;
 		this.codigoCTE = this.codigoIndex;
+		this.codigoIndex +=1;
+		this.codigoCADENA = this.codigoIndex;
 		this.codigoIndex +=1;
 		this.contadorLineas = 1;
 		this.palabras_predefinidas = new HashMap<String,Integer>();
@@ -131,6 +134,9 @@ public class AnalizadorLexico {
 						int ch_retorno = (int) token_actual.valor.charAt(0);
 						return new Tuple<String,Integer>(null,ch_retorno);
 					}		
+					else if (tipo_token.valor == 5) {
+						return new Tuple<String,Integer>(token_actual.valor, this.codigoCADENA);
+					}
 				}
 			}
 		}
