@@ -31,7 +31,7 @@ sentencia_declarativa_funcion 	: declaracionDatos sentencia_declarativa_funcion
 								| declaracionDatos
 ;
 
-declaracionDatos : tipo factor ';'
+declaracionDatos : tipo factor ',' 			//lo cambie por una coma y, asumimos que solo se puede poner un factor o puede haber por ej INT a, b, c?
 ;
 
 sentencia_ejecutable_funcion	: asignacion sentencia_ejecutable_funcion
