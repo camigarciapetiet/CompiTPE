@@ -77,6 +77,7 @@ public class Main {
         AnalizadorLexico a_lex = new AnalizadorLexico("palabras_predefinidas.txt", matrizTransicionEstados, matrizAS, e_h);
         AnalizadorSintactico a_sint = new AnalizadorSintactico(a_lex);
         a_sint.consumirTokens("testcases.txt");
+        System.out.println("termino");
 
 
 		
