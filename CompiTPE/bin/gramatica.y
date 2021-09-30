@@ -2,18 +2,28 @@
 import compiTPE;
 %}
 
-%token ID CTE CADENA IF THEN ELSE ENDIF PRINT FUNC RETURN BEGIN END BREAK INT SINGLE REPEAT PRE := || && <> == <= >=
+%token ID CTE CADENA IF THEN ELSE ENDIF PRINT FUNC RETURN BEGIN END BREAK INT SINGLE REPEAT PRE ":=" "||" "&&" "<>" "==" "<=" ">="
+%start programa
+
+%left "||"
+%left "&&"
+%left '>' '<' ">=" "<=" "==" "<>"
+%left '+' '-'
+%left '*' '/'
 
 %%
 
-// COSAS SACADAS DE LAS FILMINAS QUE SE USAN
+programa: ID sentencia_declarativa_funcion BEGIN bloque_sentencias_declarativas END
+;
 
+bloque_sentencias_declarativas	: declaracionFuncion bloque_sentencias_declarativas
+								| declaracionFuncion
+								| bloque_de_sentencias
+;
 
-
-declaracionFuncion	: tipo FUNC ID '('parametro')' sentencia_declarativa_funcion BEGIN sentencia_ejecutable_funcion RETURN '('retorno')' ';' END ';'
-					| tipo FUNC ID '('parametro')' sentencia_declarativa_funcion BEGIN pre_condicion sentencia_ejecutable_funcion RETURN '('retorno')' ';' END ';'
-;	// falta para representar el cuerpo pero no se si iria por ejemplo saltos de linea y todo eso?
-	// PUEDE NO TENER sentencia_declarativa_funcion?
+declaracionFuncion	: tipo FUNC ID '('parametro')' sentencia_declarativa_funcion BEGIN conjunto_sentencia_ejecutable RETURN '('retorno')' ';' END ';'
+					| tipo FUNC ID '('parametro')' sentencia_declarativa_funcion BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN '('retorno')' ';' END ';'
+;
 
 pre_condicion	: PRE '('condicion')' ',' CADENA
 ;
@@ -28,13 +38,7 @@ sentencia_declarativa_funcion 	: declaracionDatos sentencia_declarativa_funcion
 								| declaracionDatos
 ;
 
-declaracionDatos : tipo factor ';'
-;
-
-sentencia_ejecutable_funcion	: asignacion sentencia_ejecutable_funcion
-								| asignacion
-								| sentencia_ejecutable sentencia_ejecutable_funcion
-								| sentencia_ejecutable  // esto serian IF ELSE WHILE REPEAT etc
+declaracionDatos : tipo factor ','
 ;
 
 bloque_de_sentencias	: sentencia_ejecutable
@@ -45,14 +49,13 @@ conjunto_sentencia_ejecutable	: sentencia_ejecutable
 								| sentencia_ejecutable sentencia_ejecutable
 ;
 
-
 sentencia_ejecutable	: asignacion
 						| clausula_seleccion_if
 						| mensaje_pantalla
 						| sentencia_control_repeat
 ;
 
-asignacion: ID := expresioncompuesta ';'
+asignacion: ID ":=" expresioncompuesta ';'
 ;
 
 expresioncompuesta	: '('expresion')'
@@ -75,12 +78,13 @@ termino		: termino '/' factor
 
 factor		: ID 
 			| CTE
+			| '-' CTE {chequear rango}
 			| ID '('parametro')'
 ;
 
 
-tipo		: INT ','
-			| SINGLE ','
+tipo		: INT
+			| SINGLE
 ;
 
 clausula_seleccion_if	: IF '('condicion')' THEN bloque_de_sentencias ELSE bloque_de_sentencias ENDIF ';'
@@ -91,12 +95,12 @@ condicion	: condicion operador_logico condicion
 			| expresion
 ;
 
-operador_logico	: || 
-				| && 
-				| <> 
-				| == 
-				| <= 
-				| >=
+operador_logico	: "||" 
+				| "&&" 
+				| "<>" 
+				| "=="
+				| "<="
+				| ">="
 				| '>'
 				| '<'
 ;
@@ -104,15 +108,10 @@ operador_logico	: ||
 mensaje_pantalla	: PRINT '(' CADENA ')' ';'
 ;
 	
-sentencia_control_repeat	: REPEAT '('asignacion_int ';' condicion_repeat ';' CTE ')' bloque_de_sentencias // Como hacer que las CTE y los ID sean enteros y las cte entre 1 - 2 - 3 - 4 y que la condicion compare con i si o si?
-							| REPEAT '('asignacion_int ';' condicion_repeat ';' CTE ')' BEGIN conjunto_sentencia_ejecutable BREAK ';' END // si pongo bloque de sentencias no puedo poner el break adentro, no?
+sentencia_control_repeat	: REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' bloque_de_sentencias {chequeo semantico }
+							| REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' BEGIN conjunto_sentencia_ejecutable BREAK ';' END {chequeo semantico}
 ;		
 
-condicion_repeat	:
+condicion_repeat	: ID operador_logico ID
+					| ID operador_logico CTE
 ;
-
-// Ver de no tener duplicacion de terminos ejemplo bloque_de_sentencias + conjunto_sentencia_ejecutable y sentencia_ejecutable_funcion!!! El primero esta siendo usado en if y repeat y el otro en funciones, pero creo que hace lo mismo
-// falta: 
-//	PRECEDENCIA DE LOS OPERADORES
-//	LA PARTE INICIAL DEL PROGRAMA seria como programa : conjunto_funciones nombre_main o algo asi!
-// condicion repeat?
