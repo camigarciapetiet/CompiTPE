@@ -10,4 +10,12 @@ public class StringHolder {
 	public void resetValor() {
 		this.valor = "";
 	}
+	
+	public void set(String s) {
+		this.valor=s;
+	}
+	
+	public String toString() {
+		return valor;
+	}
 }
