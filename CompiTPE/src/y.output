@@ -58,7 +58,7 @@
   38                        | IF '(' condicion ')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';'
 
   39  condicion : expresion
-  40            | expresion operador_logico condicion
+  40            | condicion operador_logico expresion
 
   41  operador_logico : "||"
   42                  | "&&"
@@ -494,30 +494,38 @@ state 44
 state 45
 	clausula_seleccion_if : IF '(' condicion . ')' THEN bloque_sentencias_ejecutables ';'  (37)
 	clausula_seleccion_if : IF '(' condicion . ')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';'  (38)
+	condicion : condicion . operador_logico expresion  (40)
 
-	')'  shift 60
+	"||"  shift 60
+	"&&"  shift 61
+	"<>"  shift 62
+	"=="  shift 63
+	"<="  shift 64
+	">="  shift 65
+	'>'  shift 66
+	'<'  shift 67
+	')'  shift 68
 	.  error
+
+	operador_logico  goto 69
 
 
 state 46
 	expresion : expresion . '+' termino  (25)
 	expresion : expresion . '-' termino  (26)
 	condicion : expresion .  (39)
-	condicion : expresion . operador_logico condicion  (40)
 
-	"||"  shift 61
-	"&&"  shift 62
-	"<>"  shift 63
-	"=="  shift 64
-	"<="  shift 65
-	">="  shift 66
-	'>'  shift 67
-	'<'  shift 68
 	'+'  shift 55
 	'-'  shift 56
+	"||"  reduce 39
+	"&&"  reduce 39
+	"<>"  reduce 39
+	"=="  reduce 39
+	"<="  reduce 39
+	">="  reduce 39
+	'>'  reduce 39
+	'<'  reduce 39
 	')'  reduce 39
-
-	operador_logico  goto 69
 
 
 state 47
@@ -643,6 +651,54 @@ state 59
 
 
 state 60
+	operador_logico : "||" .  (41)
+
+	.  reduce 41
+
+
+state 61
+	operador_logico : "&&" .  (42)
+
+	.  reduce 42
+
+
+state 62
+	operador_logico : "<>" .  (43)
+
+	.  reduce 43
+
+
+state 63
+	operador_logico : "==" .  (44)
+
+	.  reduce 44
+
+
+state 64
+	operador_logico : "<=" .  (45)
+
+	.  reduce 45
+
+
+state 65
+	operador_logico : ">=" .  (46)
+
+	.  reduce 46
+
+
+state 66
+	operador_logico : '>' .  (47)
+
+	.  reduce 47
+
+
+state 67
+	operador_logico : '<' .  (48)
+
+	.  reduce 48
+
+
+state 68
 	clausula_seleccion_if : IF '(' condicion ')' . THEN bloque_sentencias_ejecutables ';'  (37)
 	clausula_seleccion_if : IF '(' condicion ')' . THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';'  (38)
 
@@ -650,56 +706,8 @@ state 60
 	.  error
 
 
-state 61
-	operador_logico : "||" .  (41)
-
-	.  reduce 41
-
-
-state 62
-	operador_logico : "&&" .  (42)
-
-	.  reduce 42
-
-
-state 63
-	operador_logico : "<>" .  (43)
-
-	.  reduce 43
-
-
-state 64
-	operador_logico : "==" .  (44)
-
-	.  reduce 44
-
-
-state 65
-	operador_logico : "<=" .  (45)
-
-	.  reduce 45
-
-
-state 66
-	operador_logico : ">=" .  (46)
-
-	.  reduce 46
-
-
-state 67
-	operador_logico : '>' .  (47)
-
-	.  reduce 47
-
-
-state 68
-	operador_logico : '<' .  (48)
-
-	.  reduce 48
-
-
 state 69
-	condicion : expresion operador_logico . condicion  (40)
+	condicion : condicion operador_logico . expresion  (40)
 
 	ID  shift 12
 	CTE  shift 13
@@ -707,8 +715,7 @@ state 69
 	.  error
 
 	factor  goto 41
-	condicion  goto 81
-	expresion  goto 46
+	expresion  goto 81
 	termino  goto 44
 
 
@@ -839,9 +846,21 @@ state 80
 
 
 state 81
-	condicion : expresion operador_logico condicion .  (40)
+	expresion : expresion . '+' termino  (25)
+	expresion : expresion . '-' termino  (26)
+	condicion : condicion operador_logico expresion .  (40)
 
-	.  reduce 40
+	'+'  shift 55
+	'-'  shift 56
+	"||"  reduce 40
+	"&&"  reduce 40
+	"<>"  reduce 40
+	"=="  reduce 40
+	"<="  reduce 40
+	">="  reduce 40
+	'>'  reduce 40
+	'<'  reduce 40
+	')'  reduce 40
 
 
 state 82
@@ -1029,14 +1048,14 @@ state 97
 	condicion_repeat : ID . operador_logico ID  (52)
 	condicion_repeat : ID . operador_logico CTE  (53)
 
-	"||"  shift 61
-	"&&"  shift 62
-	"<>"  shift 63
-	"=="  shift 64
-	"<="  shift 65
-	">="  shift 66
-	'>'  shift 67
-	'<'  shift 68
+	"||"  shift 60
+	"&&"  shift 61
+	"<>"  shift 62
+	"=="  shift 63
+	"<="  shift 64
+	">="  shift 65
+	'>'  shift 66
+	'<'  shift 67
 	.  error
 
 	operador_logico  goto 105
@@ -1052,9 +1071,20 @@ state 98
 
 state 99
 	pre_condicion : PRE '(' condicion . ')' ',' CADENA  (9)
+	condicion : condicion . operador_logico expresion  (40)
 
+	"||"  shift 60
+	"&&"  shift 61
+	"<>"  shift 62
+	"=="  shift 63
+	"<="  shift 64
+	">="  shift 65
+	'>'  shift 66
+	'<'  shift 67
 	')'  shift 107
 	.  error
+
+	operador_logico  goto 69
 
 
 state 100

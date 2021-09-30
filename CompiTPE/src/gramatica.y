@@ -88,7 +88,7 @@ clausula_seleccion_if	: IF '('condicion')' THEN bloque_sentencias_ejecutables ';
 ;
 
 condicion	: expresion 
-			| expresion operador_logico condicion // no acepta 2 recursiones
+			| condicion operador_logico expresion 
 ;
 
 operador_logico	: '||'
