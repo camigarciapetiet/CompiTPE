@@ -1,9 +1,6 @@
 package compiTPE;
+import java.util.*;
 import java.io.*;
-import java.util.Scanner;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class AnalizadorLexico {
 	
@@ -18,6 +15,7 @@ public class AnalizadorLexico {
 	public Map<String, Integer> palabras_predefinidas; //palabras predefeinidas = Palabras Reservadas + Operadores de mas de 1 Caracter (asignacion, and, etc)
 	public Map<String, HashMap<String, String>> tabla_simbolos;
 	public ErrorHandler error_handler;
+	public List<String> erroresLex;
 	
 	public AnalizadorLexico(String filename, int matriztransicionestados[][], accionSemantica matrizaccionsemantica[][], ErrorHandler error_handler) { // filename = TXT con las palabras predefinidas
 		this.codigoIndex = 257;
@@ -46,6 +44,7 @@ public class AnalizadorLexico {
 		this.matrizAccionSemantica = matrizaccionsemantica;
 		this.matrizTransicionEstados = matriztransicionestados;
 		this.error_handler = error_handler;
+		this.erroresLex= new ArrayList<String>();
 	}
 	
 	private int convertirSimbolo(char ch) {

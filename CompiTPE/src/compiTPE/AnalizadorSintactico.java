@@ -1,10 +1,13 @@
 package compiTPE;
+import java.util.*;
 
 public class AnalizadorSintactico {
 	public AnalizadorLexico analizadorLexico;
+	public List<String> erroresSint;
 	
 	public AnalizadorSintactico (AnalizadorLexico analizadorLexico) {
 		this.analizadorLexico = analizadorLexico;
+		this.erroresSint= new ArrayList<String>();
 	}
 	
 	

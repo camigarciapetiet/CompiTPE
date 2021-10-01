@@ -1,6 +1,5 @@
 package compiTPE;
 
-
 public class Main {
 
 	public static void cambiarbool(boolean bool) {
@@ -10,7 +9,7 @@ public class Main {
 
 		int matrizTransicionEstados[][] = {
 		        {7,7,12,13,10,16,16,16,1,4,5,6,7,11,8,9,0,0,7,-1},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},  //F=-2
+		        {-2,-2,-2,-2,-2,-2,-2,-2,2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},  //F=-2  error=-1
 		        {2,2,2,2,2,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2},
 		        {1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1},
 		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,18,17,-2,-2,-2,-2,-2,-2,-2,-2},
@@ -78,8 +77,7 @@ public class Main {
         AnalizadorSintactico a_sint = new AnalizadorSintactico(a_lex);
         a_sint.consumirTokens("testcases.txt");
         System.out.println("termino");
-
-
+        
 		
 	}
 
