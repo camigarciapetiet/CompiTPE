@@ -92,7 +92,7 @@ public class AnalizadorLexico {
 		return retorno;
 	}
 	
-	public int yylex(StringHolder yylval){
+	public int yylex(ParserVal yylval){
 		StringHolder token_actual = new StringHolder();
 		accionSemantica as;
 		BooleanHolder eot = new BooleanHolder(false); //end of token
@@ -104,11 +104,12 @@ public class AnalizadorLexico {
 		if (!this.programa.isEmpty()) {
 			while ((!eot.bool) && (!this.programa.isEmpty())) {
 				ch = this.programa.charAt(0);
+				System.out.println(ch);
 				index_simbolo = this.convertirSimbolo(ch);
 				as = this.matrizAccionSemantica[estado_actual][index_simbolo];
 				if (as != null) {
 					estado_actual = this.matrizTransicionEstados[estado_actual][index_simbolo]; // Estado de la siguiente iteracion
-					as.ejecutar(this, eot, tipo_token, token_actual, ch); //faltan los PARAMETROS, considerar mandar eot y que se vuelva true en las acciones semanticas donde termina el token
+					as.ejecutar(this, eot, tipo_token, token_actual, ch); 
 				}
 				else {
 					if (this.matrizTransicionEstados[estado_actual][index_simbolo] == -1) {
@@ -121,24 +122,24 @@ public class AnalizadorLexico {
 				}
 				else {
 					if (tipo_token.valor == 1) { //es una palabra predefinida
-						yylval.set(null);
+						yylval.sval = null; ///set(null);
 						return this.getCodigoPP(token_actual.valor); //nll
 					}
 					else if (tipo_token.valor == 2) { //es un IDENTIFICADOR
-						yylval.set(token_actual.valor);
+						yylval.sval = token_actual.valor;
 						return this.codigoIdentificador;//(token_actual.valor
 					}
 					else if (tipo_token.valor == 3) { //es una CTE
-						yylval.set(token_actual.valor);
+						yylval.sval = token_actual.valor;
 						return this.codigoCTE;//token_actual.valor
 					}
 					else if (tipo_token.valor == 4) { //hay que devolver codigo ascii
 						int ch_retorno = (int) token_actual.valor.charAt(0);
-						yylval.set(null);
-						return ch_retorno;//null
+						yylval.sval = null;
+						return ch_retorno;
 					}		
 					else if (tipo_token.valor == 5) {
-						yylval.set(token_actual.valor);
+						yylval.sval = token_actual.valor;
 						return this.codigoCADENA; //token_actual.valor
 					}
 				}

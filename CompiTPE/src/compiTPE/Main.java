@@ -2,9 +2,6 @@ package compiTPE;
 
 public class Main {
 
-	public static void cambiarbool(boolean bool) {
-		bool = !bool;
-	}
 	public static void main(String[] args) {
 
 		int matrizTransicionEstados[][] = {
@@ -74,10 +71,17 @@ public class Main {
 		
 		ErrorHandler e_h = new ErrorHandler();
         AnalizadorLexico a_lex = new AnalizadorLexico("palabras_predefinidas.txt", matrizTransicionEstados, matrizAS, e_h);
-        AnalizadorSintactico a_sint = new AnalizadorSintactico(a_lex);
-        a_sint.consumirTokens("testcases.txt");
+        //AnalizadorSintactico a_sint = new AnalizadorSintactico(a_lex);
+        a_lex.setPrograma("testcases.txt");
+        Parser newParser = new Parser(a_lex);
+        newParser.run();
+        for (String s: a_lex.erroresLex) {
+        	System.out.println(s);
+        }
+        for (String s: newParser.erroresSint) {
+        	System.out.println(s);
+        }
         System.out.println("termino");
-        
 		
 	}
 
