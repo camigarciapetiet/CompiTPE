@@ -41,6 +41,9 @@ public class AnalizadorLexico {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		this.palabras_predefinidas.put("ID", codigoIdentificador);
+		this.palabras_predefinidas.put("CTE", codigoCTE);
+		this.palabras_predefinidas.put("CADENA", codigoCADENA);
 		this.matrizAccionSemantica = matrizaccionsemantica;
 		this.matrizTransicionEstados = matriztransicionestados;
 		this.error_handler = error_handler;

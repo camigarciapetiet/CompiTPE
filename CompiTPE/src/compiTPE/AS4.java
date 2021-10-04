@@ -16,7 +16,7 @@ public class AS4 extends accionSemantica {
 		int limite_sup= (int) (Math.pow(2, 15)-1);
 		int limite_inf= (int) (-Math.pow(2, 15));
 		if (aux>limite_sup || aux<limite_inf) {
-			//warning
+			analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": constante fuera de rango");
 		}
 		Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();
         boolean isKeyPresent = false;
