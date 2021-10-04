@@ -12,6 +12,7 @@ INT
 SINGLE
 REPEAT
 PRE
+TYPEDEF
 :=
 ||
 &&

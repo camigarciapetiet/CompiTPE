@@ -2,9 +2,6 @@ package compiTPE;
 
 public class Main {
 
-	public static void cambiarbool(boolean bool) {
-		bool = !bool;
-	}
 	public static void main(String[] args) {
 
 		int matrizTransicionEstados[][] = {
@@ -14,7 +11,7 @@ public class Main {
 		        {1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1},
 		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,18,17,-2,-2,-2,-2,-2,-2,-2,-2},
 		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,19,-2,-2,-2,-2,-2,-2,-2,-2},
-		        {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,20,-1,-1,-1,-1,-1,-1,-1,-1},
+		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,20,-2,-2,-2,-2,-2,-2,-2,-2},
 		        {7,7,7,-2,-2,-2,-2,-2,-2,-2,-2,-2,7,-2,-2,-2,-2,-2,7,-2},
 		        {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,21,-1,-1,-1,-1,-1},
 		        {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,22,-1,-1,-1,-1},
@@ -51,7 +48,7 @@ public class Main {
 				{AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,ASZ,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2},
 				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS2,AS2,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
 				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS2,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
-				{null,null,null,null,null,null,null,null,null,null,null,AS2,null,null,null,null,null,null,null,null},
+				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS2,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
 				{AS2,AS2,AS2,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS2,AS3,AS3,AS3,AS3,AS3,AS2,AS3},
 				{null,null,null,null,null,null,null,null,null,null,null,null,null,null,AS2,null,null,null,null,null},
 				{null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,AS2,null,null,null,null},
@@ -74,10 +71,17 @@ public class Main {
 		
 		ErrorHandler e_h = new ErrorHandler();
         AnalizadorLexico a_lex = new AnalizadorLexico("palabras_predefinidas.txt", matrizTransicionEstados, matrizAS, e_h);
-        AnalizadorSintactico a_sint = new AnalizadorSintactico(a_lex);
-        a_sint.consumirTokens("testcases.txt");
+        //AnalizadorSintactico a_sint = new AnalizadorSintactico(a_lex);
+        a_lex.setPrograma("testcases.txt");
+        Parser newParser = new Parser(a_lex);
+        newParser.run();
+        for (String s: a_lex.erroresLex) {
+        	System.out.println(s);
+        }
+        for (String s: newParser.erroresSint) {
+        	System.out.println(s);
+        }
         System.out.println("termino");
-        
 		
 	}
 
