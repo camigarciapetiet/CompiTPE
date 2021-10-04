@@ -3,7 +3,7 @@ package compiTPE;
 import java.util.*;
 %}
 
-%token ID CTE CADENA IF THEN ELSE ENDIF PRINT FUNC RETURN BEGIN END BREAK INT SINGLE REPEAT PRE ':=' '||' '&&' '<>' '==' '<=' '>='
+%token ID CTE CADENA IF THEN ELSE ENDIF PRINT FUNC RETURN BEGIN END BREAK INT SINGLE REPEAT PRE TYPEDEF ':=' '||' '&&' '<>' '==' '<=' '>='
 %start programa
 
 %left '||'
@@ -12,7 +12,8 @@ import java.util.*;
 
 %%
 
-programa: ID bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable END ';'
+programa	: ID bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable END ';'
+			| error ';'
 ;
 
 
@@ -22,15 +23,24 @@ bloque_sentencias_declarativas	: sentencia_declarativa
 ;
 
 sentencia_declarativa	: declaracionDatos
+						| declaracionNuevoTipo
 						| declaracionFuncion
 ;
 
 declaracionDatos : tipo factor ','
+				 | ID factor ';' //Tema particular 23
 				 | tipo factor {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de factor");}	
+;
+
+declaracionNuevoTipo	: TYPEDEF ID '=' encabezado_funcion ';'
+;
+
+encabezado_funcion	: tipo FUNC '('tipo')'
 ;
 
 declaracionFuncion	: tipo FUNC ID parametro sentencias_declarativas_datos BEGIN conjunto_sentencia_ejecutable RETURN retorno ';' END ';'
 					| tipo FUNC ID parametro sentencias_declarativas_datos BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END ';'
+					| error ';'
 ;
 
 pre_condicion	: PRE '('condicion')' ',' CADENA
@@ -75,6 +85,7 @@ sentencia_ejecutable	: asignacion
 
 asignacion: ID ':=' expresioncompuesta ';'
 		  | ID expresioncompuesta ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID");}
+		  | error ';'
 ;
 
 expresioncompuesta	: '('expresion')'
