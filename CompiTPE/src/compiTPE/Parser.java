@@ -489,7 +489,7 @@ final static String yyrule[] = {
 "condicion_repeat : ID operador_logico CTE",
 };
 
-//#line 154 "gramatica.y"
+//#line 155 "gramatica.y"
 	public AnalizadorLexico analizadorLexico;
 	public List<String> erroresSint;
 	
@@ -552,7 +552,7 @@ boolean doaction;
       if (yydebug) debug("yyn:"+yyn+"  state:"+yystate+"  yychar:"+yychar);
       if (yychar < 0)      //we want a char?
         {
-        yychar = yylex();  //get next token
+        yychar = analizadorLexico.yylex(yylval);  //get next token
         if (yydebug) debug(" next yychar:"+yychar);
         //#### ERROR CHECK ####
         if (yychar < 0)    //it it didn't work/error
@@ -657,99 +657,152 @@ boolean doaction;
     switch(yyn)
       {
 //########## USER-SUPPLIED ACTIONS ##########
+case 8:
+//#line 30 "gramatica.y"
+{System.out.println("Declaracion de datos");}
+break;
+case 9:
+//#line 31 "gramatica.y"
+{System.out.println("Declaracion de datos");}
+break;
 case 10:
 //#line 32 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de factor");}
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de factor");
+				 				System.out.println("Declaracion de datos");}
+break;
+case 11:
+//#line 36 "gramatica.y"
+{System.out.println("Declaracion TYPEDEF");}
+break;
+case 16:
+//#line 47 "gramatica.y"
+{System.out.println("pre-condicion");}
 break;
 case 17:
-//#line 47 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion");}
+//#line 48 "gramatica.y"
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("pre-condicion");}
 break;
 case 18:
-//#line 48 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada entre '(' ')'");}
+//#line 49 "gramatica.y"
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada entre '(' ')'"); System.out.println("pre-condicion");}
 break;
 case 19:
-//#line 49 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion");}
+//#line 50 "gramatica.y"
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); System.out.println("pre-condicion");}
 break;
 case 20:
-//#line 50 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de ')'");}
+//#line 51 "gramatica.y"
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de ')'"); System.out.println("pre-condicion");}
 break;
 case 21:
-//#line 51 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada despues de ','");}
+//#line 52 "gramatica.y"
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada despues de ','"); System.out.println("pre-condicion");}
 break;
 case 23:
-//#line 55 "gramatica.y"
+//#line 56 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de tipo");}
 break;
 case 24:
-//#line 56 "gramatica.y"
+//#line 57 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": tipo esperado despues de '('");}
 break;
 case 25:
-//#line 57 "gramatica.y"
+//#line 58 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ID esperado despues de tipo");}
 break;
 case 26:
-//#line 58 "gramatica.y"
+//#line 59 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": tipo e ID esperados entre '(' ')'");}
 break;
 case 27:
-//#line 59 "gramatica.y"
+//#line 60 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de ID");}
 break;
 case 29:
-//#line 63 "gramatica.y"
+//#line 64 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de expresion");}
 break;
 case 30:
-//#line 64 "gramatica.y"
+//#line 65 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": expresion esperada entre '(' ')'");}
 break;
 case 31:
-//#line 65 "gramatica.y"
+//#line 66 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de expresion");}
 break;
-case 43:
+case 35:
+//#line 74 "gramatica.y"
+{System.out.println("bloque de sentencias BEGIN-END");}
+break;
+case 42:
 //#line 87 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID");}
+{System.out.println("Asignacion");}
+break;
+case 43:
+//#line 88 "gramatica.y"
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); {System.out.println("Asignacion");}}
 break;
 case 47:
-//#line 93 "gramatica.y"
+//#line 94 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de expresion");}
 break;
 case 48:
-//#line 94 "gramatica.y"
+//#line 95 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de expresion");}
 break;
-case 62:
+case 55:
+//#line 108 "gramatica.y"
+{System.out.println("factor ID");}
+break;
+case 56:
+//#line 109 "gramatica.y"
+{System.out.println("Factor CTE");}
+break;
+case 59:
+//#line 114 "gramatica.y"
+{System.out.println("tipo INT");}
+break;
+case 60:
+//#line 115 "gramatica.y"
+{System.out.println("tipo SINGLE");}
+break;
+case 61:
 //#line 118 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion");}
+{System.out.println("clausula IF");}
+break;
+case 62:
+//#line 119 "gramatica.y"
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("clausula IF");}
 break;
 case 63:
-//#line 119 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion");}
+//#line 120 "gramatica.y"
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); System.out.println("clausula IF");}
+break;
+case 64:
+//#line 121 "gramatica.y"
+{System.out.println("clausula IF-ELSE");}
 break;
 case 65:
-//#line 121 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion");}
+//#line 122 "gramatica.y"
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("clausula IF-ELSE");}
 break;
 case 66:
-//#line 122 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion");}
+//#line 123 "gramatica.y"
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion");System.out.println("clausula IF-ELSE");}
+break;
+case 77:
+//#line 141 "gramatica.y"
+{System.out.println("clausula PRINT");}
 break;
 case 78:
-//#line 141 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de cadena");}
+//#line 142 "gramatica.y"
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de cadena"); System.out.println("clausula PRINT");}
 break;
 case 79:
-//#line 142 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de cadena");}
+//#line 143 "gramatica.y"
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de cadena"); System.out.println("clausula PRINT");}
 break;
-//#line 676 "Parser.java"
+//#line 729 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####
@@ -766,7 +819,7 @@ break;
       val_push(yyval);           //also save the semantic value of parsing
       if (yychar < 0)            //we want another character?
         {
-        yychar = yylex();        //get next character
+        yychar = analizadorLexico.yylex(yylval);        //get next character
         if (yychar<0) yychar=0;  //clean, if necessary
         if (yydebug)
           yylexdebug(yystate,yychar);

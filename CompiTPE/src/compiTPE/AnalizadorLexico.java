@@ -107,7 +107,6 @@ public class AnalizadorLexico {
 		if (!this.programa.isEmpty()) {
 			while ((!eot.bool) && (!this.programa.isEmpty())) {
 				ch = this.programa.charAt(0);
-				System.out.println(ch);
 				index_simbolo = this.convertirSimbolo(ch);
 				as = this.matrizAccionSemantica[estado_actual][index_simbolo];
 				if (as != null) {
@@ -126,23 +125,28 @@ public class AnalizadorLexico {
 				else {
 					if (tipo_token.valor == 1) { //es una palabra predefinida
 						yylval.sval = null; ///set(null);
+						System.out.println("Palabra predefinida "+token_actual.valor);
 						return this.getCodigoPP(token_actual.valor); //nll
 					}
 					else if (tipo_token.valor == 2) { //es un IDENTIFICADOR
 						yylval.sval = token_actual.valor;
+						System.out.println("Identificador "+token_actual.valor);
 						return this.codigoIdentificador;//(token_actual.valor
 					}
 					else if (tipo_token.valor == 3) { //es una CTE
 						yylval.sval = token_actual.valor;
+						System.out.println("Constante "+token_actual.valor);
 						return this.codigoCTE;//token_actual.valor
 					}
 					else if (tipo_token.valor == 4) { //hay que devolver codigo ascii
 						int ch_retorno = (int) token_actual.valor.charAt(0);
 						yylval.sval = null;
+						System.out.println(token_actual.valor.charAt(0));
 						return ch_retorno;
 					}		
 					else if (tipo_token.valor == 5) {
 						yylval.sval = token_actual.valor;
+						System.out.println("Cadena "+token_actual.valor);
 						return this.codigoCADENA; //token_actual.valor
 					}
 				}

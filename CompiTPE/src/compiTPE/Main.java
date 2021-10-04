@@ -81,6 +81,10 @@ public class Main {
         for (String s: newParser.erroresSint) {
         	System.out.println(s);
         }
+        System.out.println("\nTABLA DE SIMBOLOS");
+        System.out.println(a_lex.tabla_simbolos);
+        System.out.println("\nPalabras Predefinidas");
+        System.out.println(a_lex.palabras_predefinidas);
         System.out.println("termino");
 		
 	}

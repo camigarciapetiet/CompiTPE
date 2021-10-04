@@ -11,7 +11,7 @@ public class AS3 extends accionSemantica {
 			tipo_token.valor = 1;
 		}
 		else {
-			if (cadena.valor.length() < 22) {
+			if (cadena.valor.length() > 22) {
 				analizadorLexico.erroresLex.add("Warning en la linea "+ analizadorLexico.contadorLineas + ": identificador fuera de rango.");
 			}
 			tipo_token.valor = 2;

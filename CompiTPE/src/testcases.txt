@@ -1,4 +1,15 @@
 programa
 INT x,
-x := 5;
+INT y,
+SINGLE diseno_de_compiladores_1,
+single _diseno2,                         //pponer en el informe//
+BEGIN
+x := 32767;  //constante dentro del rango//
+y := 32768; //constante fuera de rango//
+
+
+PRINT(%Cadena bien escrita%);
+PRINT(%Cadena mal 
+escrita%); 
+//comentario mal escrito/
 END;
