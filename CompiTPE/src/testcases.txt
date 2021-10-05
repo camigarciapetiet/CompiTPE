@@ -15,6 +15,7 @@ INT y,
 INT z,
 
 BEGIN
+
 	PRE: ( var < 1000 ), %hola% 
 	x := 32767;  //constante dentro del rango//
 	y := 32768; //constante fuera de rango//
