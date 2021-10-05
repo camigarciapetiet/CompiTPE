@@ -44,12 +44,12 @@ declaracionFuncion	: tipo FUNC ID parametro sentencias_declarativas_datos BEGIN 
 					| error ';'
 ;
 
-pre_condicion	: PRE '('condicion')' ',' CADENA {System.out.println("pre-condicion");}
-				| PRE condicion')' ',' CADENA {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("pre-condicion");}
-				| PRE '('')' ',' CADENA {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada entre '(' ')'"); System.out.println("pre-condicion");}
-				| PRE '('condicion ',' CADENA {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); System.out.println("pre-condicion");}
-				| PRE '('condicion')'  CADENA {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de ')'"); System.out.println("pre-condicion");}
-				| PRE '('condicion')' ',' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada despues de ','"); System.out.println("pre-condicion");}
+pre_condicion	: PRE ':' '('condicion')' ',' CADENA {System.out.println("pre-condicion");}
+				| PRE ':' condicion')' ',' CADENA {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("pre-condicion");}
+				| PRE ':' '('')' ',' CADENA {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada entre '(' ')'"); System.out.println("pre-condicion");}
+				| PRE ':' '('condicion ',' CADENA {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); System.out.println("pre-condicion");}
+				| PRE ':' '('condicion')'  CADENA {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de ')'"); System.out.println("pre-condicion");}
+				| PRE ':' '('condicion')' ',' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada despues de ','"); System.out.println("pre-condicion");}
 ;
 
 parametro	: '('tipo ID')'
@@ -86,7 +86,7 @@ sentencia_ejecutable	: asignacion
 
 asignacion: ID ':=' expresioncompuesta ';' {System.out.println("Asignacion");}
 		  | ID expresioncompuesta ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); {System.out.println("Asignacion");}}
-		  | error ';'
+		  
 ;
 
 expresioncompuesta	: '('expresion')'

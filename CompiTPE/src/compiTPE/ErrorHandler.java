@@ -2,13 +2,14 @@ package compiTPE;
 
 public class ErrorHandler {
 	public void handle(AnalizadorLexico analizadorLexico, BooleanHolder eot, IntHolder tipo_token, StringHolder token_actual, char ch) { //Solo sirve para nuestro automata
-		if (token_actual.valor == ":") { //El automata estaba en el estado 10, cuya unica salida es el simbolo =
+		/*if (token_actual.valor == ":") { //El automata estaba en el estado 10, cuya unica salida es el simbolo =
 			eot.bool = true;
 			token_actual.valor += "=";
 			tipo_token.valor = 1;
 			analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '=' esperado despues de ':'");
 		}
-		else if (token_actual.valor == "&") { //El automata estaba en el estado 8, cuya unica salida es el simbolo &
+		else */
+		if (token_actual.valor == "&") { //El automata estaba en el estado 8, cuya unica salida es el simbolo &
 			eot.bool = true;
 			token_actual.valor += "&";
 			tipo_token.valor = 1;
