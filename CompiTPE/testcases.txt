@@ -1,5 +1,30 @@
 programa
-INT x,
+INT diseno,
+SINGLE aux,
+TYPEDEF m = INT FUNC (INT);
+
+INT FUNC funcion1 (INT diseno)
+	INT auxiliarfuncion,
+	INT auxiliarfuncion2,
+	BEGIN
+	PRE: (diseno<2), %diseno menor a 2%;
+		auxiliarfuncion := 2;
+		RETURN (diseno+2);
+	END;
+
 BEGIN
-x := 5;
+diseno := 10;
+aux := 3.2S+10;
+PRINT(%Cadena bien escrita%);
+
+REPEAT (diseno = 0; diseno < 5; 1)
+	BEGIN
+		PRINT(%YAC Yet Another Chain%);
+		BREAK;
+	END;
+	
+IF (diseno < 5) THEN
+	BEGIN
+		PRINT(%YAC%);
+	END ;
 END;
