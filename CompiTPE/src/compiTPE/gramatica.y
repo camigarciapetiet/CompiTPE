@@ -12,7 +12,7 @@ import java.util.*;
 
 %%
 
-programa	: ID bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable END ';'
+programa	: ID bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable END ';' {System.out.println("Sentencia START programa");}
 			| error ';'
 ;
 
@@ -29,8 +29,7 @@ sentencia_declarativa	: declaracionDatos
 
 declaracionDatos : tipo factor ',' {System.out.println("Declaracion de datos");}
 				 | ID factor ';' {System.out.println("Declaracion de datos");} //Tema particular 23
-				 | tipo factor {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de factor");
-				 				System.out.println("Declaracion de datos");}	
+				 | tipo factor {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de factor");}
 ;
 
 declaracionNuevoTipo	: TYPEDEF ID '=' encabezado_funcion ';' {System.out.println("Declaracion TYPEDEF");}
@@ -39,17 +38,17 @@ declaracionNuevoTipo	: TYPEDEF ID '=' encabezado_funcion ';' {System.out.println
 encabezado_funcion	: tipo FUNC '('tipo')'
 ;
 
-declaracionFuncion	: tipo FUNC ID parametro sentencias_declarativas_datos BEGIN conjunto_sentencia_ejecutable RETURN retorno ';' END ';'
-					| tipo FUNC ID parametro sentencias_declarativas_datos BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END ';'
+declaracionFuncion	: tipo FUNC ID parametro sentencias_declarativas_datos BEGIN conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {System.out.println("DECLARACION FUNCION");}
+					| tipo FUNC ID parametro sentencias_declarativas_datos BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {System.out.println("DECLARACION FUNCION Y PRE CONDICION");}
 					| error ';'
 ;
 
-pre_condicion	: PRE ':' '('condicion')' ',' CADENA {System.out.println("pre-condicion");}
-				| PRE ':' condicion')' ',' CADENA {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("pre-condicion");}
-				| PRE ':' '('')' ',' CADENA {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada entre '(' ')'"); System.out.println("pre-condicion");}
-				| PRE ':' '('condicion ',' CADENA {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); System.out.println("pre-condicion");}
-				| PRE ':' '('condicion')'  CADENA {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de ')'"); System.out.println("pre-condicion");}
-				| PRE ':' '('condicion')' ',' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada despues de ','"); System.out.println("pre-condicion");}
+pre_condicion	: PRE ':' '('condicion')' ',' CADENA ';' {System.out.println("pre-condicion");}
+				| PRE ':' condicion')' ',' CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("pre-condicion");}
+				| PRE ':' '('')' ',' CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada entre '(' ')'"); System.out.println("pre-condicion");}
+				| PRE ':' '('condicion ',' CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); System.out.println("pre-condicion");}
+				| PRE ':' '('condicion')'  CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de ')'"); System.out.println("pre-condicion");}
+				| PRE ':' '('condicion')' ',' ';'{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada despues de ','"); System.out.println("pre-condicion");}
 ;
 
 parametro	: '('tipo ID')'
@@ -143,12 +142,12 @@ mensaje_pantalla	: PRINT '(' CADENA ')' ';' {System.out.println("clausula PRINT"
 					| PRINT '(' CADENA  ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de cadena"); System.out.println("clausula PRINT");}
 ;
 	
-sentencia_control_repeat	: REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' bloque_sentencias_ejecutables  //{chequeo semantico}
-							| REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' BEGIN conjunto_sentencia_ejecutable BREAK';' END ';' //{chequeo semantico}
+sentencia_control_repeat	: REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' bloque_sentencias_ejecutables  {System.out.println("Sentencia Ejecutable REPEAT - Chequeo Semantico");}
+							| REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' BEGIN conjunto_sentencia_ejecutable BREAK';' END ';'  {System.out.println("Sentencia Ejecutable REPEAT - Chequeo Semantico");}
 ;		
 
-condicion_repeat	: ID operador_logico ID
-					| ID operador_logico CTE
+condicion_repeat	: ID operador_logico ID {System.out.println("Condicion_Repeat");}
+					| ID operador_logico CTE {System.out.println("Condicion_Repeat");}
 ;
 
 %%

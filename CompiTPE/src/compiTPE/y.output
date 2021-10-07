@@ -22,12 +22,12 @@
   14                     | tipo FUNC ID parametro sentencias_declarativas_datos BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END ';'
   15                     | error ';'
 
-  16  pre_condicion : PRE ':' '(' condicion ')' ',' CADENA
-  17                | PRE ':' condicion ')' ',' CADENA
-  18                | PRE ':' '(' ')' ',' CADENA
-  19                | PRE ':' '(' condicion ',' CADENA
-  20                | PRE ':' '(' condicion ')' CADENA
-  21                | PRE ':' '(' condicion ')' ','
+  16  pre_condicion : PRE ':' '(' condicion ')' ',' CADENA ';'
+  17                | PRE ':' condicion ')' ',' CADENA ';'
+  18                | PRE ':' '(' ')' ',' CADENA ';'
+  19                | PRE ':' '(' condicion ',' CADENA ';'
+  20                | PRE ':' '(' condicion ')' CADENA ';'
+  21                | PRE ':' '(' condicion ')' ',' ';'
 
   22  parametro : '(' tipo ID ')'
   23            | tipo ID ')'
@@ -1340,12 +1340,12 @@ state 125
 
 
 state 126
-	pre_condicion : PRE . ':' '(' condicion ')' ',' CADENA  (16)
-	pre_condicion : PRE . ':' condicion ')' ',' CADENA  (17)
-	pre_condicion : PRE . ':' '(' ')' ',' CADENA  (18)
-	pre_condicion : PRE . ':' '(' condicion ',' CADENA  (19)
-	pre_condicion : PRE . ':' '(' condicion ')' CADENA  (20)
-	pre_condicion : PRE . ':' '(' condicion ')' ','  (21)
+	pre_condicion : PRE . ':' '(' condicion ')' ',' CADENA ';'  (16)
+	pre_condicion : PRE . ':' condicion ')' ',' CADENA ';'  (17)
+	pre_condicion : PRE . ':' '(' ')' ',' CADENA ';'  (18)
+	pre_condicion : PRE . ':' '(' condicion ',' CADENA ';'  (19)
+	pre_condicion : PRE . ':' '(' condicion ')' CADENA ';'  (20)
+	pre_condicion : PRE . ':' '(' condicion ')' ',' ';'  (21)
 
 	':'  shift 137
 	.  error
@@ -1478,12 +1478,12 @@ state 136
 
 
 state 137
-	pre_condicion : PRE ':' . '(' condicion ')' ',' CADENA  (16)
-	pre_condicion : PRE ':' . condicion ')' ',' CADENA  (17)
-	pre_condicion : PRE ':' . '(' ')' ',' CADENA  (18)
-	pre_condicion : PRE ':' . '(' condicion ',' CADENA  (19)
-	pre_condicion : PRE ':' . '(' condicion ')' CADENA  (20)
-	pre_condicion : PRE ':' . '(' condicion ')' ','  (21)
+	pre_condicion : PRE ':' . '(' condicion ')' ',' CADENA ';'  (16)
+	pre_condicion : PRE ':' . condicion ')' ',' CADENA ';'  (17)
+	pre_condicion : PRE ':' . '(' ')' ',' CADENA ';'  (18)
+	pre_condicion : PRE ':' . '(' condicion ',' CADENA ';'  (19)
+	pre_condicion : PRE ':' . '(' condicion ')' CADENA ';'  (20)
+	pre_condicion : PRE ':' . '(' condicion ')' ',' ';'  (21)
 
 	ID  shift 17
 	CTE  shift 18
@@ -1600,11 +1600,11 @@ state 146
 
 
 state 147
-	pre_condicion : PRE ':' '(' . condicion ')' ',' CADENA  (16)
-	pre_condicion : PRE ':' '(' . ')' ',' CADENA  (18)
-	pre_condicion : PRE ':' '(' . condicion ',' CADENA  (19)
-	pre_condicion : PRE ':' '(' . condicion ')' CADENA  (20)
-	pre_condicion : PRE ':' '(' . condicion ')' ','  (21)
+	pre_condicion : PRE ':' '(' . condicion ')' ',' CADENA ';'  (16)
+	pre_condicion : PRE ':' '(' . ')' ',' CADENA ';'  (18)
+	pre_condicion : PRE ':' '(' . condicion ',' CADENA ';'  (19)
+	pre_condicion : PRE ':' '(' . condicion ')' CADENA ';'  (20)
+	pre_condicion : PRE ':' '(' . condicion ')' ',' ';'  (21)
 
 	ID  shift 17
 	CTE  shift 18
@@ -1619,7 +1619,7 @@ state 147
 
 
 state 148
-	pre_condicion : PRE ':' condicion . ')' ',' CADENA  (17)
+	pre_condicion : PRE ':' condicion . ')' ',' CADENA ';'  (17)
 	condicion : condicion . operador_logico expresion  (67)
 
 	"||"  shift 74
@@ -1724,17 +1724,17 @@ state 157
 
 
 state 158
-	pre_condicion : PRE ':' '(' ')' . ',' CADENA  (18)
+	pre_condicion : PRE ':' '(' ')' . ',' CADENA ';'  (18)
 
 	','  shift 172
 	.  error
 
 
 state 159
-	pre_condicion : PRE ':' '(' condicion . ')' ',' CADENA  (16)
-	pre_condicion : PRE ':' '(' condicion . ',' CADENA  (19)
-	pre_condicion : PRE ':' '(' condicion . ')' CADENA  (20)
-	pre_condicion : PRE ':' '(' condicion . ')' ','  (21)
+	pre_condicion : PRE ':' '(' condicion . ')' ',' CADENA ';'  (16)
+	pre_condicion : PRE ':' '(' condicion . ',' CADENA ';'  (19)
+	pre_condicion : PRE ':' '(' condicion . ')' CADENA ';'  (20)
+	pre_condicion : PRE ':' '(' condicion . ')' ',' ';'  (21)
 	condicion : condicion . operador_logico expresion  (67)
 
 	"||"  shift 74
@@ -1753,7 +1753,7 @@ state 159
 
 
 state 160
-	pre_condicion : PRE ':' condicion ')' . ',' CADENA  (17)
+	pre_condicion : PRE ':' condicion ')' . ',' CADENA ';'  (17)
 
 	','  shift 175
 	.  error
@@ -1837,23 +1837,23 @@ state 171
 
 
 state 172
-	pre_condicion : PRE ':' '(' ')' ',' . CADENA  (18)
+	pre_condicion : PRE ':' '(' ')' ',' . CADENA ';'  (18)
 
 	CADENA  shift 181
 	.  error
 
 
 state 173
-	pre_condicion : PRE ':' '(' condicion ',' . CADENA  (19)
+	pre_condicion : PRE ':' '(' condicion ',' . CADENA ';'  (19)
 
 	CADENA  shift 182
 	.  error
 
 
 state 174
-	pre_condicion : PRE ':' '(' condicion ')' . ',' CADENA  (16)
-	pre_condicion : PRE ':' '(' condicion ')' . CADENA  (20)
-	pre_condicion : PRE ':' '(' condicion ')' . ','  (21)
+	pre_condicion : PRE ':' '(' condicion ')' . ',' CADENA ';'  (16)
+	pre_condicion : PRE ':' '(' condicion ')' . CADENA ';'  (20)
+	pre_condicion : PRE ':' '(' condicion ')' . ',' ';'  (21)
 
 	CADENA  shift 183
 	','  shift 184
@@ -1861,7 +1861,7 @@ state 174
 
 
 state 175
-	pre_condicion : PRE ':' condicion ')' ',' . CADENA  (17)
+	pre_condicion : PRE ':' condicion ')' ',' . CADENA ';'  (17)
 
 	CADENA  shift 185
 	.  error
@@ -1913,38 +1913,40 @@ state 180
 
 
 state 181
-	pre_condicion : PRE ':' '(' ')' ',' CADENA .  (18)
+	pre_condicion : PRE ':' '(' ')' ',' CADENA . ';'  (18)
 
-	.  reduce 18
+	';'  shift 190
+	.  error
 
 
 state 182
-	pre_condicion : PRE ':' '(' condicion ',' CADENA .  (19)
+	pre_condicion : PRE ':' '(' condicion ',' CADENA . ';'  (19)
 
-	.  reduce 19
+	';'  shift 191
+	.  error
 
 
 state 183
-	pre_condicion : PRE ':' '(' condicion ')' CADENA .  (20)
+	pre_condicion : PRE ':' '(' condicion ')' CADENA . ';'  (20)
 
-	.  reduce 20
+	';'  shift 192
+	.  error
 
 
 state 184
-	pre_condicion : PRE ':' '(' condicion ')' ',' . CADENA  (16)
-	pre_condicion : PRE ':' '(' condicion ')' ',' .  (21)
+	pre_condicion : PRE ':' '(' condicion ')' ',' . CADENA ';'  (16)
+	pre_condicion : PRE ':' '(' condicion ')' ',' . ';'  (21)
 
-	CADENA  shift 190
-	ID  reduce 21
-	IF  reduce 21
-	PRINT  reduce 21
-	REPEAT  reduce 21
+	CADENA  shift 193
+	';'  shift 194
+	.  error
 
 
 state 185
-	pre_condicion : PRE ':' condicion ')' ',' CADENA .  (17)
+	pre_condicion : PRE ':' condicion ')' ',' CADENA . ';'  (17)
 
-	.  reduce 17
+	';'  shift 195
+	.  error
 
 
 state 186
@@ -1956,7 +1958,7 @@ state 186
 state 187
 	declaracionFuncion : tipo FUNC ID parametro sentencias_declarativas_datos BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END . ';'  (14)
 
-	';'  shift 191
+	';'  shift 196
 	.  error
 
 
@@ -1970,7 +1972,7 @@ state 188
 	REPEAT  shift 33
 	.  error
 
-	conjunto_sentencia_ejecutable  goto 192
+	conjunto_sentencia_ejecutable  goto 197
 	sentencia_ejecutable  goto 35
 	asignacion  goto 36
 	mensaje_pantalla  goto 37
@@ -1985,18 +1987,49 @@ state 189
 
 
 state 190
-	pre_condicion : PRE ':' '(' condicion ')' ',' CADENA .  (16)
+	pre_condicion : PRE ':' '(' ')' ',' CADENA ';' .  (18)
 
-	.  reduce 16
+	.  reduce 18
 
 
 state 191
+	pre_condicion : PRE ':' '(' condicion ',' CADENA ';' .  (19)
+
+	.  reduce 19
+
+
+state 192
+	pre_condicion : PRE ':' '(' condicion ')' CADENA ';' .  (20)
+
+	.  reduce 20
+
+
+state 193
+	pre_condicion : PRE ':' '(' condicion ')' ',' CADENA . ';'  (16)
+
+	';'  shift 198
+	.  error
+
+
+state 194
+	pre_condicion : PRE ':' '(' condicion ')' ',' ';' .  (21)
+
+	.  reduce 21
+
+
+state 195
+	pre_condicion : PRE ':' condicion ')' ',' CADENA ';' .  (17)
+
+	.  reduce 17
+
+
+state 196
 	declaracionFuncion : tipo FUNC ID parametro sentencias_declarativas_datos BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END ';' .  (14)
 
 	.  reduce 14
 
 
-state 192
+state 197
 	bloque_sentencias_ejecutables : BEGIN conjunto_sentencia_ejecutable . END  (35)
 	conjunto_sentencia_ejecutable : conjunto_sentencia_ejecutable . sentencia_ejecutable  (37)
 	sentencia_control_repeat : REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' BEGIN conjunto_sentencia_ejecutable . BREAK ';' END ';'  (80)
@@ -2005,7 +2038,7 @@ state 192
 	IF  shift 31
 	PRINT  shift 32
 	END  shift 140
-	BREAK  shift 193
+	BREAK  shift 199
 	REPEAT  shift 33
 	.  error
 
@@ -2016,32 +2049,38 @@ state 192
 	sentencia_control_repeat  goto 39
 
 
-state 193
+state 198
+	pre_condicion : PRE ':' '(' condicion ')' ',' CADENA ';' .  (16)
+
+	.  reduce 16
+
+
+state 199
 	sentencia_control_repeat : REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' BEGIN conjunto_sentencia_ejecutable BREAK . ';' END ';'  (80)
 
-	';'  shift 194
+	';'  shift 200
 	.  error
 
 
-state 194
+state 200
 	sentencia_control_repeat : REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' BEGIN conjunto_sentencia_ejecutable BREAK ';' . END ';'  (80)
 
-	END  shift 195
+	END  shift 201
 	.  error
 
 
-state 195
+state 201
 	sentencia_control_repeat : REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' BEGIN conjunto_sentencia_ejecutable BREAK ';' END . ';'  (80)
 
-	';'  shift 196
+	';'  shift 202
 	.  error
 
 
-state 196
+state 202
 	sentencia_control_repeat : REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' BEGIN conjunto_sentencia_ejecutable BREAK ';' END ';' .  (80)
 
 	.  reduce 80
 
 
 39 terminals, 27 nonterminals
-83 grammar rules, 197 states
+83 grammar rules, 203 states

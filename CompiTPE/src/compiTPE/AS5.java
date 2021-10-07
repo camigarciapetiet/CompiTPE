@@ -32,6 +32,7 @@ public class AS5 extends accionSemantica {
 		}else if(valor<lim3 || valor>lim4) {
 			if(valor<lim1 || valor>lim2) {
 				if(valor!=0) {
+
 					analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": constante fuera de rango");					
 				}
 			}

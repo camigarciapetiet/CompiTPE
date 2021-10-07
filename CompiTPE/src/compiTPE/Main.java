@@ -74,9 +74,11 @@ public class Main {
         a_lex.setPrograma("testcases.txt");
         Parser newParser = new Parser(a_lex);
         newParser.run();
+        System.out.println("\nERRORES LEXICOS");
         for (String s: a_lex.erroresLex) {
         	System.out.println(s);
         }
+        System.out.println("\nERRORES SINTACTICOS");
         for (String s: newParser.erroresSint) {
         	System.out.println(s);
         }
