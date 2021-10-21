@@ -27,8 +27,8 @@ sentencia_declarativa	: declaracionDatos
 						| declaracionFuncion
 ;
 
-declaracionDatos : tipo conjunto_declaracion_variables ',' {System.out.println("Declaracion de datos");}
-				 | ID conjunto_declaracion_variables ',' {System.out.println("Declaracion de datos TYPEDEF");} //Tema particular 23
+declaracionDatos : tipo conjunto_declaracion_variables ';' {System.out.println("Declaracion de datos");}
+				 | ID conjunto_declaracion_variables ';' {System.out.println("Declaracion de datos TYPEDEF");} //Tema particular 23
 				 | tipo conjunto_declaracion_variables {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de factor");}
 ;
 
@@ -114,7 +114,7 @@ termino		: termino '/' factor
 
 factor		: ID {System.out.println("factor ID");}
 			| CTE {System.out.println("Factor CTE");}
-			| '-' CTE //{se hara una verificacion de rango en el analizador semantico ya que necesitamos sabes que tipo de CTE es (INT o SINGLE)}
+			| '-' CTE // {System.out.println("Constante negativa, se debe modificar la tabla de simbolos indicando el signo y rechequear limite}; {se hara una verificacion de rango en el analizador semantico ya que necesitamos sabes que tipo de CTE es (INT o SINGLE)}
 			| ID '('tipo ID')' //NO SE QUE ES
 ;
 
