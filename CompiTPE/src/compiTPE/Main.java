@@ -1,5 +1,8 @@
 package compiTPE;
 
+import java.io.File;
+import java.util.Scanner;
+
 public class Main {
 
 	public static void main(String[] args) {
@@ -70,23 +73,40 @@ public class Main {
 		};
 		
 		ErrorHandler e_h = new ErrorHandler();
-        AnalizadorLexico a_lex = new AnalizadorLexico("palabras_predefinidas.txt", matrizTransicionEstados, matrizAS, e_h);
-        a_lex.setPrograma("testcases.txt");
-        Parser newParser = new Parser(a_lex);
-        newParser.run();
-        System.out.println("\nERRORES LEXICOS");
-        for (String s: a_lex.erroresLex) {
-        	System.out.println(s);
-        }
-        System.out.println("\nERRORES SINTACTICOS");
-        for (String s: newParser.erroresSint) {
-        	System.out.println(s);
-        }
-        System.out.println("\nTABLA DE SIMBOLOS");
-        System.out.println(a_lex.tabla_simbolos);
-        System.out.println("\nPalabras Predefinidas");
-        System.out.println(a_lex.palabras_predefinidas);
-        System.out.println("termino");
+		System.out.println("Ingrese el nombre del programa (en formato txt) que quiera compilar:");
+		Scanner sc=new Scanner(System.in); 
+		String programa = sc.nextLine();
+		sc.close();
+		programa = programa + ".txt";
+		boolean program_exists = false;
+		String programtext = "";
+		try {
+			programtext = new Scanner(new File(programa)).useDelimiter("\\Z").next();
+			program_exists = true;
+		} catch (Exception e) {
+			System.out.println("No se encontro el archivo buscado");
+			program_exists = false;
+		}
+		if (program_exists) {
+			AnalizadorLexico a_lex = new AnalizadorLexico("palabras_predefinidas.txt", matrizTransicionEstados, matrizAS, e_h);
+	        a_lex.setPrograma(programtext);
+	        Parser newParser = new Parser(a_lex);
+	        newParser.run();
+	        System.out.println("\nERRORES LEXICOS");
+	        for (String s: a_lex.erroresLex) {
+	        	System.out.println(s);
+	        }
+	        System.out.println("\nERRORES SINTACTICOS");
+	        for (String s: newParser.erroresSint) {
+	        	System.out.println(s);
+	        }
+	        System.out.println("\nTABLA DE SIMBOLOS");
+	        System.out.println(a_lex.tabla_simbolos);
+	        System.out.println("\nPalabras Predefinidas");
+	        System.out.println(a_lex.palabras_predefinidas);
+	        System.out.println("termino");
+
+		}
 		
 	}
 

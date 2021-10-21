@@ -51,7 +51,8 @@ public class AnalizadorLexico {
 	}
 	
 	private int convertirSimbolo(char ch) {
-		if ((int) ch == 43) return 5; // +
+		if (Character.isDigit(ch)) return 2;
+		else if ((int) ch == 43) return 5; // +
 		else if ((int) ch == 46) return 3; // .
 		else if ((int) ch == 58) return 4; // :
 		else if ((int) ch == 45) return 6; // -
@@ -72,22 +73,15 @@ public class AnalizadorLexico {
 		else if ((int) ch == 32) return 16; // espacio
 		else if ((int) ch == 9) return 16; // tab
 		else if ((int) ch == 10) return 17; // ln
-		else if ((int) ch == 13) return 17; // SALTO DE CARRO = ln berreta
+		else if ((int) ch == 13) return 17; // SALTO DE CARRO = ln
 		else if (ch == 'S') return 18; // S
-		else if (Character.isDigit(ch)) return 2;
 		else if (Character.isUpperCase(ch)) return 1;
 		else if (Character.isLowerCase(ch)) return 0;
 		else return 19;
 	}
 	
-	@SuppressWarnings("resource")
-	public void setPrograma(String filename) { // filename = TXT con el programa a compilar
-		try {
-			this.programa = new Scanner(new File(filename)).useDelimiter("\\Z").next();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		this.programa = this.programa + " ";
+	public void setPrograma(String programa) { 
+		this.programa = programa + " ";
 	}
 	
 	public int getCodigoPP(String token) {
@@ -117,8 +111,7 @@ public class AnalizadorLexico {
 					if (this.matrizTransicionEstados[estado_actual][index_simbolo] == -1) {
 						this.error_handler.handle(this, eot, tipo_token, token_actual, ch);
 					}
-				}
-				
+				}				
 				if (!eot.bool) {
 					this.programa = this.programa.substring(1);
 				}

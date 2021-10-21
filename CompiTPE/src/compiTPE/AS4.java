@@ -12,7 +12,8 @@ public class AS4 extends accionSemantica {
 		// TODO Auto-generated method stub
 		eot.bool = true;
 		tipo_token.valor=3;
-		int aux= Integer.parseInt(cadena.valor);
+		
+		long aux= Long.parseLong(cadena.valor);
 		int limite_sup= (int) (Math.pow(2, 15)-1);
 		int limite_inf= (int) (-Math.pow(2, 15));
 		if (aux>limite_sup || aux<limite_inf) {

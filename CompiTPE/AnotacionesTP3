@@ -1,0 +1,30 @@
+Generacion de Codigo Intermedio:
+	Temas Particulares: 1 5 7 12 13 16 17 23
+ 	Tecnica asignada al Grupo 8: Arbol Sintactico
+ 	
+ 	
+ 	
+A cada Regla de la gramatica se le asignaran acciones a ejecutar para generar el codigo intermedio
+
+ Para SENTENCIAS EJECUTABLES
+ 	Lista de Reglas -> Arbol Sintactico -> Codigo Intermedio
+ 	
+ Para SENTENCIAS DECLARATIVAS
+ 	Lista de Reglas -> Tabla de Simbolos -> Codigo Intermedio
+ 	
+ Expresiones
+ 	ASIGNACIONES
+ 	SENTENCIAS DE CONTROL 
+ 		Lista de Reglas -> Arbol Sintactico
+ 		
+ 		
+chequeo de tipos
+
+
+- Incorporacion de informacion a la tabla de simbolos (tipo, uso y variable segun temas particulares)
+	- Tipo: Identificadores se registra en el analisis sintacatico a partir de las sentencias declarativas
+			CTES se registra en el analisis lexico	
+	- Uso: Si es una variable, funcion, tipo (typedef), parametro
+ 		
+Conversiones:
+	Tema 12: Prohibir operaciones (expresion, asignacion, comparacion, etc) entre operandos de diferentes tipos.
