@@ -8,31 +8,22 @@ public class Main {
 	public static void main(String[] args) {
 
 		int matrizTransicionEstados[][] = {
-		        {7,7,12,13,10,16,16,16,1,4,5,6,7,11,8,9,0,0,7,-1},
+		        {7,7,12,13,10,-2,-2,-2,1,4,5,6,7,11,8,9,0,0,7,-1},
 		        {-2,-2,-2,-2,-2,-2,-2,-2,2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},  //F=-2  error=-1
 		        {2,2,2,2,2,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2},
 		        {1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,18,17,-2,-2,-2,-2,-2,-2,-2,-2},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,19,-2,-2,-2,-2,-2,-2,-2,-2},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,20,-2,-2,-2,-2,-2,-2,-2,-2},
+		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
+		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
+		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
 		        {7,7,7,-2,-2,-2,-2,-2,-2,-2,-2,-2,7,-2,-2,-2,-2,-2,7,-2},
-		        {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,21,-1,-1,-1,-1,-1},
-		        {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,22,-1,-1,-1,-1},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,23,-2,-2,-2,-2,-2,-2,-2,-2},
-		        {11,11,11,11,11,11,11,11,11,11,11,11,11,24,11,11,11,-1,11,11},
+		        {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-2,-1,-1,-1,-1,-1},
+		        {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-2,-1,-1,-1,-1},
+		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
+		        {11,11,11,11,11,11,11,11,11,11,11,11,11,-2,11,11,11,-1,11,11},
 		        {-2,-2,12,13,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
 		        {-2,-2,13,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,14,-2},
 		        {-1,-1,15,-1,-1,15,15,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
-		        {-2,-2,15,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},
-		        {-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2}
+		        {-2,-2,15,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2}
 		    };
 		accionSemantica AS1= new AS1();
 		accionSemantica AS2= new AS2();
@@ -42,34 +33,29 @@ public class Main {
 		accionSemantica AS6= new AS6();
 		accionSemantica ASX= new ASX();
 		accionSemantica ASZ= new ASZ();
-		accionSemantica AS7 = new AS7();
+		accionSemantica AS7 = new AS7(); 
+		accionSemantica AS8 = new AS7();
+		accionSemantica AS9 = new AS7();
+		accionSemantica AS10 = new AS7();
+		accionSemantica ASXI = new AS7();
 		
 		accionSemantica matrizAS[][]= {
-				{AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,AS1,null,ASX,AS1,null},
+				{AS1,AS1,AS1,AS1,AS1,AS10,AS10,AS10,AS1,AS1,AS1,AS1,AS1,AS7,AS1,AS1,null,ASX,AS1,null},
 				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS2,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
-				{AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2},
+				{AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,ASXI,ASXI,AS2,AS2},
 				{AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,ASZ,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2},
-				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS2,AS2,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
-				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS2,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
-				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS2,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
+				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS9,AS9,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
+				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS9,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
+				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS9,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
 				{AS2,AS2,AS2,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS2,AS3,AS3,AS3,AS3,AS3,AS2,AS3},
-				{null,null,null,null,null,null,null,null,null,null,null,null,null,null,AS2,null,null,null,null,null},
-				{null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,AS2,null,null,null,null},
-				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS2,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
-				{AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,null,AS2,AS2},
+				{null,null,null,null,null,null,null,null,null,null,null,null,null,null,AS9,null,null,null,null,null},
+				{null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,AS9,null,null,null,null},
+				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS9,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
+				{AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS2,AS8,AS2,AS2,AS2,null,AS2,AS2},
 				{AS4,AS4,AS2,AS2,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4,AS4},
 				{AS5,AS5,AS2,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS2,AS5},
 				{null,null,AS2,null,null,AS2,AS2,null,null,null,null,null,null,null,null,null,null,null,null,null},
-				{AS5,AS5,AS2,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5},
-				{AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6,AS6},
-				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
-				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
-				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
-				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
-				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
-				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
-				{AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3,AS3},
-				{AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7,AS7}
+				{AS5,AS5,AS2,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5,AS5}
 		};
 		
 		ErrorHandler e_h = new ErrorHandler();
