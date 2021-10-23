@@ -34,10 +34,10 @@ public class Main {
 		accionSemantica ASX= new ASX();
 		accionSemantica ASZ= new ASZ();
 		accionSemantica AS7 = new AS7(); 
-		accionSemantica AS8 = new AS7();
-		accionSemantica AS9 = new AS7();
-		accionSemantica AS10 = new AS7();
-		accionSemantica ASXI = new AS7();
+		accionSemantica AS8 = new AS8();
+		accionSemantica AS9 = new AS9();
+		accionSemantica AS10 = new AS10();
+		accionSemantica ASXI = new ASXI();
 		
 		accionSemantica matrizAS[][]= {
 				{AS1,AS1,AS1,AS1,AS1,AS10,AS10,AS10,AS1,AS1,AS1,AS1,AS1,AS7,AS1,AS1,null,ASX,AS1,null},

@@ -24,6 +24,7 @@ public class AS5 extends accionSemantica {
 		if (valor == 0 && base != 0) {
 			analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": constante fuera de rango");
 			fuera_de_rango = true;
+			
 		}
 		double lim1= Math.pow(1.17549435, -38); // 1.17549435S-38
 		double lim2= Math.pow(3.40282347, 38);// 3.40282347S+38
@@ -46,6 +47,7 @@ public class AS5 extends accionSemantica {
 		if (fuera_de_rango) {
 			eot.bool = false;
 			cadena.resetValor();
+			analizadorLexico.estado_actual=0;
 		}
 		else {
 			Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();

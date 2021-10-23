@@ -24,6 +24,7 @@ public class AS4 extends accionSemantica {
 		if (fuera_de_rango) {
 			eot.bool = false;
 			cadena.resetValor();
+			analizadorLexico.estado_actual=0;
 		}
 		else {
 			Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();

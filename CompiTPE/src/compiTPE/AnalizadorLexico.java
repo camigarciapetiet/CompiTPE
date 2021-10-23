@@ -16,6 +16,7 @@ public class AnalizadorLexico {
 	public Map<String, HashMap<String, String>> tabla_simbolos;
 	public ErrorHandler error_handler;
 	public List<String> erroresLex;
+	public int estado_actual;
 	
 	public AnalizadorLexico(String filename, int matriztransicionestados[][], accionSemantica matrizaccionsemantica[][], ErrorHandler error_handler) { // filename = TXT con las palabras predefinidas
 		this.codigoIndex = 257;
@@ -48,6 +49,7 @@ public class AnalizadorLexico {
 		this.matrizTransicionEstados = matriztransicionestados;
 		this.error_handler = error_handler;
 		this.erroresLex= new ArrayList<String>();
+		this.estado_actual=0;
 	}
 	
 	private int convertirSimbolo(char ch) {
@@ -94,7 +96,7 @@ public class AnalizadorLexico {
 		accionSemantica as;
 		BooleanHolder eot = new BooleanHolder(false); //end of token
 		char ch;
-		int estado_actual = 0; // FILA de la matriz de transicion de estados y AS
+		estado_actual = 0; // FILA de la matriz de transicion de estados y AS
 		int index_simbolo; // COLUMNA de la matriz de transicion de estados y AS
 		IntHolder tipo_token = new IntHolder(); //esto se asigna en las AS asi que tambien se manda por parametro
 		
@@ -102,6 +104,7 @@ public class AnalizadorLexico {
 			while ((!eot.bool) && (!this.programa.isEmpty())) {
 				ch = this.programa.charAt(0);
 				index_simbolo = this.convertirSimbolo(ch);
+				//System.out.println("estado_actual: "+ estado_actual+" index_simbolo " + index_simbolo);
 				as = this.matrizAccionSemantica[estado_actual][index_simbolo];
 				if (as != null) {
 					estado_actual = this.matrizTransicionEstados[estado_actual][index_simbolo]; // Estado de la siguiente iteracion
@@ -137,7 +140,7 @@ public class AnalizadorLexico {
 						System.out.println(token_actual.valor.charAt(0));
 						return ch_retorno;
 					}		
-					else if (tipo_token.valor == 5) {
+					else if (tipo_token.valor == 5) { //es una cadena
 						yylval.sval = token_actual.valor;
 						System.out.println("Cadena "+token_actual.valor);
 						return this.codigoCADENA; //token_actual.valor
