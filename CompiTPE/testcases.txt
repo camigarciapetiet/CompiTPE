@@ -9,7 +9,7 @@ INT FUNC funcion1 (INT diseno)
 	INT auxiliarfuncion2;
 	BEGIN
 	PRE: (diseno<2), %diseno menor a 2%;
-		auxiliarfuncion := 313131; // CTE fuera de rango // 
+		auxiliarfuncion := 5; // CTE fuera de rango // 
 		RETURN (diseno+2);
 	END;
 
