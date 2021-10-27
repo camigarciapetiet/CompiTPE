@@ -488,7 +488,7 @@ final static String yyrule[] = {
 "condicion_repeat : ID operador_logico CTE",
 };
 
-//#line 164 "gramatica.y"
+//#line 163 "gramatica.y"
 	public AnalizadorLexico analizadorLexico;
 	public List<String> erroresSint;
 	
@@ -762,78 +762,78 @@ case 44:
 break;
 case 45:
 //#line 90 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); {System.out.println("Asignacion");}}
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); System.out.println("Asignacion");}
 break;
 case 48:
-//#line 96 "gramatica.y"
+//#line 95 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de expresion");}
 break;
 case 49:
-//#line 97 "gramatica.y"
+//#line 96 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de expresion");}
 break;
 case 59:
-//#line 113 "gramatica.y"
+//#line 112 "gramatica.y"
 {System.out.println("factor ID");}
 break;
 case 60:
-//#line 114 "gramatica.y"
+//#line 113 "gramatica.y"
 {System.out.println("Factor CTE");}
 break;
 case 62:
-//#line 119 "gramatica.y"
+//#line 118 "gramatica.y"
 {System.out.println("tipo INT");}
 break;
 case 63:
-//#line 120 "gramatica.y"
+//#line 119 "gramatica.y"
 {System.out.println("tipo SINGLE");}
 break;
 case 64:
-//#line 123 "gramatica.y"
+//#line 122 "gramatica.y"
 {System.out.println("clausula IF");}
 break;
 case 65:
-//#line 124 "gramatica.y"
+//#line 123 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("clausula IF");}
 break;
 case 66:
-//#line 125 "gramatica.y"
+//#line 124 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); System.out.println("clausula IF");}
 break;
 case 67:
-//#line 126 "gramatica.y"
+//#line 125 "gramatica.y"
 {System.out.println("clausula IF-ELSE");}
 break;
 case 68:
-//#line 127 "gramatica.y"
+//#line 126 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("clausula IF-ELSE");}
 break;
 case 69:
-//#line 128 "gramatica.y"
+//#line 127 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion");System.out.println("clausula IF-ELSE");}
 break;
 case 80:
-//#line 146 "gramatica.y"
+//#line 145 "gramatica.y"
 {System.out.println("clausula PRINT");}
 break;
 case 81:
-//#line 147 "gramatica.y"
+//#line 146 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de cadena"); System.out.println("clausula PRINT");}
 break;
 case 82:
-//#line 148 "gramatica.y"
+//#line 147 "gramatica.y"
 {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de cadena"); System.out.println("clausula PRINT");}
 break;
 case 83:
-//#line 151 "gramatica.y"
+//#line 150 "gramatica.y"
 {System.out.println("Sentencia Ejecutable REPEAT - Chequeo Semantico");}
 break;
 case 87:
-//#line 159 "gramatica.y"
+//#line 158 "gramatica.y"
 {System.out.println("Condicion_Repeat");}
 break;
 case 88:
-//#line 160 "gramatica.y"
+//#line 159 "gramatica.y"
 {System.out.println("Condicion_Repeat");}
 break;
 //#line 763 "Parser.java"

@@ -87,8 +87,7 @@ invocacion_funcion	: ID '(' factor ')' ';'
 ;
 
 asignacion: ID ':=' expresioncompuesta ';' {System.out.println("Asignacion");}
-		  | ID expresioncompuesta ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); {System.out.println("Asignacion");}}
-		  
+		  | ID expresioncompuesta ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); System.out.println("Asignacion");}		  
 ;
 
 expresioncompuesta	: '('expresion')'
