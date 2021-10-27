@@ -1,7 +1,7 @@
 programa
-INT diseno,
-SINGLE aux,
-INT identificador_fuera_de_rango, // ID fuera de rango //
+INT diseno;
+SINGLE aux;
+INT identificador_fuera_de_rango; // ID fuera de rango //
 TYPEDEF m = INT FUNC (INT);
 m a,b,c;
 INT FUNC funcion1 (INT diseno)
@@ -9,14 +9,14 @@ INT FUNC funcion1 (INT diseno)
 	INT auxiliarfuncion2;
 	BEGIN
 	PRE: (diseno<2), %diseno menor a 2%;
-		auxiliarfuncion := 5; // CTE fuera de rango // 
+		auxiliarfuncion := 5;
 		RETURN (diseno+2);
 	END;
 
 BEGIN
-diseno := 9999999999;
+diseno :=99999999;
+aux := 2.3333S-5;
 aux := 2.3333S-500;
-aux := 2.3333S-5000;
 PRINT(%Cadena bien escrita%);
 
 REPEAT (diseno = 0; diseno < 5; 1)
@@ -28,5 +28,7 @@ REPEAT (diseno = 0; diseno < 5; 1)
 IF (diseno < 5) THEN
 	BEGIN
 		PRINT(%YAC%);
-	END ;
+	END;
+ENDIF;
+
 END;

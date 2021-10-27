@@ -104,7 +104,6 @@ public class AnalizadorLexico {
 			while ((!eot.bool) && (!this.programa.isEmpty())) {
 				ch = this.programa.charAt(0);
 				index_simbolo = this.convertirSimbolo(ch);
-				//System.out.println("estado_actual: "+ estado_actual+" index_simbolo " + index_simbolo);
 				as = this.matrizAccionSemantica[estado_actual][index_simbolo];
 				if (as != null) {
 					estado_actual = this.matrizTransicionEstados[estado_actual][index_simbolo]; // Estado de la siguiente iteracion

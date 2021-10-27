@@ -43,7 +43,6 @@ encabezado_funcion_typedef	: tipo FUNC '('tipo')'
 
 declaracionFuncion	: tipo FUNC ID parametro bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {System.out.println("DECLARACION FUNCION");}
 					| tipo FUNC ID parametro bloque_sentencias_declarativas BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {System.out.println("DECLARACION FUNCION Y PRE CONDICION");}
-					| error ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": error en la declaracion de la funcion");}
 ;
 
 pre_condicion	: PRE ':' '('condicion')' ',' CADENA ';' {System.out.println("pre-condicion");}
@@ -69,7 +68,8 @@ retorno		: '('expresion')'
 ;
 
 bloque_sentencias_ejecutables	: sentencia_ejecutable
-								| BEGIN conjunto_sentencia_ejecutable END {System.out.println("bloque de sentencias BEGIN-END");}
+								| BEGIN conjunto_sentencia_ejecutable END ';' {System.out.println("bloque de sentencias BEGIN-END");}
+								| error ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": error en bloque de sentencias ejecutables");}
 ;
 
 conjunto_sentencia_ejecutable	: sentencia_ejecutable
@@ -85,9 +85,9 @@ sentencia_ejecutable	: asignacion
 invocacion_funcion	: ID '(' factor ')' ';'
 ;
 
-asignacion: ID ':=' expresioncompuesta ';' {System.out.println("Asignacion");}
-		  | ID expresioncompuesta ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); {System.out.println("Asignacion");}}
-		  
+asignacion	: ID ':=' expresioncompuesta ';' {System.out.println("Asignacion");}
+		  	| ID expresioncompuesta ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); System.out.println("Asignacion");}		  
+			| ID ':=' ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": 'variable o constante faltante"); System.out.println("Asignacion");}
 ;
 
 expresioncompuesta	: '('expresion')'
@@ -112,7 +112,6 @@ termino		: termino '/' factor
 factor		: ID {System.out.println("factor ID");}
 			| CTE {System.out.println("Factor CTE");}
 			| '-' CTE // {System.out.println("Constante negativa, se debe modificar la tabla de simbolos indicando el signo y rechequear limite}; {se hara una verificacion de rango en el analizador semantico ya que necesitamos sabes que tipo de CTE es (INT o SINGLE)}
-			//| ID '('tipo ID')' No me acuerdo que era
 ;
 
 tipo		: INT {System.out.println("tipo INT");}
@@ -125,7 +124,11 @@ clausula_seleccion_if	: IF '('condicion')' THEN bloque_sentencias_ejecutables EN
 						| IF '('condicion')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';'{System.out.println("clausula IF-ELSE");}
 						| IF condicion')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("clausula IF-ELSE");}
 						| IF '('condicion THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion");System.out.println("clausula IF-ELSE");}
-						| error ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": error en sentencia IF");}
+						| IF '('condicion')' bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": 'THEN' esperado");  System.out.println("clausula IF");}
+						| IF '('condicion')'  bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';'{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": 'THEN' esperado"); System.out.println("clausula IF-ELSE");}
+						| IF THEN bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": condicion faltante");  System.out.println("clausula IF");}
+						| IF THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';'{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": condicion faltante"); System.out.println("clausula IF-ELSE");}
+
 ;
 
 
@@ -153,7 +156,7 @@ sentencia_control_repeat	: REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')
 
 conjunto_sentencias_repeat	: BREAK ';'
 							| sentencia_ejecutable
-							| conjunto_sentencias_repeat sentencia_ejecutable
+							| sentencia_ejecutable conjunto_sentencias_repeat
 ;
 
 condicion_repeat	: ID operador_logico ID {System.out.println("Condicion_Repeat");}

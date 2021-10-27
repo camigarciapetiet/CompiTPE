@@ -17,13 +17,14 @@ public class AS4 extends accionSemantica {
 		int limite_sup= (int) (Math.pow(2, 15)-1);
 		int limite_inf= (int) (-Math.pow(2, 15));
 		if (aux>limite_sup || aux<limite_inf) {
-			analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": constante fuera de rango");
+			analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": constante fuera de rango, se descartara.");
 			fuera_de_rango = true;
 		}
 		
 		if (fuera_de_rango) {
 			eot.bool = false;
 			cadena.resetValor();
+			analizadorLexico.programa = " " + analizadorLexico.programa;
 			analizadorLexico.estado_actual=0;
 		}
 		else {

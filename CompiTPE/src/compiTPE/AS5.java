@@ -34,19 +34,20 @@ public class AS5 extends accionSemantica {
 			if(valor<lim3 || valor>lim4) {
 				if(valor!=0) {
 					fuera_de_rango = true;
-					analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": constante fuera de rango");
+					analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": constante fuera de rango, se descartara.");
 			}}
 		}else if(valor<lim3 || valor>lim4) {
 			if(valor<lim1 || valor>lim2) {
 				if(valor!=0) {
 
-					analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": constante fuera de rango");					
+					analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": constante fuera de rango, se descartara.");					
 				}
 			}
 		}
 		if (fuera_de_rango) {
 			eot.bool = false;
 			cadena.resetValor();
+			analizadorLexico.programa = " " + analizadorLexico.programa;
 			analizadorLexico.estado_actual=0;
 		}
 		else {
