@@ -12,7 +12,7 @@ import java.util.*;
 
 %%
 
-programa	: ID bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable END ';' {System.out.println("Sentencia START programa");}
+programa	: ID bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable END ';' {this.reglas.add("Sentencia START programa");}
 			| error ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": error en el programa"); }
 ;
 
@@ -26,8 +26,8 @@ sentencia_declarativa	: declaracionDatos
 						| declaracionFuncion
 ;
 
-declaracionDatos : tipo conjunto_declaracion_variables ';' {System.out.println("Declaracion de datos");}
-				 | ID conjunto_declaracion_variables ';' {System.out.println("Declaracion de datos TYPEDEF");} //Tema particular 23
+declaracionDatos : tipo conjunto_declaracion_variables ';' {this.reglas.add("Declaracion de datos");}
+				 | ID conjunto_declaracion_variables ';' {this.reglas.add("Declaracion de datos TYPEDEF");} //Tema particular 23
 				 | tipo conjunto_declaracion_variables {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de factor");}
 ;
 
@@ -35,22 +35,22 @@ conjunto_declaracion_variables	: conjunto_declaracion_variables ',' ID
 								| ID
 ;
 
-declaracionNuevoTipo	: TYPEDEF ID '=' encabezado_funcion_typedef ';' {System.out.println("Declaracion TYPEDEF");}
+declaracionNuevoTipo	: TYPEDEF ID '=' encabezado_funcion_typedef ';' {this.reglas.add("Declaracion TYPEDEF");}
 ;
 
 encabezado_funcion_typedef	: tipo FUNC '('tipo')'
 ;
 
-declaracionFuncion	: tipo FUNC ID parametro bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {System.out.println("DECLARACION FUNCION");}
-					| tipo FUNC ID parametro bloque_sentencias_declarativas BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {System.out.println("DECLARACION FUNCION Y PRE CONDICION");}
+declaracionFuncion	: tipo FUNC ID parametro bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {this.reglas.add("DECLARACION FUNCION");}
+					| tipo FUNC ID parametro bloque_sentencias_declarativas BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {this.reglas.add("DECLARACION FUNCION Y PRE CONDICION");}
 ;
 
-pre_condicion	: PRE ':' '('condicion')' ',' CADENA ';' {System.out.println("pre-condicion");}
-				| PRE ':' condicion')' ',' CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("pre-condicion");}
-				| PRE ':' '('')' ',' CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada entre '(' ')'"); System.out.println("pre-condicion");}
-				| PRE ':' '('condicion ',' CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); System.out.println("pre-condicion");}
-				| PRE ':' '('condicion')'  CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de ')'"); System.out.println("pre-condicion");}
-				| PRE ':' '('condicion')' ',' ';'{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada despues de ','"); System.out.println("pre-condicion");}
+pre_condicion	: PRE ':' '('condicion')' ',' CADENA ';' {this.reglas.add("pre-condicion");}
+				| PRE ':' condicion')' ',' CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); this.reglas.add("pre-condicion");}
+				| PRE ':' '('')' ',' CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada entre '(' ')'"); this.reglas.add("pre-condicion");}
+				| PRE ':' '('condicion ',' CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); this.reglas.add("pre-condicion");}
+				| PRE ':' '('condicion')'  CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de ')'"); this.reglas.add("pre-condicion");}
+				| PRE ':' '('condicion')' ',' ';'{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada despues de ','"); this.reglas.add("pre-condicion");}
 ;
 
 parametro	: '('tipo ID')'
@@ -68,7 +68,7 @@ retorno		: '('expresion')'
 ;
 
 bloque_sentencias_ejecutables	: sentencia_ejecutable
-								| BEGIN conjunto_sentencia_ejecutable END ';' {System.out.println("bloque de sentencias BEGIN-END");}
+								| BEGIN conjunto_sentencia_ejecutable END ';' {this.reglas.add("bloque de sentencias BEGIN-END");}
 								| error ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": error en bloque de sentencias ejecutables");}
 ;
 
@@ -85,9 +85,9 @@ sentencia_ejecutable	: asignacion
 invocacion_funcion	: ID '(' factor ')' ';'
 ;
 
-asignacion	: ID ':=' expresioncompuesta ';' {System.out.println("Asignacion");}
-		  	| ID expresioncompuesta ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); System.out.println("Asignacion");}		  
-			| ID ':=' ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": 'variable o constante faltante"); System.out.println("Asignacion");}
+asignacion	: ID ':=' expresioncompuesta ';' {this.reglas.add("Asignacion");}
+		  	| ID expresioncompuesta ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); this.reglas.add("Asignacion");}		  
+			| ID ':=' ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": 'variable o constante faltante"); this.reglas.add("Asignacion");}
 ;
 
 expresioncompuesta	: '('expresion')'
@@ -109,25 +109,25 @@ termino		: termino '/' factor
 			| invocacion_funcion
 ;
 
-factor		: ID {System.out.println("factor ID");}
-			| CTE {System.out.println("Factor CTE");}
-			| '-' CTE // {System.out.println("Constante negativa, se debe modificar la tabla de simbolos indicando el signo y rechequear limite}; {se hara una verificacion de rango en el analizador semantico ya que necesitamos sabes que tipo de CTE es (INT o SINGLE)}
+factor		: ID {this.reglas.add("factor ID");}
+			| CTE {this.reglas.add("Factor CTE");}
+			| '-' CTE // {this.reglas.add("Constante negativa, se debe modificar la tabla de simbolos indicando el signo y rechequear limite}; {se hara una verificacion de rango en el analizador semantico ya que necesitamos sabes que tipo de CTE es (INT o SINGLE)}
 ;
 
-tipo		: INT {System.out.println("tipo INT");}
-			| SINGLE {System.out.println("tipo SINGLE");}
+tipo		: INT {this.reglas.add("tipo INT");}
+			| SINGLE {this.reglas.add("tipo SINGLE");}
 ;
 
-clausula_seleccion_if	: IF '('condicion')' THEN bloque_sentencias_ejecutables ENDIF ';' {System.out.println("clausula IF");}
-						| IF condicion')' THEN bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("clausula IF");}
-						| IF '('condicion THEN bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); System.out.println("clausula IF");}
-						| IF '('condicion')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';'{System.out.println("clausula IF-ELSE");}
-						| IF condicion')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("clausula IF-ELSE");}
-						| IF '('condicion THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion");System.out.println("clausula IF-ELSE");}
-						| IF '('condicion')' bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": 'THEN' esperado");  System.out.println("clausula IF");}
-						| IF '('condicion')'  bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';'{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": 'THEN' esperado"); System.out.println("clausula IF-ELSE");}
-						| IF THEN bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": condicion faltante");  System.out.println("clausula IF");}
-						| IF THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';'{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": condicion faltante"); System.out.println("clausula IF-ELSE");}
+clausula_seleccion_if	: IF '('condicion')' THEN bloque_sentencias_ejecutables ENDIF ';' {this.reglas.add("clausula IF");}
+						| IF condicion')' THEN bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); this.reglas.add("clausula IF");}
+						| IF '('condicion THEN bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); this.reglas.add("clausula IF");}
+						| IF '('condicion')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';'{this.reglas.add("clausula IF-ELSE");}
+						| IF condicion')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); this.reglas.add("clausula IF-ELSE");}
+						| IF '('condicion THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion");this.reglas.add("clausula IF-ELSE");}
+						| IF '('condicion')' bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": 'THEN' esperado");  this.reglas.add("clausula IF");}
+						| IF '('condicion')'  bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';'{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": 'THEN' esperado"); this.reglas.add("clausula IF-ELSE");}
+						| IF THEN bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": condicion faltante");  this.reglas.add("clausula IF");}
+						| IF THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';'{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": condicion faltante"); this.reglas.add("clausula IF-ELSE");}
 
 ;
 
@@ -146,12 +146,12 @@ operador_logico	: '||'
 				| '<'
 ;
 
-mensaje_pantalla	: PRINT '(' CADENA ')' ';' {System.out.println("clausula PRINT");}
-					| PRINT  CADENA ')' ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de cadena"); System.out.println("clausula PRINT");}
-					| PRINT '(' CADENA  ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de cadena"); System.out.println("clausula PRINT");}
+mensaje_pantalla	: PRINT '(' CADENA ')' ';' {this.reglas.add("clausula PRINT");}
+					| PRINT  CADENA ')' ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de cadena"); this.reglas.add("clausula PRINT");}
+					| PRINT '(' CADENA  ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de cadena"); this.reglas.add("clausula PRINT");}
 ;
 	
-sentencia_control_repeat	: REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' BEGIN conjunto_sentencias_repeat END ';'  {System.out.println("Sentencia Ejecutable REPEAT - Chequeo Semantico");}
+sentencia_control_repeat	: REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' BEGIN conjunto_sentencias_repeat END ';'  {this.reglas.add("Sentencia Ejecutable REPEAT - Chequeo Semantico");}
 ;		
 
 conjunto_sentencias_repeat	: BREAK ';'
@@ -159,18 +159,20 @@ conjunto_sentencias_repeat	: BREAK ';'
 							| sentencia_ejecutable conjunto_sentencias_repeat
 ;
 
-condicion_repeat	: ID operador_logico ID {System.out.println("Condicion_Repeat");}
-					| ID operador_logico CTE {System.out.println("Condicion_Repeat");}
+condicion_repeat	: ID operador_logico ID {this.reglas.add("Condicion_Repeat");}
+					| ID operador_logico CTE {this.reglas.add("Condicion_Repeat");}
 ;
 
 %%
 	public AnalizadorLexico analizadorLexico;
 	public List<String> erroresSint;
+	public List<String> reglas;
 	
 	public Parser(AnalizadorLexico a_lex)
 	{
 		this.analizadorLexico = a_lex;
 		this.erroresSint = new ArrayList<String>();
+		this.reglas = new ArrayList<String>();
 	}
 	
 	public void yyerror(String error)

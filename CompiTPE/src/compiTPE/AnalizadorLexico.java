@@ -17,6 +17,7 @@ public class AnalizadorLexico {
 	public ErrorHandler error_handler;
 	public List<String> erroresLex;
 	public int estado_actual;
+	public List<String> informeTokens;
 	
 	public AnalizadorLexico(String filename, int matriztransicionestados[][], accionSemantica matrizaccionsemantica[][], ErrorHandler error_handler) { // filename = TXT con las palabras predefinidas
 		this.codigoIndex = 257;
@@ -49,6 +50,7 @@ public class AnalizadorLexico {
 		this.matrizTransicionEstados = matriztransicionestados;
 		this.error_handler = error_handler;
 		this.erroresLex= new ArrayList<String>();
+		this.informeTokens= new ArrayList<String>();
 		this.estado_actual=0;
 	}
 	
@@ -120,28 +122,28 @@ public class AnalizadorLexico {
 				else {
 					if (tipo_token.valor == 1) { //es una palabra predefinida
 						yylval.sval = null; ///set(null);
-						System.out.println("Palabra predefinida "+token_actual.valor);
+						informeTokens.add("Palabra predefinida "+token_actual.valor);
 						return this.getCodigoPP(token_actual.valor); //nll
 					}
 					else if (tipo_token.valor == 2) { //es un IDENTIFICADOR
 						yylval.sval = token_actual.valor;
-						System.out.println("Identificador "+token_actual.valor);
+						informeTokens.add("Identificador "+token_actual.valor);
 						return this.codigoIdentificador;//(token_actual.valor
 					}
 					else if (tipo_token.valor == 3) { //es una CTE
 						yylval.sval = token_actual.valor;
-						System.out.println("Constante "+token_actual.valor);
+						informeTokens.add("Constante "+token_actual.valor);
 						return this.codigoCTE;//token_actual.valor
 					}
 					else if (tipo_token.valor == 4) { //hay que devolver codigo ascii
 						int ch_retorno = (int) token_actual.valor.charAt(0);
 						yylval.sval = null;
-						System.out.println(token_actual.valor.charAt(0));
+						informeTokens.add(Character.toString(token_actual.valor.charAt(0)));
 						return ch_retorno;
 					}		
 					else if (tipo_token.valor == 5) { //es una cadena
 						yylval.sval = token_actual.valor;
-						System.out.println("Cadena "+token_actual.valor);
+						informeTokens.add("Cadena "+token_actual.valor);
 						return this.codigoCADENA; //token_actual.valor
 					}
 				}

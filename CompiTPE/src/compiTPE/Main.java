@@ -78,15 +78,23 @@ public class Main {
 	        a_lex.setPrograma(programtext);
 	        Parser newParser = new Parser(a_lex);
 	        newParser.run();
-	        System.out.println("\nERRORES LEXICOS");
+	        System.out.println("\n\nINFORME TOKENS");
+	        for (String s: a_lex.informeTokens) {
+	        	System.out.println(s);
+	        }
+	        System.out.println("\n\nINFORME REGLAS");
+	        for (String s: newParser.reglas) {
+	        	System.out.println(s);
+	        }
+	        System.out.println("\n\nERRORES LEXICOS");
 	        for (String s: a_lex.erroresLex) {
 	        	System.out.println(s);
 	        }
-	        System.out.println("\nERRORES SINTACTICOS");
+	        System.out.println("\n\nERRORES SINTACTICOS");
 	        for (String s: newParser.erroresSint) {
 	        	System.out.println(s);
 	        }
-	        System.out.println("\nTABLA DE SIMBOLOS");
+	        System.out.println("\n\n\nTABLA DE SIMBOLOS");
 	        System.out.println(a_lex.tabla_simbolos);
 	        System.out.println("\nPalabras Predefinidas");
 	        System.out.println(a_lex.palabras_predefinidas);
