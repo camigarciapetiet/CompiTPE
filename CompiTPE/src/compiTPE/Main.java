@@ -80,11 +80,11 @@ public class Main {
 	        newParser.run();
 	        System.out.println("\n\nINFORME TOKENS");
 	        for (String s: a_lex.informeTokens) {
-	        	System.out.println(s);
+	        	System.out.print(s+ ", ");
 	        }
 	        System.out.println("\n\nINFORME REGLAS");
 	        for (String s: newParser.reglas) {
-	        	System.out.println(s);
+	        	System.out.print(s + ", ");
 	        }
 	        System.out.println("\n\nERRORES LEXICOS");
 	        for (String s: a_lex.erroresLex) {
@@ -98,7 +98,6 @@ public class Main {
 	        System.out.println(a_lex.tabla_simbolos);
 	        System.out.println("\nPalabras Predefinidas");
 	        System.out.println(a_lex.palabras_predefinidas);
-	        System.out.println("termino");
 
 		}
 		
