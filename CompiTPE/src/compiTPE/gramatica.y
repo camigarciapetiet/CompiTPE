@@ -70,6 +70,7 @@ retorno		: '('expresion')'
 
 bloque_sentencias_ejecutables	: sentencia_ejecutable
 								| BEGIN conjunto_sentencia_ejecutable END {System.out.println("bloque de sentencias BEGIN-END");}
+								| error ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": error en bloque de sentencias ejecutables");}
 ;
 
 conjunto_sentencia_ejecutable	: sentencia_ejecutable
@@ -125,7 +126,6 @@ clausula_seleccion_if	: IF '('condicion')' THEN bloque_sentencias_ejecutables EN
 						| IF '('condicion')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';'{System.out.println("clausula IF-ELSE");}
 						| IF condicion')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); System.out.println("clausula IF-ELSE");}
 						| IF '('condicion THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion");System.out.println("clausula IF-ELSE");}
-						| error ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": error en sentencia IF");}
 ;
 
 
@@ -153,7 +153,7 @@ sentencia_control_repeat	: REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')
 
 conjunto_sentencias_repeat	: BREAK ';'
 							| sentencia_ejecutable
-							| conjunto_sentencias_repeat sentencia_ejecutable
+							| sentencia_ejecutable conjunto_sentencias_repeat
 ;
 
 condicion_repeat	: ID operador_logico ID {System.out.println("Condicion_Repeat");}
