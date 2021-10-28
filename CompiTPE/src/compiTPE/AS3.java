@@ -11,8 +11,11 @@ public class AS3 extends accionSemantica {
 			tipo_token.valor = 1;
 		}
 		else {
-			if (cadena.valor.length() < 22) {
-				//aca hace la marca de warning si se pasa del rango ???
+			if (cadena.valor.length() > 22) {
+				while (cadena.valor.length() > 22) { //Borro caracteres hata que sea long 22.
+					cadena.valor = cadena.valor.substring(0, cadena.valor.length()-1);
+				}
+				analizadorLexico.erroresLex.add("Warning en la linea "+ analizadorLexico.contadorLineas + ": identificador fuera de rango, se renombro a: " + cadena.valor);
 			}
 			tipo_token.valor = 2;
 

@@ -1,36 +1,13 @@
 package compiTPE;
 
-import java.util.*;
 
 public class AS7 extends accionSemantica {
 
 	@Override
 	public String ejecutar(AnalizadorLexico analizadorLexico, BooleanHolder eot, IntHolder tipo_token, StringHolder cadena, char caracter) {
-		eot.bool = true;
-		if (analizadorLexico.palabras_predefinidas.get(cadena.valor) != null){
-			tipo_token.valor = 1;
-		}
-		else {
-			tipo_token.valor = 5;
-
-			
-			Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();
-	        boolean isKeyPresent = false;
-	        while (iterator.hasNext()) {
-	            Map.Entry<String, HashMap<String,String>> entry = iterator.next();
-	            if (cadena.valor == entry.getKey()) {
-	                isKeyPresent = true;
-	                return null;
-	            }
-	        }
-	        
-	        
-	        if (isKeyPresent == false) {
-	        	analizadorLexico.tabla_simbolos.put(cadena.valor, new HashMap<String,String>()); //Por ahora no guardamos ningun atributo!
-	        	analizadorLexico.tabla_simbolos.get(cadena.valor).put("linea",String.valueOf(analizadorLexico.contadorLineas)); //EJEMPLO
-	        }
-			
-		}
+		eot.bool = false;
+		cadena.resetValor();
+		
 		return null;
 	}
 

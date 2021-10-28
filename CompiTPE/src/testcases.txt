@@ -1,3 +1,0 @@
-IF 5 == 4 //comentario//
-PEDRO := JUPITER
-%cadena%

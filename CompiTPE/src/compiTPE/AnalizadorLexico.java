@@ -1,9 +1,6 @@
 package compiTPE;
+import java.util.*;
 import java.io.*;
-import java.util.Scanner;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class AnalizadorLexico {
 	
@@ -18,6 +15,9 @@ public class AnalizadorLexico {
 	public Map<String, Integer> palabras_predefinidas; //palabras predefeinidas = Palabras Reservadas + Operadores de mas de 1 Caracter (asignacion, and, etc)
 	public Map<String, HashMap<String, String>> tabla_simbolos;
 	public ErrorHandler error_handler;
+	public List<String> erroresLex;
+	public int estado_actual;
+	public List<String> informeTokens;
 	
 	public AnalizadorLexico(String filename, int matriztransicionestados[][], accionSemantica matrizaccionsemantica[][], ErrorHandler error_handler) { // filename = TXT con las palabras predefinidas
 		this.codigoIndex = 257;
@@ -43,13 +43,20 @@ public class AnalizadorLexico {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		this.palabras_predefinidas.put("ID", codigoIdentificador);
+		this.palabras_predefinidas.put("CTE", codigoCTE);
+		this.palabras_predefinidas.put("CADENA", codigoCADENA);
 		this.matrizAccionSemantica = matrizaccionsemantica;
 		this.matrizTransicionEstados = matriztransicionestados;
 		this.error_handler = error_handler;
+		this.erroresLex= new ArrayList<String>();
+		this.informeTokens= new ArrayList<String>();
+		this.estado_actual=0;
 	}
 	
 	private int convertirSimbolo(char ch) {
-		if ((int) ch == 43) return 5; // +
+		if (Character.isDigit(ch)) return 2;
+		else if ((int) ch == 43) return 5; // +
 		else if ((int) ch == 46) return 3; // .
 		else if ((int) ch == 58) return 4; // :
 		else if ((int) ch == 45) return 6; // -
@@ -70,22 +77,15 @@ public class AnalizadorLexico {
 		else if ((int) ch == 32) return 16; // espacio
 		else if ((int) ch == 9) return 16; // tab
 		else if ((int) ch == 10) return 17; // ln
-		else if ((int) ch == 13) return 17; // SALTO DE CARRO = ln berreta
+		else if ((int) ch == 13) return 17; // SALTO DE CARRO = ln
 		else if (ch == 'S') return 18; // S
-		else if (Character.isDigit(ch)) return 2;
 		else if (Character.isUpperCase(ch)) return 1;
 		else if (Character.isLowerCase(ch)) return 0;
 		else return 19;
 	}
 	
-	@SuppressWarnings("resource")
-	public void setPrograma(String filename) { // filename = TXT con el programa a compilar
-		try {
-			this.programa = new Scanner(new File(filename)).useDelimiter("\\Z").next();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		this.programa = this.programa + " ";
+	public void setPrograma(String programa) { 
+		this.programa = programa + " ";
 	}
 	
 	public int getCodigoPP(String token) {
@@ -93,12 +93,12 @@ public class AnalizadorLexico {
 		return retorno;
 	}
 	
-	public int yylex(StringHolder yylval){
+	public int yylex(ParserVal yylval){
 		StringHolder token_actual = new StringHolder();
 		accionSemantica as;
 		BooleanHolder eot = new BooleanHolder(false); //end of token
 		char ch;
-		int estado_actual = 0; // FILA de la matriz de transicion de estados y AS
+		estado_actual = 0; // FILA de la matriz de transicion de estados y AS
 		int index_simbolo; // COLUMNA de la matriz de transicion de estados y AS
 		IntHolder tipo_token = new IntHolder(); //esto se asigna en las AS asi que tambien se manda por parametro
 		
@@ -109,37 +109,41 @@ public class AnalizadorLexico {
 				as = this.matrizAccionSemantica[estado_actual][index_simbolo];
 				if (as != null) {
 					estado_actual = this.matrizTransicionEstados[estado_actual][index_simbolo]; // Estado de la siguiente iteracion
-					as.ejecutar(this, eot, tipo_token, token_actual, ch); //faltan los PARAMETROS, considerar mandar eot y que se vuelva true en las acciones semanticas donde termina el token
+					as.ejecutar(this, eot, tipo_token, token_actual, ch); 
 				}
 				else {
 					if (this.matrizTransicionEstados[estado_actual][index_simbolo] == -1) {
 						this.error_handler.handle(this, eot, tipo_token, token_actual, ch);
 					}
-				}
-				
+				}				
 				if (!eot.bool) {
 					this.programa = this.programa.substring(1);
 				}
 				else {
 					if (tipo_token.valor == 1) { //es una palabra predefinida
-						yylval.set(null);
+						yylval.sval = null; ///set(null);
+						informeTokens.add("Palabra predefinida "+token_actual.valor);
 						return this.getCodigoPP(token_actual.valor); //nll
 					}
 					else if (tipo_token.valor == 2) { //es un IDENTIFICADOR
-						yylval.set(token_actual.valor);
+						yylval.sval = token_actual.valor;
+						informeTokens.add("Identificador "+token_actual.valor);
 						return this.codigoIdentificador;//(token_actual.valor
 					}
 					else if (tipo_token.valor == 3) { //es una CTE
-						yylval.set(token_actual.valor);
+						yylval.sval = token_actual.valor;
+						informeTokens.add("Constante "+token_actual.valor);
 						return this.codigoCTE;//token_actual.valor
 					}
 					else if (tipo_token.valor == 4) { //hay que devolver codigo ascii
 						int ch_retorno = (int) token_actual.valor.charAt(0);
-						yylval.set(null);
-						return ch_retorno;//null
+						yylval.sval = null;
+						informeTokens.add(Character.toString(token_actual.valor.charAt(0)));
+						return ch_retorno;
 					}		
-					else if (tipo_token.valor == 5) {
-						yylval.set(token_actual.valor);
+					else if (tipo_token.valor == 5) { //es una cadena
+						yylval.sval = token_actual.valor;
+						informeTokens.add("Cadena "+token_actual.valor);
 						return this.codigoCADENA; //token_actual.valor
 					}
 				}
