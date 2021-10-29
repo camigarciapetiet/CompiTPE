@@ -18,13 +18,14 @@ public class AS3 extends accionSemantica {
 				analizadorLexico.erroresLex.add("Warning en la linea "+ analizadorLexico.contadorLineas + ": identificador fuera de rango, se renombro a: " + cadena.valor);
 			}
 			tipo_token.valor = 2;
-
+			
+			cadena.valor = cadena.valor + analizadorLexico.ambito;
 			
 			Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();
 	        boolean isKeyPresent = false;
 	        while (iterator.hasNext()) {
 	            Map.Entry<String, HashMap<String,String>> entry = iterator.next();
-	            if (cadena.valor == entry.getKey()) {
+	            if (entry.getKey().compareTo(cadena.valor) == 0) {
 	                isKeyPresent = true;
 	                return null;
 	            }
@@ -33,7 +34,7 @@ public class AS3 extends accionSemantica {
 	        
 	        if (isKeyPresent == false) {
 	        	analizadorLexico.tabla_simbolos.put(cadena.valor, new HashMap<String,String>()); //Por ahora no guardamos ningun atributo!
-	        	analizadorLexico.tabla_simbolos.get(cadena.valor).put("linea",String.valueOf(analizadorLexico.contadorLineas)); //EJEMPLO
+	        	//analizadorLexico.tabla_simbolos.get(cadena.valor).put("linea",String.valueOf(analizadorLexico.contadorLineas)); //EJEMPLO
 	        }
 			
 		}

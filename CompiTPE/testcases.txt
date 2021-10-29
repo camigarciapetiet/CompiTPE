@@ -1,21 +1,31 @@
+//TENER EN CUENTA: REMOVER AMBITOS CUANDO SE GENERE CODIGO INTERMEDIO!!!//
+
 programa
 INT diseno;
+INT diseno; //variable ya declarada, chequeo semantico//
 SINGLE aux;
-INT identificador_fuera_de_rango; // ID fuera de rango //
+INT identificador_fuera_de_rango; //ID fuera de rango//
 TYPEDEF m = INT FUNC (INT);
 m a,b,c;
-INT FUNC funcion1 (INT diseno)
+INT FUNC funcion1 (INT parametro)
 	INT auxiliarfuncion;
 	INT auxiliarfuncion2;
 	BEGIN
-	PRE: (diseno<2), %diseno menor a 2%;
+	PRE: (diseno<2), %diseno menor a 2%; //diseno declarado en un ambito anterior al de la funcion, por lo que es alcanzable//
 		auxiliarfuncion := 5;
 		RETURN (diseno+2);
 	END;
+INT FUNC funcion1 (INT parametro) //no se chequea "redeclaracion" de parametros. funcion1 ya declarada//
+	INT auxfunc1;
+	BEGIN
+		PRINT(%hola%);
+		RETURN(5);
+	END;
 
-BEGIN
-diseno :=99999999;
-aux := 2.3333S-5;
+BEGIN	
+
+perrito := 5; //variable no declarada//
+diseno := funcion5(4); //funcion no declarada//
 aux := 2.3333S-500;
 PRINT(%Cadena bien escrita%);
 
@@ -31,4 +41,5 @@ IF (diseno < 5) THEN
 	END;
 ENDIF;
 
+PRINT(%hola%);
 END;

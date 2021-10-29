@@ -63,8 +63,10 @@ public class AS5 extends accionSemantica {
 	        
 	        
 	        if (isKeyPresent == false) {
-	        	analizadorLexico.tabla_simbolos.put(cadena.valor, new HashMap<String,String>()); //Por ahora no guardamos ningun atributo!
-	        	analizadorLexico.tabla_simbolos.get(cadena.valor).put("linea",String.valueOf(analizadorLexico.contadorLineas)); //EJEMPLO
+	        	analizadorLexico.tabla_simbolos.put(cadena.valor, new HashMap<String,String>());
+	        	//analizadorLexico.tabla_simbolos.get(cadena.valor).put("linea",String.valueOf(analizadorLexico.contadorLineas));
+	        	
+	        	analizadorLexico.tabla_simbolos.get(cadena.valor).put("tipo","SINGLE"); 
 	        }
 		}
 		return null;
