@@ -67,6 +67,7 @@ public class AS5 extends accionSemantica {
 	        	//analizadorLexico.tabla_simbolos.get(cadena.valor).put("linea",String.valueOf(analizadorLexico.contadorLineas));
 	        	
 	        	analizadorLexico.tabla_simbolos.get(cadena.valor).put("tipo","SINGLE"); 
+	        	analizadorLexico.tabla_simbolos.get(cadena.valor).put("uso","constante"); 
 	        }
 		}
 		return null;

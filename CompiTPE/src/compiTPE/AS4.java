@@ -43,7 +43,9 @@ public class AS4 extends accionSemantica {
 	        	analizadorLexico.tabla_simbolos.put(cadena.valor, new HashMap<String,String>());
 	        	//analizadorLexico.tabla_simbolos.get(cadena.valor).put("linea",String.valueOf(analizadorLexico.contadorLineas)); 
 	        	
-	        	analizadorLexico.tabla_simbolos.get(cadena.valor).put("tipo","INT"); 
+	        	analizadorLexico.tabla_simbolos.get(cadena.valor).put("tipo","INT");
+	        	analizadorLexico.tabla_simbolos.get(cadena.valor).put("uso","constante"); 
+
 	        }
 		}
 		return null;

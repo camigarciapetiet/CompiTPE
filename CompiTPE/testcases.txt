@@ -2,20 +2,20 @@
 
 programa
 INT diseno;
-INT diseno; //variable ya declarada, chequeo semantico//
+INT diseno; //error semantico: variable ya declarada//
 SINGLE aux;
 INT identificador_fuera_de_rango; //ID fuera de rango//
-TYPEDEF m = INT FUNC (INT);
-m a,b,c;
-INT FUNC funcion1 (INT parametro)
+TYPEDEF m = INT FUNC (SINGLE);
+m a;
+INT FUNC funcion1 (SINGLE parametro)
 	INT auxiliarfuncion;
 	INT auxiliarfuncion2;
 	BEGIN
-	PRE: (diseno<2), %diseno menor a 2%; //diseno declarado en un ambito anterior al de la funcion, por lo que es alcanzable//
+	PRE: (diseno<2), %diseno menor a 2%; //verificacion semantica: diseno declarado en un ambito anterior al de la funcion, por lo que es alcanzable//
 		auxiliarfuncion := 5;
-		RETURN (diseno+2);
+		RETURN (diseno+5);
 	END;
-INT FUNC funcion1 (INT parametro) //no se chequea "redeclaracion" de parametros. funcion1 ya declarada//
+INT FUNC funcion1 (SINGLE parametro) //error semantico: funcion1 ya declarada//
 	INT auxfunc1;
 	BEGIN
 		PRINT(%hola%);
@@ -24,8 +24,10 @@ INT FUNC funcion1 (INT parametro) //no se chequea "redeclaracion" de parametros.
 
 BEGIN	
 
-perrito := 5; //variable no declarada//
-diseno := funcion5(4); //funcion no declarada//
+perrito := 5; //error semantico: variable no declarada//
+diseno := funcion1(4); //error semantico: el parametro debe ser un SINGLE, no un INT.//
+diseno := funcion5(4) + 5; //error semantico: funcion no declarada | error semantico: tipos incompatibles porque no existe funcion5 es tipo nulo//
+a := funcion1; //asignar funciones a tipos typedef por mas que el tipo de a sea m.programa y el de funcion1 sea INT, es valido porque el tipo de m.programa es INT//
 aux := 2.3333S-500;
 PRINT(%Cadena bien escrita%);
 

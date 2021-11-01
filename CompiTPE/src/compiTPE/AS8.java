@@ -26,6 +26,8 @@ public class AS8 extends accionSemantica {
         if (isKeyPresent == false) {
         	analizadorLexico.tabla_simbolos.put(token_actual.valor, new HashMap<String,String>()); //Por ahora no guardamos ningun atributo!
         	//analizadorLexico.tabla_simbolos.get(token_actual.valor).put("linea",String.valueOf(analizadorLexico.contadorLineas)); //EJEMPLO
+        	analizadorLexico.tabla_simbolos.get(token_actual.valor).put("uso","cadena"); 
+
         }
 		return null;
 	}

@@ -126,7 +126,7 @@ public class AnalizadorLexico {
 				}
 				else {
 					if (tipo_token.valor == 1) { //es una palabra predefinida
-						//yylval.sval = null; ///set(null);
+						yylval.sval = token_actual.valor; 
 						informeTokens.add("Palabra predefinida "+token_actual.valor);
 						return this.getCodigoPP(token_actual.valor); //null
 					}
@@ -142,7 +142,7 @@ public class AnalizadorLexico {
 					}
 					else if (tipo_token.valor == 4) { //hay que devolver codigo ascii
 						int ch_retorno = (int) token_actual.valor.charAt(0);
-						//yylval.sval = null; 								// No setear el null asi no pierdo el ultimo valor leido?
+						//yylval.sval = token_actual.valor; 					
 						informeTokens.add(Character.toString(token_actual.valor.charAt(0)));
 						return ch_retorno;
 					}		

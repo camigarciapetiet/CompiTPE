@@ -12,11 +12,14 @@ import java.util.*;
 
 %%
 
-programa	: nombre_ambito bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable END ';' {desapilar_ambito(); this.reglas.add("Sentencia START programa");}
+programa	: nombre_programa bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable END ';' {desapilar_ambito(); this.reglas.add("Sentencia START programa");}
 			| error ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": error en el programa"); }
 ;
 
-nombre_ambito	: ID {chequeoS_redeclaracion_funcion($1); apilar_ambito($1); set_uso($1,"funcion");} 
+nombre_programa	: ID {apilar_ambito($1); set_campo($1,"uso","programa");}
+;
+
+nombre_ambito	: ID {chequeoS_redeclaracion_funcion($1); apilar_ambito($1); set_campo($1,"uso","funcion"); setLastFuncType($1);} 
 ;
 
 bloque_sentencias_declarativas	: sentencia_declarativa 
@@ -28,25 +31,33 @@ sentencia_declarativa	: declaracionDatos
 						| declaracionFuncion
 ;
 
-declaracionDatos : tipo conjunto_declaracion_variables ';' {this.reglas.add("Declaracion de datos");}
-				 | ID conjunto_declaracion_variables ';' {this.reglas.add("Declaracion de datos TYPEDEF");} //Tema particular 23
+declaracionDatos : tipo conjunto_declaracion_variables ';' {setPendingTypes($1.sval); this.reglas.add("Declaracion de datos");}
+				 | nombre_typedef conjunto_declaracion_variables ';' {setPendingTypes($1.sval); this.reglas.add("Declaracion de datos TYPEDEF");} //Tema particular 23
+;
+nombre_typedef	: ID {System.out.println("Chequear que " + $1.sval + " sea typedef");}
 ;
 
 conjunto_declaracion_variables	: conjunto_declaracion_variables ',' nombre_declaracion
 								| nombre_declaracion
 ;
 
-nombre_declaracion	: ID {chequeoS_redeclaracion_variable($1); set_uso($1,"variable");}
+nombre_declaracion	: ID {chequeoS_redeclaracion_variable($1); set_campo($1,"uso","variable"); addPendingTypeList($1.sval);}
 ;
 
-declaracionNuevoTipo	: TYPEDEF ID '=' encabezado_funcion_typedef ';' {this.reglas.add("Declaracion TYPEDEF");}
+declaracionNuevoTipo	: TYPEDEF nombre_funcion_typedef '=' encabezado_funcion_typedef ';' 
 ;
 
-encabezado_funcion_typedef	: tipo FUNC '('tipo')' {System.out.println($1.sval);}
+nombre_funcion_typedef	: ID {addPendingTypeList($1.sval); set_campo($1, "uso", "typedef"); setLastFuncType($1);} //uso typedef o uso funcion??
 ;
 
-declaracionFuncion	: tipo FUNC nombre_ambito parametro bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {desapilar_ambito(); this.reglas.add("DECLARACION FUNCION");}
-					| tipo FUNC nombre_ambito parametro bloque_sentencias_declarativas BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {desapilar_ambito(); this.reglas.add("DECLARACION FUNCION Y PRE CONDICION");}
+encabezado_funcion_typedef	: tipo FUNC '('tipo')' {setPendingTypes("funcion typedef"); setFuncType("tipo",$1.sval); setFuncType("parametro",$2.sval);}
+;
+
+declaracionFuncion	: cabeza_funcion bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {desapilar_ambito(); this.reglas.add("DECLARACION FUNCION");}
+					| cabeza_funcion bloque_sentencias_declarativas BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {desapilar_ambito(); this.reglas.add("DECLARACION FUNCION Y PRE CONDICION");}
+;
+
+cabeza_funcion	: tipo FUNC nombre_ambito parametro {setFuncType("tipo",$1.sval); copiarTipoParametro($4,$3);}
 ;
 
 pre_condicion	: PRE ':' '('condicion')' ',' CADENA ';' {this.reglas.add("pre-condicion");}
@@ -57,7 +68,7 @@ pre_condicion	: PRE ':' '('condicion')' ',' CADENA ';' {this.reglas.add("pre-con
 				| PRE ':' '('condicion')' ',' ';'{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada despues de ','"); this.reglas.add("pre-condicion");}
 ;
 
-parametro	: '('tipo nombre_parametro')'
+parametro	: '('tipo nombre_parametro')' {setPendingTypes($2.sval);}
 			| tipo ID')' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de tipo");}
 			|'(' ID')' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": tipo esperado despues de '('");}
 			|'('tipo ')' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ID esperado despues de tipo");}
@@ -65,7 +76,7 @@ parametro	: '('tipo nombre_parametro')'
 			|'('tipo ID {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de ID");}
 ;
 
-nombre_parametro	: ID {set_uso($1,"parametro");}
+nombre_parametro	: ID {set_campo($1,"uso", "parametro"); addPendingTypeList($1.sval);}
 ;
 
 retorno		: '('expresion')'
@@ -90,18 +101,18 @@ sentencia_ejecutable	: asignacion
 						| sentencia_control_repeat
 ;
 
-invocacion_funcion	: nombre_invocacion '(' factor ')'
+invocacion_funcion	: nombre_invocacion '(' factor ')' {chequeoS_parametro_funcion($1, $2);}
 ;
 
 nombre_invocacion : ID {chequeoS_funcion_no_declarada($1);}
 ;
 
-asignacion	: operador_asignacion ':=' expresioncompuesta ';' {this.reglas.add("Asignacion");}
+asignacion	: operador_asignacion ':=' expresioncompuesta ';' {chequeoS_diferentes_tipos($1, $3); this.reglas.add("Asignacion");}
 		  	| operador_asignacion expresioncompuesta ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); this.reglas.add("Asignacion");}		  
 			| operador_asignacion ':=' ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": variable o constante faltante"); this.reglas.add("Asignacion");}
 ;
 
-operador_asignacion	: ID {chequeoS_variable_no_declarada($1);}
+operador_asignacion	: ID {chequeoS_variable_no_declarada($1);} //Esto ya no permite que se pongan funciones para asignar
 ;
 
 expresioncompuesta	: '('expresion')'
@@ -110,23 +121,24 @@ expresioncompuesta	: '('expresion')'
 					|'('expresion {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de expresion");}
 ;
 
-expresion	: expresion '+' termino 
-			| expresion '-' termino
+expresion	: expresion '+' termino {chequeoS_diferentes_tipos($0, $1);}
+			| expresion '-' termino {chequeoS_diferentes_tipos($0, $1);}
 			| termino
 ;
 
-termino		: termino '/' factor
-			| termino '*' factor
+termino		: termino '/' factor {chequeoS_diferentes_tipos($0, $1);}
+			| termino '*' factor {chequeoS_diferentes_tipos($0, $1);}
 			| factor
-			| termino '/' invocacion_funcion
-			| termino '*' invocacion_funcion
+			| termino '/' invocacion_funcion {chequeoS_diferentes_tipos($0, $1);}
+			| termino '*' invocacion_funcion {chequeoS_diferentes_tipos($0, $1);}
 			| invocacion_funcion
 ;
 
 factor		: ID {this.reglas.add("factor ID"); chequeoS_variable_no_declarada($1);}
 			| CTE {this.reglas.add("Factor CTE");}
-			| '-' CTE {chequeoS_cte_negativa($1);}
-		// {this.reglas.add("Constante negativa, se debe modificar la tabla de simbolos indicando el signo y rechequear limite}; {se hara una verificacion de rango en el analizador semantico ya que necesitamos sabes que tipo de CTE es (INT o SINGLE)}
+			| '-' CTE {reverificar_cte_negativa($1);}
+//PENDIENTE: tema particular 23 typedef ID '(' ID ')'
+//PENDIENTE: tema particular 23 typedef ID '(' CTE ')'
 ;
 
 tipo		: INT {this.reglas.add("tipo INT");}
@@ -148,7 +160,7 @@ clausula_seleccion_if	: IF '('condicion')' THEN bloque_sentencias_ejecutables EN
 
 
 condicion	: expresion 
-			| condicion operador_logico expresion 
+			| condicion operador_logico expresion {chequeoS_diferentes_tipos($0, $1);}
 ;
 
 operador_logico	: '||'
@@ -174,7 +186,7 @@ conjunto_sentencias_repeat	: BREAK ';'
 							| sentencia_ejecutable conjunto_sentencias_repeat
 ;
 
-condicion_repeat	: ID operador_logico ID {this.reglas.add("Condicion_Repeat");}
+condicion_repeat	: ID operador_logico ID {System.out.println("Comparacion: " + $0.sval + " " + $1.sval); this.reglas.add("Condicion_Repeat");}
 					| ID operador_logico CTE {this.reglas.add("Condicion_Repeat");}
 ;
 
@@ -182,12 +194,30 @@ condicion_repeat	: ID operador_logico ID {this.reglas.add("Condicion_Repeat");}
 	public AnalizadorLexico analizadorLexico;
 	public List<String> erroresSint;
 	public List<String> reglas;
+	public List<String> pendingTypeList;
+	public String lastFuncType;
 	
-	
-	private void set_uso (ParserVal identificador, String uso) 
+	private int yylex() 
 	{
-		//chequear si existe?
-		analizadorLexico.tabla_simbolos.get(identificador.sval).put("uso",uso);
+		return analizadorLexico.yylex(yylval);
+	}
+	
+	public Parser(AnalizadorLexico a_lex)
+	{
+		this.analizadorLexico = a_lex;
+		this.erroresSint = new ArrayList<String>();
+		this.reglas = new ArrayList<String>();
+		this.pendingTypeList = new ArrayList<String>();
+	}
+	
+	public void yyerror(String error)
+	{
+		System.out.println("error : "+error);
+	}
+	
+	private void set_campo (ParserVal identificador, String campo, String contenido) 
+	{
+		analizadorLexico.tabla_simbolos.get(identificador.sval).put(campo,contenido);
 	}
 	private void apilar_ambito(ParserVal ambito)
 	{
@@ -209,22 +239,6 @@ condicion_repeat	: ID operador_logico ID {this.reglas.add("Condicion_Repeat");}
 		{
 			analizadorLexico.ambito = analizadorLexico.ambito.substring(0,separacion);
 		}
-	}
-	private int yylex() 
-	{
-		return analizadorLexico.yylex(yylval);
-	}
-	
-	public Parser(AnalizadorLexico a_lex)
-	{
-		this.analizadorLexico = a_lex;
-		this.erroresSint = new ArrayList<String>();
-		this.reglas = new ArrayList<String>();
-	}
-	
-	public void yyerror(String error)
-	{
-		System.out.println(error);
 	}
 	
 	private void chequeoS_variable_no_declarada(ParserVal variable)
@@ -253,7 +267,7 @@ condicion_repeat	: ID operador_logico ID {this.reglas.add("Condicion_Repeat");}
 		
 		if (!variable_declarada) 
 		{
-			System.out.println("error: variable " + variable.sval + " no declarada.");
+			System.out.println("error semantico: variable " + variable.sval + " no declarada.");
 		}
 	}
 	
@@ -279,14 +293,24 @@ condicion_repeat	: ID operador_logico ID {this.reglas.add("Condicion_Repeat");}
 		}
 	}
 	
-	private void chequeoS_cte_negativa (ParserVal variable)
+	private void reverificar_cte_negativa (ParserVal variable)
 	{
-		//eliminar variable.sval de la tabla de simbolos
-		variable.sval = "-" + variable.sval;
+		String new_variable = "-" + variable.sval;
+		String tipo = analizadorLexico.tabla_simbolos.get(variable.sval).get("tipo");
+		//analizadorLexico.tabla_simbolos.remove(variable.sval); CREO QUE NO HAY QUE HACERLO.
+		boolean cumple_rango = false;
 		//rechequear rango
-		//si cumple rango insertar en la tabla de simbolos
-		
-		//si no cumple descartarlo y error
+		if (cumple_rango)
+		{
+			analizadorLexico.tabla_simbolos.put(new_variable, new HashMap<String,String>());
+			analizadorLexico.tabla_simbolos.get(new_variable).put("tipo", tipo);
+			analizadorLexico.tabla_simbolos.get(new_variable).put("uso", "constante");
+		}
+		if (!cumple_rango)
+		{
+			//descartarlo y error
+		}
+		variable.sval = new_variable;
 	}
 	
 	private void chequeoS_funcion_no_declarada (ParserVal funcion)
@@ -301,6 +325,7 @@ condicion_repeat	: ID operador_logico ID {this.reglas.add("Condicion_Repeat");}
 	            Map.Entry<String, HashMap<String,String>> entry = iterator.next();
 	            if (entry.getKey().compareTo(funcion_ambito) == 0 && analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso") != null) 
 	            {
+	            	//agregar if uso == funcion?
 	                funcion_declarada = true;
 	            }
 	        }
@@ -314,7 +339,7 @@ condicion_repeat	: ID operador_logico ID {this.reglas.add("Condicion_Repeat");}
 		
 		if (!funcion_declarada)
 		{
-		System.out.println("error: funcion " + funcion.sval + " no declarada");
+		System.out.println("error semantico: funcion " + funcion.sval + " no declarada");
 		}
 	}
 	
@@ -338,4 +363,123 @@ condicion_repeat	: ID operador_logico ID {this.reglas.add("Condicion_Repeat");}
 		{
 			System.out.println("error semantico: funcion " + funcion.sval + " ya declarada");
 		}	
+	}
+	
+	private void addPendingTypeList(String identificador)
+	{
+		pendingTypeList.add(identificador);
+	}
+	
+	private void setPendingTypes(String tipo)
+	{
+	    for(String identificador : pendingTypeList) {
+     		analizadorLexico.tabla_simbolos.get(identificador).put("tipo",tipo);
+    	}
+	    pendingTypeList.clear();
+	}
+	
+	private String getTipoVariable(String id)
+	{
+		//Esta funcion recibe tanto constantes como identificadores, por lo que hace falta buscarlo a secas el loop de ambito/alcance
+		try {
+		if (analizadorLexico.tabla_simbolos.get(id).get("uso") != null)
+		{
+			return analizadorLexico.tabla_simbolos.get(id).get("tipo");
+		}
+		}
+		catch (Exception e) {}
+
+		String variable_ambito = id;
+		while (variable_ambito.lastIndexOf('.') != -1)
+		{	
+			Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();
+	        while (iterator.hasNext()) 
+	        {
+	            Map.Entry<String, HashMap<String,String>> entry = iterator.next();
+	            if (entry.getKey().compareTo(variable_ambito) == 0 && analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso") != null)
+	            {//Se compara uso ya que la variable debe estar declarada para que tenga tipo
+	                return analizadorLexico.tabla_simbolos.get(entry.getKey()).get("tipo");
+	            }
+	        }
+	        int ambito_index = variable_ambito.lastIndexOf('.');
+			if (ambito_index > 0) {
+				variable_ambito = variable_ambito.substring(0,ambito_index);
+			}
+		
+		}
+		
+		return "nulo";
+	}
+
+	
+	private void chequeoS_diferentes_tipos(ParserVal id1, ParserVal id2)
+	{
+		String tipo_1 = getTipoVariable(id1.sval);
+		String tipo_2 = getTipoVariable(id2.sval);
+		
+		
+		if (getTipoVariable(tipo_1) != "nulo") //es typedef
+			tipo_1 = getTipoVariable(tipo_1);
+		if (getTipoVariable(tipo_2) != "nulo") //es typedef
+			tipo_2 = getTipoVariable(tipo_2);
+			
+			
+		if (tipo_1.compareTo(tipo_2) == 0 && tipo_1 != "nulo")
+		{
+			return;
+		}
+
+		System.out.println("error semantico: " + id1.sval +"("+tipo_1+ ") y " + id2.sval +"("+tipo_2+") son de tipos incompatibles para la operacion."); 
+	}
+	
+	private void setLastFuncType (ParserVal func) //Tanto typedef como funcion
+	{
+		lastFuncType = func.sval;
+	}
+	
+	private void setFuncType (String campo, String contenido)
+	{
+		analizadorLexico.tabla_simbolos.get(lastFuncType).put(campo,contenido);
+	}
+	
+	private void copiarTipoParametro (ParserVal copiar, ParserVal pegar)
+	{
+		String tipo = getTipoVariable(copiar.sval);
+		analizadorLexico.tabla_simbolos.get(pegar.sval).put("tipo_parametro",tipo);
+	}
+	
+	private String getTipoParametroFuncion(ParserVal funcion)
+	{
+			String variable_ambito = funcion.sval;
+			while (variable_ambito.lastIndexOf('.') != -1)
+			{	
+				Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();
+		        while (iterator.hasNext()) 
+		        {
+		            Map.Entry<String, HashMap<String,String>> entry = iterator.next();
+		            if (entry.getKey().compareTo(variable_ambito) == 0 && analizadorLexico.tabla_simbolos.get(entry.getKey()).get("tipo_parametro") != null)
+		            {
+		                return analizadorLexico.tabla_simbolos.get(entry.getKey()).get("tipo_parametro");
+		            }
+		        }
+		        int ambito_index = variable_ambito.lastIndexOf('.');
+				if (ambito_index > 0) {
+					variable_ambito = variable_ambito.substring(0,ambito_index);
+				}
+			
+			}
+		
+		return "nulo";
+	}
+	
+	private void chequeoS_parametro_funcion(ParserVal funcion, ParserVal parametro)
+	{
+		String tipo_parametro_funcion = getTipoParametroFuncion(funcion);
+		String tipo_parametro = getTipoVariable(parametro.sval);
+		
+		if (tipo_parametro_funcion.compareTo(tipo_parametro) == 0 && tipo_parametro_funcion != "nulo")
+		{
+			return;
+		}
+		System.out.println("error semantico: el parametro de " + funcion.sval + " debe ser de tipo " + tipo_parametro_funcion +" y no de tipo " + tipo_parametro); 
 	}
