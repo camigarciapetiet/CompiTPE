@@ -1,22 +1,43 @@
+//TENER EN CUENTA: REMOVER AMBITOS CUANDO SE GENERE CODIGO INTERMEDIO!!!//
+
 programa
 INT diseno;
+INT diseno; //error semantico: variable ya declarada//
 SINGLE aux;
-INT identificador_fuera_de_rango; // ID fuera de rango //
-TYPEDEF m = INT FUNC (INT);
-m a,b,c;
-INT FUNC funcion1 (INT diseno)
+INT identificador_fuera_de_rango; //ID fuera de rango//
+TYPEDEF m = INT FUNC (SINGLE);
+typedefnodeclarado j; //error semantico: typedef no declarado//
+m a;
+INT FUNC funcion1 (SINGLE parametro)
 	INT auxiliarfuncion;
 	INT auxiliarfuncion2;
+	INT FUNC func2 (INT parametro) //funcion anidada//
+		INT auxfunc2;
+		BEGIN
+		PRINT(%hola%);
+		RETURN (2);
+		END;
 	BEGIN
-	PRE: (diseno<2), %diseno menor a 2%;
-		auxiliarfuncion := 5;
-		RETURN (diseno+2);
+	PRE: (diseno<2), %diseno menor a 2%; //verificacion semantica: diseno declarado en un ambito anterior al de la funcion, por lo que es alcanzable//
+		auxfunc2 := 5;
+		RETURN (diseno+5);
+	END;
+INT FUNC funcion1 (SINGLE parametro) //error semantico: funcion1 ya declarada//
+	INT auxfunc1;
+	BEGIN
+		PRINT(%hola%);
+		RETURN(5);
 	END;
 
-BEGIN
-diseno :=99999999;
-aux := 2.3333S-5;
-aux := 2.3333S-500;
+BEGIN	
+
+perrito := 5; //error semantico: variable no declarada | error semantico: tipos incompatibles porque perrito no existe es tipu nulo//
+diseno := funcion1(4); //error semantico: el parametro debe ser un SINGLE, no un INT.//
+diseno := funcion5(4) + 5; //error semantico: funcion no declarada | error semantico x2: tipos incompatibles porque no existe funcion5 es tipo nulo | error semantico: parametro es tipo INT y como no la funcion no esta declarada el parametro debe ser nulo//
+a := funcion1; //asignar funciones a tipos typedef por mas que el tipo de a sea m.programa y el de funcion1 sea INT, es valido porque el tipo de m.programa es INT//
+a := 3; //error semantico: tipos incompatibles, 3 deberia ser una funcion compatible con el retorno de  m.programa que es INT//
+aux := -2.3333S-500;
+diseno := a(5.3S5); //diseno es un INT y a es un typedef de retorno INT con parametro SINGLE, valido//
 PRINT(%Cadena bien escrita%);
 
 REPEAT (diseno = 0; diseno < 5; 1)
@@ -31,4 +52,5 @@ IF (diseno < 5) THEN
 	END;
 ENDIF;
 
+PRINT(%hola%);
 END;

@@ -19,6 +19,9 @@ public class AnalizadorLexico {
 	public int estado_actual;
 	public List<String> informeTokens;
 	
+	//tp3
+	public String ambito;
+	
 	public AnalizadorLexico(String filename, int matriztransicionestados[][], accionSemantica matrizaccionsemantica[][], ErrorHandler error_handler) { // filename = TXT con las palabras predefinidas
 		this.codigoIndex = 257;
 		this.codigoIdentificador = this.codigoIndex;
@@ -52,6 +55,8 @@ public class AnalizadorLexico {
 		this.erroresLex= new ArrayList<String>();
 		this.informeTokens= new ArrayList<String>();
 		this.estado_actual=0;
+		
+		this.ambito = "";
 	}
 	
 	private int convertirSimbolo(char ch) {
@@ -121,23 +126,23 @@ public class AnalizadorLexico {
 				}
 				else {
 					if (tipo_token.valor == 1) { //es una palabra predefinida
-						yylval.sval = null; ///set(null);
+						yylval.sval = token_actual.valor; 
 						informeTokens.add("Palabra predefinida "+token_actual.valor);
-						return this.getCodigoPP(token_actual.valor); //nll
+						return this.getCodigoPP(token_actual.valor); //null
 					}
 					else if (tipo_token.valor == 2) { //es un IDENTIFICADOR
 						yylval.sval = token_actual.valor;
 						informeTokens.add("Identificador "+token_actual.valor);
-						return this.codigoIdentificador;//(token_actual.valor
+						return this.codigoIdentificador;
 					}
 					else if (tipo_token.valor == 3) { //es una CTE
 						yylval.sval = token_actual.valor;
 						informeTokens.add("Constante "+token_actual.valor);
-						return this.codigoCTE;//token_actual.valor
+						return this.codigoCTE;
 					}
 					else if (tipo_token.valor == 4) { //hay que devolver codigo ascii
 						int ch_retorno = (int) token_actual.valor.charAt(0);
-						yylval.sval = null;
+						//yylval.sval = token_actual.valor; 					
 						informeTokens.add(Character.toString(token_actual.valor.charAt(0)));
 						return ch_retorno;
 					}		
