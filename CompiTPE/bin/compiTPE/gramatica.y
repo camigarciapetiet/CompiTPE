@@ -108,13 +108,13 @@ invocacion_funcion	: nombre_invocacion '(' factor ')' {chequeoS_parametro_funcio
 nombre_invocacion : ID {chequeoS_funcion_no_declarada($1);}
 ;
 
-asignacion	: operador_asignacion ':=' expresioncompuesta ';' {chequeoS_diferentes_tipos($1, $3); this.reglas.add("Asignacion");}
+asignacion	: operador_asignacion ':=' expresioncompuesta ';' {chequeoS_diferentes_tipos($1, $3, false); this.reglas.add("Asignacion");}
 		  	| operador_asignacion expresioncompuesta ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); this.reglas.add("Asignacion");}		  
 			| operador_asignacion ':=' ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": variable o constante faltante"); this.reglas.add("Asignacion");}
 			| operador_asignacion ':=' '-' ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": variable o constante faltante"); this.reglas.add("Asignacion");}
 ;
 
-operador_asignacion	: ID {chequeoS_variable_no_declarada($1);} //Esto ya no permite que se pongan funciones para asignar
+operador_asignacion	: ID {chequeoS_variable_no_declarada($1); chequeoS_operador_valido($1);} //Esto ya no permite que se pongan funciones para asignar
 ;
 
 expresioncompuesta	: '('expresion')'
@@ -123,16 +123,16 @@ expresioncompuesta	: '('expresion')'
 					|'('expresion {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de expresion");}
 ;
 
-expresion	: expresion '+' termino {chequeoS_diferentes_tipos($0, $1);}
-			| expresion '-' termino {chequeoS_diferentes_tipos($0, $1);}
+expresion	: expresion '+' termino {chequeoS_diferentes_tipos($0, $1, false);}
+			| expresion '-' termino {chequeoS_diferentes_tipos($0, $1, false);}
 			| termino
 ;
 
-termino		: termino '/' factor {chequeoS_diferentes_tipos($0, $1);}
-			| termino '*' factor {chequeoS_diferentes_tipos($0, $1);}
+termino		: termino '/' factor {chequeoS_diferentes_tipos($0, $1, false);}
+			| termino '*' factor {chequeoS_diferentes_tipos($0, $1, false);}
 			| factor
-			| termino '/' invocacion_funcion {chequeoS_diferentes_tipos($0, $1);}
-			| termino '*' invocacion_funcion {chequeoS_diferentes_tipos($0, $1);}
+			| termino '/' invocacion_funcion {chequeoS_diferentes_tipos($0, $1, false);}
+			| termino '*' invocacion_funcion {chequeoS_diferentes_tipos($0, $1, false);}
 			| invocacion_funcion
 ;
 
@@ -160,7 +160,7 @@ clausula_seleccion_if	: IF '('condicion')' THEN bloque_sentencias_ejecutables EN
 
 
 condicion	: expresion 
-			| condicion operador_logico expresion {chequeoS_diferentes_tipos($0, $1);}
+			| condicion operador_logico expresion {chequeoS_diferentes_tipos($0, $1, false);}
 ;
 
 operador_logico	: '||'
@@ -178,7 +178,7 @@ mensaje_pantalla	: PRINT '(' CADENA ')' ';' {this.reglas.add("clausula PRINT");}
 					| PRINT '(' CADENA  ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de cadena"); this.reglas.add("clausula PRINT");}
 ;
 	
-sentencia_control_repeat	: REPEAT '(' ID '=' CTE ';' condicion_repeat ';' CTE ')' BEGIN conjunto_sentencias_repeat END ';'  {this.reglas.add("Sentencia Ejecutable REPEAT - Chequeo Semantico");}
+sentencia_control_repeat	: REPEAT '(' declaracion_repeat ')' BEGIN conjunto_sentencias_repeat END ';'  {this.reglas.add("Sentencia Ejecutable REPEAT - Chequeo Semantico");}
 ;		
 
 conjunto_sentencias_repeat	: BREAK ';'
@@ -186,8 +186,16 @@ conjunto_sentencias_repeat	: BREAK ';'
 							| sentencia_ejecutable conjunto_sentencias_repeat
 ;
 
-condicion_repeat	: ID operador_logico ID {System.out.println("Comparacion: " + $0.sval + " " + $1.sval); this.reglas.add("Condicion_Repeat");}
-					| ID operador_logico CTE {this.reglas.add("Condicion_Repeat");}
+declaracion_repeat :  asignacion_repeat ';' condicion_repeat ';' CTE {chequeoS_repeat_check_i($1);}
+;
+
+asignacion_repeat : variable_repeat '=' CTE { chequeoS_repeat_tipo_entero($1,"INT"); chequeoS_repeat_tipo_entero($2, "INT");}
+;
+
+variable_repeat : ID {chequeoS_variable_no_declarada($1); chequeoS_operador_valido($1);}
+;
+
+condicion_repeat	: ID operador_logico expresion {chequeoS_diferentes_tipos($0, $2, true); this.reglas.add("Condicion_Repeat"); chequeoS_repeat_set_i($2);}			
 ;
 
 %%
@@ -196,6 +204,9 @@ condicion_repeat	: ID operador_logico ID {System.out.println("Comparacion: " + $
 	public List<String> reglas;
 	public List<String> pendingTypeList;
 	public String lastFuncType;
+	
+	public ParserVal aux_i; //para mantener constancia del repeat
+	public ParserVal aux_m; // para mantener constancia del repeat
 	
 	private int yylex() 
 	{
@@ -244,70 +255,58 @@ condicion_repeat	: ID operador_logico ID {System.out.println("Comparacion: " + $
 	private void chequeoS_variable_no_declarada(ParserVal variable)
 	{
 		//Averigua si la variable esta declarada y en el alcance del ambito donde se la utiliza
-		String variable_ambito = variable.sval;
-		boolean variable_declarada = false;
-		if (isFuncion(variable.sval))
+		String var = getEntradaValidaTS(variable);
+		
+		if (var != null) 
 		{
-			chequeoS_funcion_no_declarada(variable);
-			return;
-		}
-		while (variable_ambito.lastIndexOf('.') != -1 && !variable_declarada)
-		{	
-			Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();
-	        while (iterator.hasNext()) 
-	        {
-	            Map.Entry<String, HashMap<String,String>> entry = iterator.next();
-	            if (entry.getKey().compareTo(variable_ambito) == 0 && analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso") != null) 
-	            {
-	            	if (analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("variable") == 0)
-	                	variable_declarada = true;
-	            }
-	        }
-	        
-	        int ambito_index = variable_ambito.lastIndexOf('.');
-			if (ambito_index > 0) {
-				variable_ambito = variable_ambito.substring(0,ambito_index);
+			if (isFuncion(var))
+			{
+				chequeoS_funcion_no_declarada(variable);
+				return;
 			}
-		
+
+			try {
+				if (analizadorLexico.tabla_simbolos.get(var).get("uso").compareTo("variable") == 0)
+				{
+					return;
+				}
+				System.out.println("error semantico: variable " + variable.sval + " no declarada");
+			} catch (Exception e) {}
 		}
-		
-		if (!variable_declarada) 
-		{
-			System.out.println("error semantico: variable " + variable.sval + " no declarada.");
-		}
+		System.out.println("error semantico: variable " + variable.sval + " no declarada");
+		return;
+	
 	}
 	
 	private void chequeoS_redeclaracion_variable(ParserVal variable)
 	{
 		// buscar en la tabla de simbolos si esta (no hace falta por campo uso sino que no pertenezcan al mismo ambito y listo)
 		// pero si hay que verificar que 'uso' no sea null porque sino, no esta declarada.
-		boolean variable_redeclarada = false;
-
-			Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();
-	        while (iterator.hasNext()) 
-	        {
-	            Map.Entry<String, HashMap<String,String>> entry = iterator.next();
-	            if (entry.getKey().compareTo(variable.sval) == 0 && analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso") != null)  
-	            {
-	            	if (analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("variable") == 0)
-	                	variable_redeclarada = true;
-	            }
-	        }
 		
-		if (variable_redeclarada)
+		String var = getEntradaValidaTS(variable);
+		if (var != null)
 		{
-			System.out.println("error semantico: variable " + variable.sval + " ya declarada");
+			try {
+				if (analizadorLexico.tabla_simbolos.get(var).get("uso").compareTo("variable") == 0)
+				{
+					System.out.println("error semantico: variable " + variable.sval + " ya declarada");
+					return;
+				}
+			} catch (Exception e) {}
 		}
+		return;
 	}
 	
 	private void reverificar_cte_negativa (ParserVal variable)
 	{
+		System.out.println("var negativa: " + variable.sval);
 		String new_variable = "-" + variable.sval;
-		String tipo = analizadorLexico.tabla_simbolos.get(variable.sval).get("tipo");
+		String var = getEntradaValidaTS(variable);
+		String tipo = analizadorLexico.tabla_simbolos.get(var).get("tipo");
 		boolean fuera_de_rango = false;
-		long aux= Long.parseLong(new_variable);
 		if (tipo.compareTo("INT") == 0)
 		{
+			long aux= Long.parseLong(new_variable);
 			int limite_sup= (int) (Math.pow(2, 15)-1);
 			int limite_inf= (int) (-Math.pow(2, 15));
 			if (aux>limite_sup || aux<limite_inf) {
@@ -327,8 +326,9 @@ condicion_repeat	: ID operador_logico ID {System.out.println("Comparacion: " + $
 			if (valor == 0 && base != 0) {
 				analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": constante fuera de rango");
 				fuera_de_rango = true;
-				
 			}
+			
+			System.out.println(valor);
 			double lim1= Math.pow(1.17549435, -38); // 1.17549435S-38
 			double lim2= Math.pow(3.40282347, 38);// 3.40282347S+38
 			double lim3= Math.pow(-3.40282347, 38);//-3.40282347S+38 
@@ -337,6 +337,7 @@ condicion_repeat	: ID operador_logico ID {System.out.println("Comparacion: " + $
 				if(valor<lim3 || valor>lim4) {
 					if(valor!=0) {
 						fuera_de_rango = true;
+							System.out.println("fuera de rangaso");
 				}}
 			}else if(valor<lim3 || valor>lim4) {
 				if(valor<lim1 || valor>lim2) {
@@ -346,8 +347,6 @@ condicion_repeat	: ID operador_logico ID {System.out.println("Comparacion: " + $
 				}
 			}
 		}
-		//rechequear rango
-		
 		
 		if (!fuera_de_rango)
 		{
@@ -357,49 +356,34 @@ condicion_repeat	: ID operador_logico ID {System.out.println("Comparacion: " + $
 		}
 		if (fuera_de_rango)
 		{
-			//descartarlo y error
+			System.out.println("error semantico: variable negativa fuera de rango");
 		}
 		variable.sval = new_variable;
 	}
 	
 	private void chequeoS_funcion_no_declarada (ParserVal funcion)
 	{
+		String func = getEntradaValidaTS(funcion);
 		
-		boolean isTypeDef = isTypeDef(getTipoVariable(funcion.sval));
-		if (isTypeDef)
+		if (func != null) 
 		{
-			funcion.sval = getTipoVariable(funcion.sval);
-			chequeoS_typedef_existe(funcion);
-			return;
-		}
-		
-		
-		String funcion_ambito = funcion.sval;
-		boolean funcion_declarada = false;
-		while (funcion_ambito.lastIndexOf('.') != -1 && !funcion_declarada)
-		{	
-			Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();
-	        while (iterator.hasNext()) 
-	        {
-	            Map.Entry<String, HashMap<String,String>> entry = iterator.next();
-	            if (entry.getKey().compareTo(funcion_ambito) == 0 && analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso") != null) 
-	            {
-	            	if (analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("funcion") == 0)
-	                	funcion_declarada = true;
-	            }
-	        }
-	        
-	        int ambito_index = funcion_ambito.lastIndexOf('.');
-			if (ambito_index > 0) 
+			boolean isTypeDef = isTypeDef(getTipoVariable(funcion.sval));
+			if (isTypeDef)
 			{
-				funcion_ambito = funcion_ambito.substring(0,ambito_index);
+				funcion.sval = getTipoVariable(funcion.sval);
+				chequeoS_typedef_existe(funcion);
+				return;
 			}
+			try {
+				if (analizadorLexico.tabla_simbolos.get(func).get("uso").compareTo("funcion") == 0)
+				{
+					return;
+				}
+				System.out.println("error semantico: funcion " + funcion.sval + " no declarada");
+			} catch (Exception e) {}
 		}
-		
-		if (!funcion_declarada)
-		{
 		System.out.println("error semantico: funcion " + funcion.sval + " no declarada");
-		}
+		return;
 	}
 	
 	private void chequeoS_redeclaracion_funcion (ParserVal funcion)
@@ -471,21 +455,13 @@ condicion_repeat	: ID operador_logico ID {System.out.println("Comparacion: " + $
 		return "nulo";
 	}
 
-	
-	private boolean isFuncion(String id)
+	private void chequeoS_diferentes_tipos(ParserVal id1, ParserVal id2, boolean condicion_repeat)
 	{
-		if (analizadorLexico.tabla_simbolos.get(id).get("uso") != null)
-		{
-			if (analizadorLexico.tabla_simbolos.get(id).get("uso").compareTo("funcion") == 0)
-				return true;
-		}
-		return false;
 		
-	}
-	private void chequeoS_diferentes_tipos(ParserVal id1, ParserVal id2)
-	{
+		
 		String tipo_1 = getTipoVariable(id1.sval);
 		String tipo_2 = getTipoVariable(id2.sval);
+		
 		
 		
 		if (getTipoVariable(tipo_1) != "nulo") //es typedef
@@ -497,6 +473,15 @@ condicion_repeat	: ID operador_logico ID {System.out.println("Comparacion: " + $
 		if (getTipoVariable(tipo_2) != "nulo") //es typedef
 		{
 			tipo_2 = getTipoVariable(tipo_2);
+		}
+		
+		if (condicion_repeat == true) // CONDICION REPEAT DEBEN SER DE TIPO ENTERO
+		{
+			if (tipo_1.compareTo("INT") != 0 || tipo_2.compareTo("INT") != 0)
+			{
+				System.out.println("error semantico: en una sentencia repeat, los datos de condicion deben ser de tipo entero (INT)");
+				return;
+			}
 		}
 		
 		if (tipo_1.compareTo(tipo_2) == 0 && tipo_1 != "nulo")
@@ -523,30 +508,6 @@ condicion_repeat	: ID operador_logico ID {System.out.println("Comparacion: " + $
 		analizadorLexico.tabla_simbolos.get(pegar.sval).put("parametro",tipo);
 	}
 	
-	private String getTipoParametroFuncion(String funcion)
-	{
-			String variable_ambito = funcion;
-			while (variable_ambito.lastIndexOf('.') != -1)
-			{	
-				Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();
-		        while (iterator.hasNext()) 
-		        {
-		            Map.Entry<String, HashMap<String,String>> entry = iterator.next();
-		            if (entry.getKey().compareTo(variable_ambito) == 0 && analizadorLexico.tabla_simbolos.get(entry.getKey()).get("parametro") != null)
-		            {
-		                return analizadorLexico.tabla_simbolos.get(entry.getKey()).get("parametro");
-		            }
-		        }
-		        int ambito_index = variable_ambito.lastIndexOf('.');
-				if (ambito_index > 0) {
-					variable_ambito = variable_ambito.substring(0,ambito_index);
-				}
-			
-			}
-		
-		return "nulo";
-	}
-	
 	private boolean isTypeDef(String func)
 	{
 		try {
@@ -554,48 +515,112 @@ condicion_repeat	: ID operador_logico ID {System.out.println("Comparacion: " + $
 				return true;
 		} catch (Exception e) {}
 		return false;
-		
+	}
+	
+	private boolean isFuncion(String id)
+	{
+		if (analizadorLexico.tabla_simbolos.get(id).get("uso") != null)
+		{
+			if (analizadorLexico.tabla_simbolos.get(id).get("uso").compareTo("funcion") == 0)
+				return true;
+		}
+		return false;
 	}
 	
 	private void chequeoS_parametro_funcion(ParserVal funcion, ParserVal parametro)
 	{
-		String tipo_parametro_funcion = getTipoParametroFuncion(funcion.sval);
-		String tipo_parametro = getTipoVariable(parametro.sval);
+		String func = getEntradaValidaTS(funcion);
+		String par = getEntradaValidaTS(parametro);
 		
-		if (isTypeDef(getTipoVariable(funcion.sval)))
-		{
-			tipo_parametro_funcion = getTipoParametroFuncion(getTipoVariable(funcion.sval));
-		}
+		try {
+			String tipo_par_func = analizadorLexico.tabla_simbolos.get(func).get("tipo_parametro");
+			String tipo_par = analizadorLexico.tabla_simbolos.get(par).get("tipo");
+			if (isTypeDef(tipo_par_func)) {
+				tipo_par_func = analizadorLexico.tabla_simbolos.get(tipo_par_func).get("tipo");
+			}
+			
+			if (tipo_par_func.compareTo(tipo_par) == 0 && tipo_par_func != null)
+			{
+				return;
+			}
+			System.out.println("error semantico: el parametro de " + funcion.sval + " debe ser de tipo " + tipo_par_func +" y no de tipo " + tipo_par); 
+		} catch (Exception e) { }
+		return;
 		
-		if (tipo_parametro_funcion.compareTo(tipo_parametro) == 0 && tipo_parametro_funcion != "nulo")
-		{
-			return;
-		}
-		System.out.println("error semantico: el parametro de " + funcion.sval + " debe ser de tipo " + tipo_parametro_funcion +" y no de tipo " + tipo_parametro); 
 	}
 	
-	private void chequeoS_typedef_existe(ParserVal typedef)
+	private void chequeoS_typedef_existe(ParserVal var)
 	{
-		String variable_ambito = typedef.sval;
-		while (variable_ambito.lastIndexOf('.') != -1)
-		{	
-			Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();
-	        while (iterator.hasNext()) 
-	        {
-	            Map.Entry<String, HashMap<String,String>> entry = iterator.next();
-	            if (entry.getKey().compareTo(variable_ambito) == 0 && analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso") != null)
-	            {//Se compara uso ya que la variable debe estar declarada para que tenga tipo
-	            		try {
-	            		if (analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("typedef") == 0)
-	                		return;
-	            		}
-	            		catch(Exception e) {}
-	            }
-	        }
-	        int ambito_index = variable_ambito.lastIndexOf('.');
-			if (ambito_index > 0) {
-				variable_ambito = variable_ambito.substring(0,ambito_index);
+		String typedef = getEntradaValidaTS(var);
+		try
+		{
+			String uso_typedef = analizadorLexico.tabla_simbolos.get(typedef).get("uso");
+			if (uso_typedef.compareTo("typedef") == 0)
+				return;
+		} catch (Exception e){}
+		System.out.println("error semantico: no existe un typedef de nombre " + var.sval); 
+		return;
+	}
+	
+	private void chequeoS_repeat_tipo_entero(ParserVal var, String tipo)
+	{
+		String variable = getEntradaValidaTS(var);
+		try
+		{
+			String tipo_variable = analizadorLexico.tabla_simbolos.get(variable).get("tipo");
+			if (tipo_variable.compareTo(tipo) == 0)
+				return;
+		} catch (Exception e){}
+		System.out.println("error semantico: la variable o constante deberia ser de tipo entero");
+		return;
+		
+	}
+
+	private void chequeoS_operador_valido(ParserVal op)
+	{
+		String operador = getEntradaValidaTS(op);
+		try
+		{
+			String uso_operador = analizadorLexico.tabla_simbolos.get(operador).get("uso");
+			if (uso_operador.compareTo("variable") == 0)
+				return;
+		} catch (Exception e){}
+		System.out.println("error semantico: operador de asignacion invalido, " + op.sval + " no es una variable.");
+		return;
+	}
+	
+	private String getEntradaValidaTS(ParserVal entrada)
+	{
+		//Esta funcion devuelve una referencia a la tabla de simbolos valida (de existir) de una entrada (en el alcance de su ambito), tanto ID como CTE.
+		String iterador_entrada = entrada.sval;
+		boolean no_quedan_ambitos = false;
+		while (!no_quedan_ambitos)
+		{
+			try {
+				String entrada_actual_uso = analizadorLexico.tabla_simbolos.get(iterador_entrada).get("uso");
+				if (entrada_actual_uso != null)
+					{return iterador_entrada;}
 			}
+			catch (Exception e) { }
+			
+			int ambito_index = iterador_entrada.lastIndexOf('.');
+			if (ambito_index > 0) {
+				iterador_entrada = iterador_entrada.substring(0,ambito_index);
+			} else {no_quedan_ambitos = true;}
 		}
-		System.out.println("error semantico: no existe un typedef de nombre " + typedef.sval); 
+		return null;
+	}
+	
+	private void chequeoS_repeat_set_i (ParserVal i)
+	{
+		aux_i = i;
+	}
+	
+	private void chequeoS_repeat_check_i (ParserVal i)
+	{
+		if (aux_i.sval.compareTo(i.sval) != 0)
+		{
+			System.out.println("error semantico: en una sentencia repeat se debe comparar usando la variable de control");
+		}
+		return;
 	}
