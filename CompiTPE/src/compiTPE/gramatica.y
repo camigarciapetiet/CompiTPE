@@ -207,6 +207,9 @@ condicion_repeat	: ID operador_logico expresion {chequeoS_diferentes_tipos($0, $
 	public ParserVal aux_i; //para mantener constancia del repeat
 	public ParserVal aux_m; // para mantener constancia del repeat
 	
+	public ParserVal aux_i; //para mantener constancia del repeat
+	public ParserVal aux_m; // para mantener constancia del repeat
+	
 	private int yylex() 
 	{
 		return analizadorLexico.yylex(yylval);
