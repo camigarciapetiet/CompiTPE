@@ -2,9 +2,9 @@ package compiTPE;
 
 public class Nodo {
 
-	String nombre;
-	Nodo izq;
-	Nodo der;
+	public String nombre;
+	public Nodo izq;
+	public Nodo der;
 	
 	public Nodo(String s) {
 		this.nombre=s;
@@ -18,7 +18,7 @@ public class Nodo {
 		this.izq = izq;
 		this.der = der;
 	}
-	
+		
 	public void setHijos(Nodo izq, Nodo der) {
 		this.izq=izq;
 		this.der=der;
