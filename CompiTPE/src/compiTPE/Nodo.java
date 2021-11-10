@@ -1,10 +1,10 @@
 package compiTPE;
 
-public class Nodo {
+public class Nodo extends ParserVal {
 
 	public String nombre;
-	public Nodo izq;
-	public Nodo der;
+	public Object izq;
+	public Object der;
 	
 	public Nodo(String s) {
 		this.nombre=s;
@@ -12,14 +12,20 @@ public class Nodo {
 		der=null;
 	}
 
-	public Nodo(String nombre, Nodo izq, Nodo der) {
+	public Nodo(int s) {
+		this.nombre=String.valueOf(s);
+		izq=null;
+		der=null;
+	}
+
+	public Nodo(String nombre, Object izq, Object der) {
 		super();
 		this.nombre = nombre;
 		this.izq = izq;
 		this.der = der;
 	}
 		
-	public void setHijos(Nodo izq, Nodo der) {
+	public void setHijos(Object izq, Object der) {
 		this.izq=izq;
 		this.der=der;
 	}

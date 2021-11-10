@@ -937,17 +937,17 @@ final static String yyrule[] = {
 		}
 		return;
 	}
-	
+	/*
 	public void imprimirArbol(Nodo nodo){
         if(nodo == null)
             return;
         
         System.out.println(nodo.nombre + " ");
         System.out.print("    ");
-        imprimirArbol(nodo.izq);
+        imprimirArbol(nodo.izq.obj);
         System.out.print("    ");
-        imprimirArbol(nodo.der);
-	}
+        imprimirArbol(nodo.der.obj);
+	}*/
 //#line 880 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
@@ -1104,7 +1104,7 @@ boolean doaction;
 //########## USER-SUPPLIED ACTIONS ##########
 case 1:
 //#line 15 "gramatica.y"
-{desapilar_ambito(); this.reglas.add("Sentencia START programa"); this.raiz= new Nodo("Programa", val_peek(5), val_peek(2));}
+{desapilar_ambito(); this.reglas.add("Sentencia START programa"); this.raiz= new Nodo("Programa", val_peek(5).obj, val_peek(2).obj);}
 break;
 case 2:
 //#line 16 "gramatica.y"
@@ -1112,7 +1112,7 @@ case 2:
 break;
 case 3:
 //#line 19 "gramatica.y"
-{apilar_ambito(val_peek(0)); set_campo(val_peek(0),"uso","programa"); yyval= new Nodo(val_peek(0));}
+{apilar_ambito(val_peek(0)); set_campo(val_peek(0),"uso","programa"); yyval.obj= new Nodo(val_peek(0).sval);}
 break;
 case 4:
 //#line 22 "gramatica.y"
@@ -1224,7 +1224,7 @@ case 37:
 break;
 case 38:
 //#line 87 "gramatica.y"
-{yyval= new Nodo("S", val_peek(0), null);}
+{yyval.obj= new Nodo("S", val_peek(0).obj, null);}
 break;
 case 39:
 //#line 88 "gramatica.y"
@@ -1236,11 +1236,11 @@ case 40:
 break;
 case 41:
 //#line 92 "gramatica.y"
-{yyval= new Nodo("S", val_peek(0), null);}
+{yyval.obj= new Nodo("S", val_peek(0).obj, null);}
 break;
 case 42:
 //#line 93 "gramatica.y"
-{yyval= new Nodo("S", val_peek(1), val_peek(0));}
+{yyval.obj= new Nodo("S", val_peek(1).obj, val_peek(0).obj);}
 break;
 case 43:
 //#line 96 "gramatica.y"
@@ -1260,19 +1260,19 @@ case 46:
 break;
 case 47:
 //#line 102 "gramatica.y"
-{chequeoS_parametro_funcion(val_peek(3), val_peek(2)); yyval=new Nodo("invocacion funcion", val_peek(3), val_peek(1));}
+{chequeoS_parametro_funcion(val_peek(3), val_peek(2)); yyval.obj=new Nodo("invocacion funcion", val_peek(3).obj, val_peek(1).obj);}
 break;
 case 48:
 //#line 106 "gramatica.y"
-{chequeoS_funcion_no_declarada(val_peek(0)); yyval=new Nodo (val_peek(0));}
+{chequeoS_funcion_no_declarada(val_peek(0)); yyval.obj=new Nodo (val_peek(0).sval);}
 break;
 case 49:
 //#line 109 "gramatica.y"
-{chequeoS_diferentes_tipos(val_peek(3), val_peek(1)); this.reglas.add("Asignacion"); yyval= new Nodo(val_peek(2), val_peek(3), val_peek(1));}
+{chequeoS_diferentes_tipos(val_peek(3), val_peek(1)); this.reglas.add("Asignacion"); yyval.obj= new Nodo(":=", val_peek(3).obj, val_peek(1).obj);}
 break;
 case 50:
 //#line 110 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); this.reglas.add("Asignacion"); yyval= new Nodo(":=", val_peek(2), val_peek(1))}
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); this.reglas.add("Asignacion"); yyval.obj= new Nodo(":=", val_peek(2).obj, val_peek(1).obj);}
 break;
 case 51:
 //#line 113 "gramatica.y"
@@ -1296,11 +1296,11 @@ case 55:
 break;
 case 56:
 //#line 122 "gramatica.y"
-{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); yyval= new Nodo(val_peek(1), val_peek(2), val_peek(0));}
+{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); yyval.obj= new Nodo("+", val_peek(2).obj, val_peek(0).obj);}
 break;
 case 57:
 //#line 123 "gramatica.y"
-{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); yyval= new Nodo(val_peek(1), val_peek(2), val_peek(0));}
+{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); yyval.obj= new Nodo("-", val_peek(2).obj, val_peek(0).obj);}
 break;
 case 58:
 //#line 124 "gramatica.y"
@@ -1308,11 +1308,11 @@ case 58:
 break;
 case 59:
 //#line 127 "gramatica.y"
-{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); yyval= new Nodo(val_peek(1), val_peek(2), val_peek(0));}
+{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); yyval.obj= new Nodo("/", val_peek(2).obj, val_peek(0).obj);}
 break;
 case 60:
 //#line 128 "gramatica.y"
-{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); yyval= new Nodo(val_peek(1), val_peek(2), val_peek(0));}
+{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); yyval.obj= new Nodo("*", val_peek(2).obj, val_peek(0).obj);}
 break;
 case 61:
 //#line 129 "gramatica.y"
@@ -1320,11 +1320,11 @@ case 61:
 break;
 case 62:
 //#line 130 "gramatica.y"
-{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); yyval= new Nodo(val_peek(1), val_peek(2), val_peek(0));}
+{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); yyval.obj= new Nodo("/", val_peek(2).obj, val_peek(0).obj);}
 break;
 case 63:
 //#line 131 "gramatica.y"
-{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); yyval= new Nodo(val_peek(1), val_peek(2), val_peek(0));}
+{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); yyval.obj= new Nodo("*", val_peek(2).obj, val_peek(0).obj);}
 break;
 case 64:
 //#line 132 "gramatica.y"
@@ -1332,15 +1332,15 @@ case 64:
 break;
 case 65:
 //#line 135 "gramatica.y"
-{this.reglas.add("factor ID"); chequeoS_variable_no_declarada(val_peek(0)); yyval=new Nodo(val_peek(0));}
+{this.reglas.add("factor ID"); chequeoS_variable_no_declarada(val_peek(0)); yyval.obj=new Nodo(val_peek(0).sval);}
 break;
 case 66:
 //#line 136 "gramatica.y"
-{this.reglas.add("Factor CTE"); yyval=new Nodo(val_peek(0));}
+{this.reglas.add("Factor CTE"); yyval.obj=new Nodo(val_peek(0).ival);}
 break;
 case 67:
 //#line 137 "gramatica.y"
-{reverificar_cte_negativa(val_peek(1)); yyval=new Nodo("-"+val_peek(1));}
+{reverificar_cte_negativa(val_peek(1)); yyval.obj=new Nodo("-"+val_peek(1));}
 break;
 case 68:
 //#line 140 "gramatica.y"
@@ -1352,103 +1352,103 @@ case 69:
 break;
 case 70:
 //#line 144 "gramatica.y"
-{yyval= new Nodo("IF", val_peek(4), val_peek(2));}
+{yyval.obj= new Nodo("IF", val_peek(4).obj, val_peek(2).obj);}
 break;
 case 71:
 //#line 145 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); this.reglas.add("clausula IF"); yyval= new Nodo("IF", val_peek(4), val_peek(2));}
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); this.reglas.add("clausula IF"); yyval.obj= new Nodo("IF", val_peek(4).obj, val_peek(2).obj);}
 break;
 case 72:
 //#line 146 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); this.reglas.add("clausula IF"); yyval= new Nodo("IF", val_peek(3), val_peek(2));}
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); this.reglas.add("clausula IF"); yyval.obj= new Nodo("IF", val_peek(3).obj, val_peek(2).obj);}
 break;
 case 73:
 //#line 149 "gramatica.y"
-{yyval= new Nodo("cuerpo", val_peek(0), null);}
+{yyval.obj= new Nodo("cuerpo", val_peek(0).obj, null);}
 break;
 case 74:
 //#line 150 "gramatica.y"
-{yyval= new Nodo("cuerpo", val_peek(1), val_peek(0));}
+{yyval.obj= new Nodo("cuerpo", val_peek(1).obj, val_peek(0).obj);}
 break;
 case 75:
 //#line 153 "gramatica.y"
-{yyval= new Nodo("THEN", val_peek(0), null);}
+{yyval.obj= new Nodo("THEN", val_peek(0).obj, null);}
 break;
 case 76:
 //#line 154 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": 'THEN' esperado"); yyval= new Nodo("THEN", val_peek(0), null);}
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": 'THEN' esperado"); yyval.obj= new Nodo("THEN", val_peek(0).obj, null);}
 break;
 case 77:
 //#line 157 "gramatica.y"
-{yyval= new Nodo("ELSE", val_peek(0), null);}
+{yyval.obj= new Nodo("ELSE", val_peek(0).obj, null);}
 break;
 case 78:
 //#line 160 "gramatica.y"
-{yyval=new Nodo("condicion", val_peek(0), null);}
+{yyval.obj=new Nodo("condicion", val_peek(0).obj, null);}
 break;
 case 79:
 //#line 161 "gramatica.y"
-{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); yyval= val_peek(2).setHijos(val_peek(2), val_peek(0));}
+{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), false); val_peek(1).obj.setHijos(val_peek(2).obj,val_peek(0).obj); yyval.obj= val_peek(1).obj;}
 break;
 case 80:
 //#line 164 "gramatica.y"
-{yyval= new Nodo(val_peek(0));}
+{yyval.obj= new Nodo("||");}
 break;
 case 81:
 //#line 165 "gramatica.y"
-{yyval= new Nodo(val_peek(0));}
+{yyval.obj= new Nodo("&&");}
 break;
 case 82:
 //#line 166 "gramatica.y"
-{yyval= new Nodo(val_peek(0));}
+{yyval.obj= new Nodo("<>");}
 break;
 case 83:
 //#line 167 "gramatica.y"
-{yyval= new Nodo(val_peek(0));}
+{yyval.obj= new Nodo("==");}
 break;
 case 84:
 //#line 168 "gramatica.y"
-{yyval= new Nodo(val_peek(0));}
+{yyval.obj= new Nodo("<=");}
 break;
 case 85:
 //#line 169 "gramatica.y"
-{yyval= new Nodo(val_peek(0));}
+{yyval.obj= new Nodo(">=");}
 break;
 case 86:
 //#line 170 "gramatica.y"
-{yyval= new Nodo(val_peek(0));}
+{yyval.obj= new Nodo(">");}
 break;
 case 87:
 //#line 171 "gramatica.y"
-{yyval= new Nodo(val_peek(0));}
+{yyval.obj= new Nodo("<");}
 break;
 case 88:
 //#line 174 "gramatica.y"
-{this.reglas.add("clausula PRINT"); yyval= new Nodo(val_peek(4), val_peek(2), null);}
+{this.reglas.add("clausula PRINT"); yyval.obj= new Nodo("PRINT", val_peek(2).obj, null);}
 break;
 case 89:
 //#line 175 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de cadena"); this.reglas.add("clausula PRINT"); yyval= new Nodo(val_peek(3), val_peek(2), null);}
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de cadena"); this.reglas.add("clausula PRINT"); yyval.obj= new Nodo("PRINT", val_peek(2).obj, null);}
 break;
 case 90:
 //#line 176 "gramatica.y"
-{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de cadena"); this.reglas.add("clausula PRINT"); yyval= new Nodo(val_peek(3), val_peek(1), null);}
+{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de cadena"); this.reglas.add("clausula PRINT"); yyval.obj= new Nodo("PRINT", val_peek(1).obj, null);}
 break;
 case 91:
 //#line 179 "gramatica.y"
-{this.reglas.add("Sentencia Ejecutable REPEAT - Chequeo Semantico"); new Nodo("Repeat", val_peek(5), val_peek(3));}
+{this.reglas.add("Sentencia Ejecutable REPEAT - Chequeo Semantico"); new Nodo("Repeat", val_peek(5).obj, val_peek(3).obj);}
 break;
 case 92:
 //#line 182 "gramatica.y"
-{yyval= new Nodo("BREAK");}
+{yyval.obj= new Nodo("BREAK");}
 break;
 case 93:
 //#line 183 "gramatica.y"
-{yyval= new Nodo("S", val_peek(0), null);}
+{yyval.obj= new Nodo("S", val_peek(0).obj, null);}
 break;
 case 94:
 //#line 184 "gramatica.y"
-{yyval= new Nodo("S", val_peek(1), val_peek(0));}
+{yyval.obj= new Nodo("S", val_peek(1).obj, val_peek(0).obj);}
 break;
 case 95:
 //#line 187 "gramatica.y"
