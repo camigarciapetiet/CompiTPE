@@ -3,8 +3,8 @@ package compiTPE;
 public class Nodo extends ParserVal {
 
 	public String nombre;
-	public Object izq;
-	public Object der;
+	public ParserVal izq;
+	public ParserVal der;
 	
 	public Nodo(String s) {
 		this.nombre=s;
@@ -18,15 +18,14 @@ public class Nodo extends ParserVal {
 		der=null;
 	}
 
-	public Nodo(String nombre, Object izq, Object der) {
+	public Nodo(String nombre, ParserVal izq, ParserVal der) {
 		super();
 		this.nombre = nombre;
 		this.izq = izq;
 		this.der = der;
 	}
-		
-	public void setHijos(Object izq, Object der) {
-		this.izq=izq;
-		this.der=der;
+	
+	public String toString() {
+		return nombre;
 	}
 }

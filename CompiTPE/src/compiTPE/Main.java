@@ -98,6 +98,9 @@ public class Main {
 	        System.out.println(a_lex.tabla_simbolos);
 	        System.out.println("\nPalabras Predefinidas");
 	        System.out.println(a_lex.palabras_predefinidas);
+	        
+	        System.out.println("\n\nARBOL");
+	        newParser.imprimirArbol(newParser.raiz);
 
 		}
 		
