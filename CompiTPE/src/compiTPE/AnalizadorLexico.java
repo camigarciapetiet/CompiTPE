@@ -16,6 +16,7 @@ public class AnalizadorLexico {
 	public Map<String, HashMap<String, String>> tabla_simbolos;
 	public ErrorHandler error_handler;
 	public List<String> erroresLex;
+	public List<String> warningsLex;
 	public int estado_actual;
 	public List<String> informeTokens;
 	
@@ -54,6 +55,7 @@ public class AnalizadorLexico {
 		this.error_handler = error_handler;
 		this.erroresLex= new ArrayList<String>();
 		this.informeTokens= new ArrayList<String>();
+		this.warningsLex = new ArrayList<String>();
 		this.estado_actual=0;
 		
 		this.ambito = "";

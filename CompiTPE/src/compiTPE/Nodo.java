@@ -28,7 +28,7 @@ public class Nodo extends ParserVal implements Cloneable {
 		this.der = der;
 		tipo=null;
 	}
-	
+
 	public void setTipo(String tipo) {
 		this.tipo=tipo;
 	}

@@ -1,11 +1,12 @@
 package compiTPE;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		int matrizTransicionEstados[][] = {
 		        {7,7,12,13,10,-2,-2,-2,1,4,5,6,7,11,8,9,0,0,7,-1},
@@ -78,6 +79,7 @@ public class Main {
 	        a_lex.setPrograma(programtext);
 	        Parser newParser = new Parser(a_lex);
 	        newParser.run();
+	        
 	        System.out.println("\n\nINFORME TOKENS");
 	        for (String s: a_lex.informeTokens) {
 	        	System.out.print(s+ ", ");
@@ -98,10 +100,27 @@ public class Main {
 	        System.out.println(a_lex.tabla_simbolos);
 	        System.out.println("\nPalabras Predefinidas");
 	        System.out.println(a_lex.palabras_predefinidas);
-	        
-	        System.out.println("\n\nARBOL");
-	        newParser.imprimirArbol(newParser.raiz);
 
+//	        if (a_lex.erroresLex.isEmpty() && newParser.erroresSint.isEmpty())
+//	        {
+	        	CodeGenerator cg_assembler = new CodeGenerator(newParser.raiz, newParser);
+	        	cg_assembler.run();
+//	        }
+//	        else {
+//	        	System.out.println("Se han encontrado errores lexicos y/o sintacticos en la compilación del programa, por lo que no ha sido compilado.");
+//  		        System.out.println("\n\nERRORES LEXICOS");
+//		        for (String s: a_lex.erroresLex) {
+//		        	System.out.println(s);
+//		        }
+//		        System.out.println("\n\nERRORES SINTACTICOS");
+//		        for (String s: newParser.erroresSint) {
+//		        	System.out.println(s);
+//		        }
+//		        System.out.println("\n\n\nTABLA DE SIMBOLOS");
+//		        System.out.println(a_lex.tabla_simbolos);
+//		        System.out.println("\nPalabras Predefinidas");
+//		        System.out.println(a_lex.palabras_predefinidas);
+//	        }
 		}
 		
 	}
