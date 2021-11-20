@@ -141,8 +141,7 @@
 
  102  variable_repeat : ID
 
- 103  condicion_repeat : ID operador_logico ID
- 104                   | ID operador_logico CTE
+ 103  condicion_repeat : ID operador_logico expresion
 
 state 0
 	$accept : . programa $end  (0)
@@ -1887,8 +1886,7 @@ state 165
 
 
 state 166
-	condicion_repeat : ID . operador_logico ID  (103)
-	condicion_repeat : ID . operador_logico CTE  (104)
+	condicion_repeat : ID . operador_logico expresion  (103)
 
 	"||"  shift 84
 	"&&"  shift 85
@@ -2137,32 +2135,38 @@ state 190
 
 
 state 191
-	condicion_repeat : ID operador_logico . ID  (103)
-	condicion_repeat : ID operador_logico . CTE  (104)
+	condicion_repeat : ID operador_logico . expresion  (103)
 
-	ID  shift 212
-	CTE  shift 213
+	ID  shift 50
+	CTE  shift 51
+	'-'  shift 54
 	.  error
+
+	expresion  goto 212
+	invocacion_funcion  goto 57
+	nombre_invocacion  goto 58
+	factor  goto 59
+	termino  goto 60
 
 
 state 192
 	declaracion_repeat : asignacion_repeat ';' condicion_repeat ';' . CTE  (100)
 
-	CTE  shift 214
+	CTE  shift 213
 	.  error
 
 
 state 193
 	pre_condicion : PRE ':' '(' ')' ',' . CADENA ';'  (24)
 
-	CADENA  shift 215
+	CADENA  shift 214
 	.  error
 
 
 state 194
 	pre_condicion : PRE ':' '(' condicion ',' . CADENA ';'  (25)
 
-	CADENA  shift 216
+	CADENA  shift 215
 	.  error
 
 
@@ -2171,15 +2175,15 @@ state 195
 	pre_condicion : PRE ':' '(' condicion ')' . CADENA ';'  (26)
 	pre_condicion : PRE ':' '(' condicion ')' . ',' ';'  (27)
 
-	CADENA  shift 217
-	','  shift 218
+	CADENA  shift 216
+	','  shift 217
 	.  error
 
 
 state 196
 	pre_condicion : PRE ':' condicion ')' ',' . CADENA ';'  (23)
 
-	CADENA  shift 219
+	CADENA  shift 218
 	.  error
 
 
@@ -2192,14 +2196,14 @@ state 197
 state 198
 	declaracionFuncion : cabeza_funcion bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable RETURN retorno ';' END . ';'  (19)
 
-	';'  shift 220
+	';'  shift 219
 	.  error
 
 
 state 199
 	declaracionFuncion : cabeza_funcion bloque_sentencias_declarativas BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' . END ';'  (20)
 
-	END  shift 221
+	END  shift 220
 	.  error
 
 
@@ -2212,7 +2216,7 @@ state 200
 state 201
 	clausula_seleccion_if : IF '(' condicion THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables . ENDIF ';'  (78)
 
-	ENDIF  shift 222
+	ENDIF  shift 221
 	.  error
 
 
@@ -2232,7 +2236,7 @@ state 203
 	REPEAT  shift 33
 	.  error
 
-	bloque_sentencias_ejecutables  goto 223
+	bloque_sentencias_ejecutables  goto 222
 	sentencia_ejecutable  goto 81
 	asignacion  goto 36
 	mensaje_pantalla  goto 37
@@ -2244,14 +2248,14 @@ state 203
 state 204
 	clausula_seleccion_if : IF '(' condicion ')' THEN bloque_sentencias_ejecutables ENDIF . ';'  (73)
 
-	';'  shift 224
+	';'  shift 223
 	.  error
 
 
 state 205
 	clausula_seleccion_if : IF '(' condicion ')' bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables . ENDIF ';'  (80)
 
-	ENDIF  shift 225
+	ENDIF  shift 224
 	.  error
 
 
@@ -2264,7 +2268,7 @@ state 206
 state 207
 	clausula_seleccion_if : IF condicion ')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables . ENDIF ';'  (77)
 
-	ENDIF  shift 226
+	ENDIF  shift 225
 	.  error
 
 
@@ -2289,197 +2293,195 @@ state 210
 state 211
 	sentencia_control_repeat : REPEAT '(' declaracion_repeat ')' BEGIN conjunto_sentencias_repeat END . ';'  (96)
 
-	';'  shift 227
+	';'  shift 226
 	.  error
 
 
 state 212
-	condicion_repeat : ID operador_logico ID .  (103)
+	expresion : expresion . '+' termino  (59)
+	expresion : expresion . '-' termino  (60)
+	condicion_repeat : ID operador_logico expresion .  (103)
 
-	.  reduce 103
+	'-'  shift 94
+	'+'  shift 95
+	';'  reduce 103
 
 
 state 213
-	condicion_repeat : ID operador_logico CTE .  (104)
-
-	.  reduce 104
-
-
-state 214
 	declaracion_repeat : asignacion_repeat ';' condicion_repeat ';' CTE .  (100)
 
 	.  reduce 100
 
 
-state 215
+state 214
 	pre_condicion : PRE ':' '(' ')' ',' CADENA . ';'  (24)
+
+	';'  shift 227
+	.  error
+
+
+state 215
+	pre_condicion : PRE ':' '(' condicion ',' CADENA . ';'  (25)
 
 	';'  shift 228
 	.  error
 
 
 state 216
-	pre_condicion : PRE ':' '(' condicion ',' CADENA . ';'  (25)
+	pre_condicion : PRE ':' '(' condicion ')' CADENA . ';'  (26)
 
 	';'  shift 229
 	.  error
 
 
 state 217
-	pre_condicion : PRE ':' '(' condicion ')' CADENA . ';'  (26)
+	pre_condicion : PRE ':' '(' condicion ')' ',' . CADENA ';'  (22)
+	pre_condicion : PRE ':' '(' condicion ')' ',' . ';'  (27)
 
-	';'  shift 230
+	CADENA  shift 230
+	';'  shift 231
 	.  error
 
 
 state 218
-	pre_condicion : PRE ':' '(' condicion ')' ',' . CADENA ';'  (22)
-	pre_condicion : PRE ':' '(' condicion ')' ',' . ';'  (27)
+	pre_condicion : PRE ':' condicion ')' ',' CADENA . ';'  (23)
 
-	CADENA  shift 231
 	';'  shift 232
 	.  error
 
 
 state 219
-	pre_condicion : PRE ':' condicion ')' ',' CADENA . ';'  (23)
-
-	';'  shift 233
-	.  error
-
-
-state 220
 	declaracionFuncion : cabeza_funcion bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable RETURN retorno ';' END ';' .  (19)
 
 	.  reduce 19
 
 
-state 221
+state 220
 	declaracionFuncion : cabeza_funcion bloque_sentencias_declarativas BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END . ';'  (20)
+
+	';'  shift 233
+	.  error
+
+
+state 221
+	clausula_seleccion_if : IF '(' condicion THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF . ';'  (78)
 
 	';'  shift 234
 	.  error
 
 
 state 222
-	clausula_seleccion_if : IF '(' condicion THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF . ';'  (78)
+	clausula_seleccion_if : IF '(' condicion ')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables . ENDIF ';'  (76)
 
-	';'  shift 235
+	ENDIF  shift 235
 	.  error
 
 
 state 223
-	clausula_seleccion_if : IF '(' condicion ')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables . ENDIF ';'  (76)
-
-	ENDIF  shift 236
-	.  error
-
-
-state 224
 	clausula_seleccion_if : IF '(' condicion ')' THEN bloque_sentencias_ejecutables ENDIF ';' .  (73)
 
 	.  reduce 73
 
 
-state 225
+state 224
 	clausula_seleccion_if : IF '(' condicion ')' bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF . ';'  (80)
+
+	';'  shift 236
+	.  error
+
+
+state 225
+	clausula_seleccion_if : IF condicion ')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF . ';'  (77)
 
 	';'  shift 237
 	.  error
 
 
 state 226
-	clausula_seleccion_if : IF condicion ')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF . ';'  (77)
-
-	';'  shift 238
-	.  error
-
-
-state 227
 	sentencia_control_repeat : REPEAT '(' declaracion_repeat ')' BEGIN conjunto_sentencias_repeat END ';' .  (96)
 
 	.  reduce 96
 
 
-state 228
+state 227
 	pre_condicion : PRE ':' '(' ')' ',' CADENA ';' .  (24)
 
 	.  reduce 24
 
 
-state 229
+state 228
 	pre_condicion : PRE ':' '(' condicion ',' CADENA ';' .  (25)
 
 	.  reduce 25
 
 
-state 230
+state 229
 	pre_condicion : PRE ':' '(' condicion ')' CADENA ';' .  (26)
 
 	.  reduce 26
 
 
-state 231
+state 230
 	pre_condicion : PRE ':' '(' condicion ')' ',' CADENA . ';'  (22)
 
-	';'  shift 239
+	';'  shift 238
 	.  error
 
 
-state 232
+state 231
 	pre_condicion : PRE ':' '(' condicion ')' ',' ';' .  (27)
 
 	.  reduce 27
 
 
-state 233
+state 232
 	pre_condicion : PRE ':' condicion ')' ',' CADENA ';' .  (23)
 
 	.  reduce 23
 
 
-state 234
+state 233
 	declaracionFuncion : cabeza_funcion bloque_sentencias_declarativas BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END ';' .  (20)
 
 	.  reduce 20
 
 
-state 235
+state 234
 	clausula_seleccion_if : IF '(' condicion THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';' .  (78)
 
 	.  reduce 78
 
 
-state 236
+state 235
 	clausula_seleccion_if : IF '(' condicion ')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF . ';'  (76)
 
-	';'  shift 240
+	';'  shift 239
 	.  error
 
 
-state 237
+state 236
 	clausula_seleccion_if : IF '(' condicion ')' bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';' .  (80)
 
 	.  reduce 80
 
 
-state 238
+state 237
 	clausula_seleccion_if : IF condicion ')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';' .  (77)
 
 	.  reduce 77
 
 
-state 239
+state 238
 	pre_condicion : PRE ':' '(' condicion ')' ',' CADENA ';' .  (22)
 
 	.  reduce 22
 
 
-state 240
+state 239
 	clausula_seleccion_if : IF '(' condicion ')' THEN bloque_sentencias_ejecutables ELSE bloque_sentencias_ejecutables ENDIF ';' .  (76)
 
 	.  reduce 76
 
 
 39 terminals, 41 nonterminals
-105 grammar rules, 241 states
+104 grammar rules, 240 states

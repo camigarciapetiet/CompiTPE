@@ -744,7 +744,7 @@ final static String yyrule[] = {
 	    pendingTypeList.clear();
 	}
 	
-	private String getTipoVariable(String id)
+	public String getTipoVariable(String id)
 	{
 		//Esta funcion recibe tanto constantes como identificadores, por lo que hace falta buscarlo a secas el loop de ambito/alcance
 		try {
@@ -830,7 +830,7 @@ final static String yyrule[] = {
 		analizadorLexico.tabla_simbolos.get(pegar.sval).put("parametro",tipo);
 	}
 	
-	private boolean isTypeDef(String func)
+	boolean isTypeDef(String func)
 	{
 		try {
 			if (analizadorLexico.tabla_simbolos.get(func).get("tipo") != null)
@@ -970,6 +970,8 @@ int yyn;       //next next thing to do
 int yym;       //
 int yystate;   //current parsing state from state table
 String yys;    //current token string
+public ArrayList<Nodo> listFunciones;
+public Nodo raiz;
 
 
 //###############################################################

@@ -1,0 +1,19 @@
+.MODEL small
+.STACK 200h
+.DATA
+identificador_fuera_de.programa DW ?
+auxiliarfuncion2.programa.funcion1 DW ?
+hola db 'hola' 
+auxiliarfuncion.programa.funcion1 DW ?
+auxfunc1.programa.funcion1 DW ?
+Cadenabienescrita db 'Cadena bien escrita' 
+aux.programa DD ?
+disenomenora2 db 'diseno menor a 2' 
+YACYetAnotherChain db 'YAC Yet Another Chain' 
+diseno.programa DW ?
+YAC db 'YAC' 
+auxfunc2.programa.funcion1.func2 DW ?
+.CODE
+programa:
+END programa
+
