@@ -19,7 +19,7 @@ public class CodeGenerator {
 	private LinkedList<Integer> pilaLabels;
 	private int contLabels;
 	private LinkedList<String> aux;
-	private ArrayList<Nodo> listFunciones;
+	private ArrayList<ParserVal> listFunciones;
 	
 	public CodeGenerator(Nodo raizArbol, Parser analizadorSintactico)
 	{
@@ -27,7 +27,7 @@ public class CodeGenerator {
 		this.analizador = analizadorSintactico;
 		this.pilaLabels = new LinkedList<Integer>();
 		this.contLabels = 0;
-		this.listFunciones = analizadorSintactico.listFunciones;
+		this.listFunciones = analizadorSintactico.listaFunc;
 	}
 	
 	public void run() throws IOException 

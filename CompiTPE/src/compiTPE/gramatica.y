@@ -205,7 +205,7 @@ asignacion_repeat : variable_repeat '=' constante_repeat { chequeoS_repeat_tipo_
 variable_repeat : ID {chequeoS_variable_no_declarada($1); chequeoS_operador_valido($1);$$.obj=new Nodo($1.sval); System.out.println("var repeat "+$$.obj);}
 ;
 
-condicion_repeat	: id_repeat operador_logico expresion {chequeoS_diferentes_tipos($0, $2, true); this.reglas.add("Condicion_Repeat"); chequeoS_repeat_set_i($3); $$.obj=new Nodo($2.sval, $1, $3);}
+condicion_repeat	: id_repeat operador_logico expresion {chequeoS_diferentes_tipos($0, $1, true); this.reglas.add("Condicion_Repeat"); chequeoS_repeat_set_i($1); $$.obj=new Nodo($2.sval, $1, $3);}
 ;
 
 constante_repeat : CTE {$$.obj=new Nodo($1.sval); System.out.println("Cte repeat "+$$.obj);}
@@ -221,7 +221,7 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 	public List<String> pendingTypeList;
 	public String lastFuncType;
 	public ParserVal raiz;
-	public List<ParserVal> listaFunc;
+	public ArrayList<ParserVal> listaFunc;
 	
 	public ParserVal aux_i; //para mantener constancia del repeat
 	public ParserVal aux_m; // para mantener constancia del repeat
@@ -285,7 +285,7 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 			}
 
 			try {
-				if (analizadorLexico.tabla_simbolos.get(var).get("uso").compareTo("variable") == 0)
+				if (analizadorLexico.tabla_simbolos.get(var).get("uso").compareTo("variable") == 0 || analizadorLexico.tabla_simbolos.get(var).get("uso").compareTo("parametro") == 0)
 				{
 					return;
 				}
@@ -639,6 +639,7 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 	{
 		if (aux_i.sval.compareTo(i.sval) != 0)
 		{
+			System.out.println("CHECK:" + i.sval);
 			System.out.println("error semantico: en una sentencia repeat se debe comparar usando la variable de control");
 		}
 		return;

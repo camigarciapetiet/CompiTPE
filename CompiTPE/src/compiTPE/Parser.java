@@ -521,7 +521,7 @@ final static String yyrule[] = {
 	public List<String> pendingTypeList;
 	public String lastFuncType;
 	public ParserVal raiz;
-	public List<ParserVal> listaFunc;
+	public ArrayList<ParserVal> listaFunc;
 	
 	public ParserVal aux_i; //para mantener constancia del repeat
 	public ParserVal aux_m; // para mantener constancia del repeat
@@ -585,7 +585,7 @@ final static String yyrule[] = {
 			}
 
 			try {
-				if (analizadorLexico.tabla_simbolos.get(var).get("uso").compareTo("variable") == 0)
+				if (analizadorLexico.tabla_simbolos.get(var).get("uso").compareTo("variable") == 0 || analizadorLexico.tabla_simbolos.get(var).get("uso").compareTo("parametro") == 0)
 				{
 					return;
 				}
@@ -939,6 +939,7 @@ final static String yyrule[] = {
 	{
 		if (aux_i.sval.compareTo(i.sval) != 0)
 		{
+			System.out.println("CHECK:" + i.sval);
 			System.out.println("error semantico: en una sentencia repeat se debe comparar usando la variable de control");
 		}
 		return;
@@ -966,7 +967,7 @@ final static String yyrule[] = {
 	
 	
 	
-//#line 898 "Parser.java"
+//#line 899 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
 //###############################################################
@@ -1494,7 +1495,7 @@ case 100:
 break;
 case 101:
 //#line 208 "gramatica.y"
-{chequeoS_diferentes_tipos(val_peek(3), val_peek(1), true); this.reglas.add("Condicion_Repeat"); chequeoS_repeat_set_i(val_peek(0)); yyval.obj=new Nodo(val_peek(1).sval, val_peek(2), val_peek(0));}
+{chequeoS_diferentes_tipos(val_peek(3), val_peek(2), true); this.reglas.add("Condicion_Repeat"); chequeoS_repeat_set_i(val_peek(2)); yyval.obj=new Nodo(val_peek(1).sval, val_peek(2), val_peek(0));}
 break;
 case 102:
 //#line 211 "gramatica.y"
@@ -1504,7 +1505,7 @@ case 103:
 //#line 214 "gramatica.y"
 {yyval.obj=new Nodo(val_peek(0).sval);}
 break;
-//#line 1431 "Parser.java"
+//#line 1432 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####

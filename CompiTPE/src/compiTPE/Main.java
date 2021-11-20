@@ -103,8 +103,8 @@ public class Main {
 
 //	        if (a_lex.erroresLex.isEmpty() && newParser.erroresSint.isEmpty())
 //	        {
-	        	CodeGenerator cg_assembler = new CodeGenerator(newParser.raiz, newParser);
-	        	cg_assembler.run();
+	        	//CodeGenerator cg_assembler = new CodeGenerator((Nodo) newParser.raiz, newParser);
+	        	//cg_assembler.run();
 //	        }
 //	        else {
 //	        	System.out.println("Se han encontrado errores lexicos y/o sintacticos en la compilación del programa, por lo que no ha sido compilado.");
