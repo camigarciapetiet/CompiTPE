@@ -12,14 +12,14 @@ import java.util.*;
 
 %%
 
-programa	: nombre_programa bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable END ';' {desapilar_ambito(); this.reglas.add("Sentencia START programa"); this.raiz= new Nodo("Programa", $1, $4);}
+programa	: nombre_programa bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable END ';' {desapilar_ambito(); this.reglas.add("Sentencia START programa"); this.raiz= new ParserVal(new Nodo("Programa", $1, $4));}
 			| error ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": error en el programa"); }
 ;
 
 nombre_programa	: ID {apilar_ambito($1); set_campo($1,"uso","programa"); $$.obj= new Nodo($1.sval);}
 ;
 
-nombre_ambito	: ID {chequeoS_redeclaracion_funcion($1); apilar_ambito($1); set_campo($1,"uso","funcion"); setLastFuncType($1);} 
+nombre_ambito	: ID {chequeoS_redeclaracion_funcion($1); apilar_ambito($1); set_campo($1,"uso","funcion"); setLastFuncType($1); $$.sval=$1.sval;} 
 ;
 
 bloque_sentencias_declarativas	: sentencia_declarativa 
@@ -53,19 +53,16 @@ nombre_funcion_typedef	: ID {addPendingTypeList($1.sval); set_campo($1, "uso", "
 encabezado_funcion_typedef	: tipo FUNC '('tipo')' {setPendingTypes("funcion typedef"); setFuncType("tipo",$1.sval); setFuncType("parametro",$2.sval);}
 ;
 
-declaracionFuncion	: cabeza_funcion bloque_sentencias_declarativas BEGIN conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {desapilar_ambito(); this.reglas.add("DECLARACION FUNCION");}
-					| cabeza_funcion bloque_sentencias_declarativas BEGIN pre_condicion conjunto_sentencia_ejecutable RETURN retorno ';' END ';' {desapilar_ambito(); this.reglas.add("DECLARACION FUNCION Y PRE CONDICION");}
+declaracionFuncion	: cabeza_funcion bloque_sentencias_declarativas BEGIN cuerpo_funcion cuerpo_retorno ';' END ';' {desapilar_ambito(); $$.obj=new Nodo($1.sval, $4, $5); listaFunc.add($$);}
 ;
 
-cabeza_funcion	: tipo FUNC nombre_ambito parametro {setFuncType("tipo",$1.sval); copiarTipoParametro($4,$3);}
+cabeza_funcion	: tipo FUNC nombre_ambito parametro {setFuncType("tipo",$1.sval); copiarTipoParametro($4,$3); $$.sval=$3.sval;}
 ;
 
-pre_condicion	: PRE ':' '('condicion')' ',' CADENA ';' {this.reglas.add("pre-condicion");}
-				| PRE ':' condicion')' ',' CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); this.reglas.add("pre-condicion");}
-				| PRE ':' '('')' ',' CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada entre '(' ')'"); this.reglas.add("pre-condicion");}
-				| PRE ':' '('condicion ',' CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); this.reglas.add("pre-condicion");}
-				| PRE ':' '('condicion')'  CADENA ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de ')'"); this.reglas.add("pre-condicion");}
-				| PRE ':' '('condicion')' ',' ';'{this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": cadena esperada despues de ','"); this.reglas.add("pre-condicion");}
+pre_condicion	: PRE ':' '('condicion')' ',' cadena_cuerpo ';' {this.reglas.add("pre-condicion"); $$.obj=new Nodo("PRE", $4, $7);}
+				| PRE ':' condicion')' ',' cadena_cuerpo ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); this.reglas.add("pre-condicion");$$.obj=new Nodo("PRE", $3, $6);}
+				| PRE ':' '('condicion ',' cadena_cuerpo ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); this.reglas.add("pre-condicion");$$.obj=new Nodo("PRE", $4, $6);}
+				| PRE ':' '('condicion')'  cadena_cuerpo ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de ')'"); this.reglas.add("pre-condicion");$$.obj=new Nodo("PRE", $4, $6);}
 ;
 
 parametro	: '('tipo nombre_parametro')' {setPendingTypes($2.sval);}
@@ -77,6 +74,12 @@ parametro	: '('tipo nombre_parametro')' {setPendingTypes($2.sval);}
 ;
 
 nombre_parametro	: ID {set_campo($1,"uso", "parametro"); addPendingTypeList($1.sval);}
+;
+
+cuerpo_funcion : conjunto_sentencia_ejecutable				  {this.reglas.add("DECLARACION FUNCION"); $$.obj= new Nodo("cuerpo", null, $1);}
+			   | pre_condicion conjunto_sentencia_ejecutable  {this.reglas.add("DECLARACION FUNCION Y PRE CONDICION"); $$.obj= new Nodo("cuerpo", $1, $2);}
+
+cuerpo_retorno : RETURN retorno { $$.obj=new Nodo("RETURN", $2, null);}
 ;
 
 retorno		: '('expresion')' {$$= $2;}
@@ -110,7 +113,7 @@ asignacion	: operador_asignacion ':=' expresioncompuesta ';' {chequeoS_diferente
 		  	| operador_asignacion expresioncompuesta ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); this.reglas.add("Asignacion"); $$.obj= new Nodo(":=", $1, $2);}		  
 ;
 
-operador_asignacion	: ID {chequeoS_variable_no_declarada($1); chequeoS_operador_valido($1); $$=$1;} //Esto ya no permite que se pongan funciones para asignar
+operador_asignacion	: ID {chequeoS_variable_no_declarada($1); chequeoS_operador_valido($1); $$.obj= new Nodo($1.sval);} //Esto ya no permite que se pongan funciones para asignar
 ;
 
 expresioncompuesta	: '('expresion')' {$$= $2;}
@@ -134,7 +137,7 @@ termino		: termino '/' factor {chequeoS_diferentes_tipos($0, $1, false); $$.obj=
 
 factor		: ID {this.reglas.add("factor ID"); chequeoS_variable_no_declarada($1); $$.obj=new Nodo($1.sval);}
 			| CTE {this.reglas.add("Factor CTE"); $$.obj=new Nodo($1.sval);}
-			| '-' CTE {reverificar_cte_negativa($1); $$.obj=new Nodo("-"+$1.sval);}
+			| '-' CTE {$$.obj=new Nodo("-"+$1.sval);reverificar_cte_negativa($1);  }
 ;
 
 tipo		: INT {this.reglas.add("tipo INT");}
@@ -161,22 +164,25 @@ condicion	: expresion {$$.obj=new Nodo("condicion", $1, null);}
 			| condicion operador_logico expresion {chequeoS_diferentes_tipos($0, $1, false); $$.obj= new Nodo($2.sval, $1, $3);}
 ;
 
-operador_logico	: '||' {$$=$1;}
-				| '&&' {$$=$1;}
-				| '<>' {$$=$1;}
-				| '==' {$$=$1;}
-				| '<=' {$$=$1;}
-				| '>=' {$$=$1;}
-				| '>' {$$=$1;}
-				| '<' {$$=$1;}
+operador_logico	: '||' {$$.sval="||";}
+				| '&&' {$$.sval="&&";}
+				| '<>' {$$.sval="<>";}
+				| '==' {$$.sval="==";}
+				| '<=' {$$.sval="<=";}
+				| '>=' {$$.sval=">=";}
+				| '>' {$$.sval=">";}
+				| '<' {$$.sval="<";}
 ;
 
-mensaje_pantalla	: PRINT '(' CADENA ')' ';' {this.reglas.add("clausula PRINT"); $$.obj= new Nodo("PRINT", $3, null);}
-					| PRINT  CADENA ')' ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de cadena"); this.reglas.add("clausula PRINT"); $$.obj= new Nodo("PRINT", $2, null);}
-					| PRINT '(' CADENA  ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de cadena"); this.reglas.add("clausula PRINT"); $$.obj= new Nodo("PRINT", $3, null);}
+mensaje_pantalla	: PRINT '(' cadena_cuerpo ')' ';' {this.reglas.add("clausula PRINT"); $$.obj= new Nodo("PRINT",$3, null);}
+					| PRINT  cadena_cuerpo ')' ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de cadena"); this.reglas.add("clausula PRINT"); $$.obj= new Nodo("PRINT", $2, null);}
+					| PRINT '(' cadena_cuerpo  ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de cadena"); this.reglas.add("clausula PRINT"); $$.obj= new Nodo("PRINT", $3, null);}
+;
+
+cadena_cuerpo : CADENA {$$.obj=new Nodo($1.sval);}
 ;
 	
-sentencia_control_repeat	: REPEAT '(' declaracion_repeat ')' BEGIN conjunto_sentencias_repeat END ';'  {this.reglas.add("Sentencia Ejecutable REPEAT - Chequeo Semantico"); new Nodo("Repeat", $3, $5);}
+sentencia_control_repeat	: REPEAT '(' declaracion_repeat ')' BEGIN conjunto_sentencias_repeat END ';'  {this.reglas.add("Sentencia Ejecutable REPEAT - Chequeo Semantico"); $$.obj=new Nodo("Repeat", $3, $6);}
 ;		
 
 conjunto_sentencias_repeat	: BREAK ';' {$$.obj= new Nodo("BREAK");}
@@ -184,16 +190,28 @@ conjunto_sentencias_repeat	: BREAK ';' {$$.obj= new Nodo("BREAK");}
 							| sentencia_ejecutable conjunto_sentencias_repeat {$$.obj= new Nodo("S", $1, $2);}
 ;
 
-declaracion_repeat :  asignacion_repeat ';' condicion_repeat ';' CTE {chequeoS_repeat_check_i($1); //falta ver bien commo queda la declaracion}
+declaracion_repeat :  nodo_asignacion ';' nodo_condicion {chequeoS_repeat_check_i($1); $$.obj=new Nodo("declaracion_repeat", $1, $3);}
 ;
 
-asignacion_repeat : variable_repeat '=' CTE { chequeoS_repeat_tipo_entero($1,"INT"); chequeoS_repeat_tipo_entero($2, "INT");}
+nodo_asignacion : asignacion_repeat { $$.obj=new Nodo("asignacion_repeat", $1,null);}
 ;
 
-variable_repeat : ID {chequeoS_variable_no_declarada($1); chequeoS_operador_valido($1);}
+nodo_condicion : condicion_repeat ';' constante_repeat {$$.obj=new Nodo("condicion", $1, $3);}
 ;
 
-condicion_repeat	: ID operador_logico expresion {chequeoS_diferentes_tipos($0, $2, true); this.reglas.add("Condicion_Repeat"); chequeoS_repeat_set_i($2);}
+asignacion_repeat : variable_repeat '=' constante_repeat { chequeoS_repeat_tipo_entero($1,"INT"); chequeoS_repeat_tipo_entero($2, "INT"); $$.obj=new Nodo("=", $1, $3);}
+;
+
+variable_repeat : ID {chequeoS_variable_no_declarada($1); chequeoS_operador_valido($1);$$.obj=new Nodo($1.sval); System.out.println("var repeat "+$$.obj);}
+;
+
+condicion_repeat	: id_repeat operador_logico expresion {chequeoS_diferentes_tipos($0, $2, true); this.reglas.add("Condicion_Repeat"); chequeoS_repeat_set_i($3); $$.obj=new Nodo($2.sval, $1, $3);}
+;
+
+constante_repeat : CTE {$$.obj=new Nodo($1.sval); System.out.println("Cte repeat "+$$.obj);}
+;
+
+id_repeat : ID {$$.obj=new Nodo($1.sval);}
 ;
 
 %%
@@ -202,7 +220,8 @@ condicion_repeat	: ID operador_logico expresion {chequeoS_diferentes_tipos($0, $
 	public List<String> reglas;
 	public List<String> pendingTypeList;
 	public String lastFuncType;
-	public Nodo raiz;
+	public ParserVal raiz;
+	public List<ParserVal> listaFunc;
 	
 	public ParserVal aux_i; //para mantener constancia del repeat
 	public ParserVal aux_m; // para mantener constancia del repeat
@@ -218,6 +237,7 @@ condicion_repeat	: ID operador_logico expresion {chequeoS_diferentes_tipos($0, $
 		this.erroresSint = new ArrayList<String>();
 		this.reglas = new ArrayList<String>();
 		this.pendingTypeList = new ArrayList<String>();
+		this.listaFunc= new ArrayList<ParserVal>();
 	}
 	
 	public void yyerror(String error)
@@ -628,17 +648,16 @@ condicion_repeat	: ID operador_logico expresion {chequeoS_diferentes_tipos($0, $
         
         Nodo clon=null;
 		try {
-			clon = (Nodo)super.clone();
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		clon = (Nodo)nodo.obj;
+		}catch (Exception e) {
+		
 		}
 		if(clon!=null){
-        	System.out.println(clon + " ");
-        	System.out.print("    ");
-        	imprimirArbol(clon.izq);
-        	System.out.print("    ");
-        	imprimirArbol(clon.der);
+			if(!clon.nodoAux()){
+        		System.out.println(clon);
+        	}
+        	imprimirArbol(clon.getIzq());
+        	imprimirArbol(clon.getDer());
         } else{
         	return;
         }
