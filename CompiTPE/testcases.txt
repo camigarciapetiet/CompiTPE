@@ -26,6 +26,7 @@ REPEAT (diseno = 0; diseno < 5; 1)
 IF (diseno < 5) THEN
 	BEGIN
 		PRINT(%YAC%);
+		diseno := 5;
 	END;
 ENDIF;
 diseno:=funcion1(diseno);

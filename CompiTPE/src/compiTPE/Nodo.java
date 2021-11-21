@@ -66,4 +66,10 @@ public class Nodo extends ParserVal implements Cloneable {
 			return true;
 		return false;
 	}
+
+	public boolean esRegistro() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

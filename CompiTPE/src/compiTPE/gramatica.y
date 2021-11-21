@@ -441,7 +441,7 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 	    pendingTypeList.clear();
 	}
 	
-	private String getTipoVariable(String id)
+	public String getTipoVariable(String id)
 	{
 		//Esta funcion recibe tanto constantes como identificadores, por lo que hace falta buscarlo a secas el loop de ambito/alcance
 		try {
@@ -527,7 +527,7 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 		analizadorLexico.tabla_simbolos.get(pegar.sval).put("parametro",tipo);
 	}
 	
-	private boolean isTypeDef(String func)
+	public boolean isTypeDef(String func)
 	{
 		try {
 			if (analizadorLexico.tabla_simbolos.get(func).get("tipo") != null)

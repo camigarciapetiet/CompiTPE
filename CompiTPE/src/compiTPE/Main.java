@@ -80,49 +80,57 @@ public class Main {
 	        Parser newParser = new Parser(a_lex);
 	        newParser.run();
 	        
-	        System.out.println("\n\nINFORME TOKENS");
-	        for (String s: a_lex.informeTokens) {
-	        	System.out.print(s+ ", ");
-	        }
-	        System.out.println("\n\nINFORME REGLAS");
-	        for (String s: newParser.reglas) {
-	        	System.out.print(s + ", ");
-	        }
-	        System.out.println("\n\nERRORES LEXICOS");
-	        for (String s: a_lex.erroresLex) {
-	        	System.out.println(s);
-	        }
-	        System.out.println("\n\nERRORES SINTACTICOS");
-	        for (String s: newParser.erroresSint) {
-	        	System.out.println(s);
-	        }
-	        System.out.println("\n\n\nTABLA DE SIMBOLOS");
-	        System.out.println(a_lex.tabla_simbolos);
-	        System.out.println("\nPalabras Predefinidas");
-	        System.out.println(a_lex.palabras_predefinidas);
-
-//	        if (a_lex.erroresLex.isEmpty() && newParser.erroresSint.isEmpty())
-//	        {
-	        	//CodeGenerator cg_assembler = new CodeGenerator((Nodo) newParser.raiz, newParser);
-	        	//cg_assembler.run();
+//	        System.out.println("\n\nINFORME TOKENS");
+//	        for (String s: a_lex.informeTokens) {
+//	        	System.out.print(s+ ", ");
 //	        }
-//	        else {
-//	        	System.out.println("Se han encontrado errores lexicos y/o sintacticos en la compilación del programa, por lo que no ha sido compilado.");
-//  		        System.out.println("\n\nERRORES LEXICOS");
-//		        for (String s: a_lex.erroresLex) {
-//		        	System.out.println(s);
-//		        }
-//		        System.out.println("\n\nERRORES SINTACTICOS");
-//		        for (String s: newParser.erroresSint) {
-//		        	System.out.println(s);
-//		        }
-//		        System.out.println("\n\n\nTABLA DE SIMBOLOS");
-//		        System.out.println(a_lex.tabla_simbolos);
-//		        System.out.println("\nPalabras Predefinidas");
-//		        System.out.println(a_lex.palabras_predefinidas);
+//	        System.out.println("\n\nINFORME REGLAS");
+//	        for (String s: newParser.reglas) {
+//	        	System.out.print(s + ", ");
 //	        }
+//	        System.out.println("\n\nERRORES LEXICOS");
+//	        for (String s: a_lex.erroresLex) {
+//	        	System.out.println(s);
+//	        }
+//	        System.out.println("\n\nERRORES SINTACTICOS");
+//	        for (String s: newParser.erroresSint) {
+//	        	System.out.println(s);
+//	        }
+//	        System.out.println("\n\n\nTABLA DE SIMBOLOS");
+//	        System.out.println(a_lex.tabla_simbolos);
+//	        System.out.println("\nPalabras Predefinidas");
+//	        System.out.println(a_lex.palabras_predefinidas);
+//	        
+//			System.out.println("\n\nARBOL");
+//	        newParser.imprimirArbol(newParser.raiz);
+//
+//	        System.out.println("\n\nLISTA FUNCIONES");
+//	        for(ParserVal nodo : newParser.listaFunc) {
+//	            System.out.println("nodo:");
+//	            newParser.imprimirArbol(nodo);
+//	        }
+	        if (a_lex.erroresLex.isEmpty() && newParser.erroresSint.isEmpty())
+	        {
+	        	CodeGenerator cg_assembler = new CodeGenerator((Nodo) newParser.raiz.obj, newParser);
+	        	cg_assembler.run();
+	        }
+	        else {
+	        	System.out.println("Se han encontrado errores lexicos y/o sintacticos en la compilación del programa, por lo que no ha sido compilado.");
+  		        System.out.println("\n\nERRORES LEXICOS");
+		        for (String s: a_lex.erroresLex) {
+		        	System.out.println(s);
+		        }
+		        System.out.println("\n\nERRORES SINTACTICOS");
+		        for (String s: newParser.erroresSint) {
+		        	System.out.println(s);
+		        }
+		        System.out.println("\n\n\nTABLA DE SIMBOLOS");
+		        System.out.println(a_lex.tabla_simbolos);
+		        System.out.println("\nPalabras Predefinidas");
+		        System.out.println(a_lex.palabras_predefinidas);
+	        }
 		}
-		
+
 	}
 
 }
