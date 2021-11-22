@@ -522,7 +522,7 @@ final static String yyrule[] = {
 	public String lastFuncType;
 	public ParserVal raiz;
 	public ArrayList<ParserVal> listaFunc;
-	
+	public List<String> erroresSem;
 	public ParserVal aux_i; //para mantener constancia del repeat
 	public ParserVal aux_m; // para mantener constancia del repeat
 	
@@ -538,11 +538,12 @@ final static String yyrule[] = {
 		this.reglas = new ArrayList<String>();
 		this.pendingTypeList = new ArrayList<String>();
 		this.listaFunc= new ArrayList<ParserVal>();
+		this.erroresSem = new ArrayList<String>();
 	}
 	
 	public void yyerror(String error)
 	{
-		System.out.println("error : "+error);
+		this.erroresSem.add("error : "+error+" no identificado");
 	}
 	
 	private void set_campo (ParserVal identificador, String campo, String contenido) 
@@ -589,10 +590,10 @@ final static String yyrule[] = {
 				{
 					return;
 				}
-				System.out.println("error semantico: variable " + variable.sval + " no declarada");
+				this.erroresSem.add("error semantico: variable " + variable.sval + " no declarada");
 			} catch (Exception e) {}
 		}
-		System.out.println("error semantico: variable " + variable.sval + " no declarada");
+		this.erroresSem.add("error semantico: variable " + variable.sval + " no declarada");
 		return;
 	
 	}
@@ -608,7 +609,7 @@ final static String yyrule[] = {
 			try {
 				if (analizadorLexico.tabla_simbolos.get(var).get("uso").compareTo("variable") == 0)
 				{
-					System.out.println("error semantico: variable " + variable.sval + " ya declarada");
+					this.erroresSem.add("error semantico: variable " + variable.sval + " ya declarada");
 					return;
 				}
 			} catch (Exception e) {}
@@ -618,7 +619,6 @@ final static String yyrule[] = {
 	
 	private void reverificar_cte_negativa (ParserVal variable)
 	{
-		System.out.println("var negativa: " + variable.sval);
 		String new_variable = "-" + variable.sval;
 		String var = getEntradaValidaTS(variable);
 		String tipo = analizadorLexico.tabla_simbolos.get(var).get("tipo");
@@ -647,7 +647,6 @@ final static String yyrule[] = {
 				fuera_de_rango = true;
 			}
 			
-			System.out.println(valor);
 			double lim1= Math.pow(1.17549435, -38); // 1.17549435S-38
 			double lim2= Math.pow(3.40282347, 38);// 3.40282347S+38
 			double lim3= Math.pow(-3.40282347, 38);//-3.40282347S+38 
@@ -656,7 +655,6 @@ final static String yyrule[] = {
 				if(valor<lim3 || valor>lim4) {
 					if(valor!=0) {
 						fuera_de_rango = true;
-							System.out.println("fuera de rangaso");
 				}}
 			}else if(valor<lim3 || valor>lim4) {
 				if(valor<lim1 || valor>lim2) {
@@ -675,7 +673,7 @@ final static String yyrule[] = {
 		}
 		if (fuera_de_rango)
 		{
-			System.out.println("error semantico: variable negativa fuera de rango");
+			analizadorLexico.erroresLex.add("error semantico: variable negativa fuera de rango");
 		}
 		variable.sval = new_variable;
 	}
@@ -698,10 +696,10 @@ final static String yyrule[] = {
 				{
 					return;
 				}
-				System.out.println("error semantico: funcion " + funcion.sval + " no declarada");
+				this.erroresSem.add("error semantico: funcion " + funcion.sval + " no declarada");
 			} catch (Exception e) {}
 		}
-		System.out.println("error semantico: funcion " + funcion.sval + " no declarada");
+		this.erroresSem.add("error semantico: funcion " + funcion.sval + " no declarada");
 		return;
 	}
 	
@@ -724,7 +722,7 @@ final static String yyrule[] = {
 		
 		if (funcion_redeclarada)
 		{
-			System.out.println("error semantico: funcion " + funcion.sval + " ya declarada");
+			this.erroresSem.add("error semantico: funcion " + funcion.sval + " ya declarada");
 		}	
 	}
 	
@@ -741,7 +739,7 @@ final static String yyrule[] = {
 	    pendingTypeList.clear();
 	}
 	
-	String getTipoVariable(String id)
+	public String getTipoVariable(String id)
 	{
 		//Esta funcion recibe tanto constantes como identificadores, por lo que hace falta buscarlo a secas el loop de ambito/alcance
 		try {
@@ -787,7 +785,7 @@ final static String yyrule[] = {
 		{
 			tipo_1 = getTipoVariable(tipo_1);
 			if (!isFuncion(id2.sval))
-				System.out.println("error semantico: " + id2.sval +"("+tipo_2+ ") debe ser una funcion de retorno " + tipo_1); 
+				this.erroresSem.add("error semantico: " + id2.sval +"("+tipo_2+ ") debe ser una funcion de retorno " + tipo_1); 
 		}
 		if (getTipoVariable(tipo_2) != "nulo") //es typedef
 		{
@@ -798,7 +796,7 @@ final static String yyrule[] = {
 		{
 			if (tipo_1.compareTo("INT") != 0 || tipo_2.compareTo("INT") != 0)
 			{
-				System.out.println("error semantico: en una sentencia repeat, los datos de condicion deben ser de tipo entero (INT)");
+				this.erroresSem.add("error semantico: en una sentencia repeat, los datos de condicion deben ser de tipo entero (INT)");
 				return;
 			}
 		}
@@ -808,7 +806,7 @@ final static String yyrule[] = {
 			return;
 		}
 
-		System.out.println("error semantico: " + id1.sval +"("+tipo_1+ ") y " + id2.sval +"("+tipo_2+") son de tipos incompatibles para la operacion."); 
+		this.erroresSem.add("error semantico: " + id1.sval +"("+tipo_1+ ") y " + id2.sval +"("+tipo_2+") son de tipos incompatibles para la operacion."); 
 	}
 	
 	private void setLastFuncType (ParserVal func) //Tanto typedef como funcion
@@ -827,7 +825,7 @@ final static String yyrule[] = {
 		analizadorLexico.tabla_simbolos.get(pegar.sval).put("parametro",tipo);
 	}
 	
-	boolean isTypeDef(String func)
+	public boolean isTypeDef(String func)
 	{
 		try {
 			if (analizadorLexico.tabla_simbolos.get(func).get("tipo") != null)
@@ -862,7 +860,7 @@ final static String yyrule[] = {
 			{
 				return;
 			}
-			System.out.println("error semantico: el parametro de " + funcion.sval + " debe ser de tipo " + tipo_par_func +" y no de tipo " + tipo_par); 
+			this.erroresSem.add("error semantico: el parametro de " + funcion.sval + " debe ser de tipo " + tipo_par_func +" y no de tipo " + tipo_par); 
 		} catch (Exception e) { }
 		return;
 		
@@ -877,7 +875,7 @@ final static String yyrule[] = {
 			if (uso_typedef.compareTo("typedef") == 0)
 				return;
 		} catch (Exception e){}
-		System.out.println("error semantico: no existe un typedef de nombre " + var.sval); 
+		this.erroresSem.add("error semantico: no existe un typedef de nombre " + var.sval); 
 		return;
 	}
 	
@@ -890,7 +888,7 @@ final static String yyrule[] = {
 			if (tipo_variable.compareTo(tipo) == 0)
 				return;
 		} catch (Exception e){}
-		System.out.println("error semantico: la variable o constante deberia ser de tipo entero");
+		this.erroresSem.add("error semantico: la variable o constante deberia ser de tipo entero");
 		return;
 		
 	}
@@ -904,7 +902,7 @@ final static String yyrule[] = {
 			if (uso_operador.compareTo("variable") == 0)
 				return;
 		} catch (Exception e){}
-		System.out.println("error semantico: operador de asignacion invalido, " + op.sval + " no es una variable.");
+		this.erroresSem.add("error semantico: operador de asignacion invalido, " + op.sval + " no es una variable.");
 		return;
 	}
 	
@@ -940,7 +938,7 @@ final static String yyrule[] = {
 		if (aux_i.sval.compareTo(i.sval) != 0)
 		{
 			System.out.println("CHECK:" + i.sval);
-			System.out.println("error semantico: en una sentencia repeat se debe comparar usando la variable de control");
+			this.erroresSem.add("error semantico: en una sentencia repeat se debe comparar usando la variable de control");
 		}
 		return;
 	}
@@ -967,7 +965,7 @@ final static String yyrule[] = {
 	
 	
 	
-//#line 899 "Parser.java"
+//#line 897 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
 //###############################################################
@@ -1505,7 +1503,7 @@ case 103:
 //#line 214 "gramatica.y"
 {yyval.obj=new Nodo(val_peek(0).sval);}
 break;
-//#line 1432 "Parser.java"
+//#line 1430 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####

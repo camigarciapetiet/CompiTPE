@@ -1,19 +1,19 @@
 null.MODEL small
 .STACK 200h
 .DATA
-aux.programa DD ?
-disenomenora2 db "disenomenora2", 0 
-auxiliarfuncion2.programa.funcion1 DW ?
-YACYetAnotherChain db "YACYetAnotherChain", 0 
-diseno.programa DW ?
-c.programa DD ?
-diseno.programa.funcion1 DW ?
-auxiliarfuncion.programa.funcion1 DW ?
-b.programa DD ?
-YAC db "YAC", 0 
-a.programa DD ?
-Cadenabienescrita db "Cadenabienescrita", 0 
-@aux1 DD ?
+recfuncion db "none", 0aux.programa DD ?
+recfuncion db "none", 0disenomenora2 db "disenomenora2", 0 
+recfuncion db "none", 0auxiliarfuncion2.programa.funcion1 DW ?
+recfuncion db "none", 0recfuncion db "none", 0recfuncion db "none", 0YACYetAnotherChain db "YACYetAnotherChain", 0 
+recfuncion db "none", 0diseno.programa DW ?
+recfuncion db "none", 0c.programa DD ?
+recfuncion db "none", 0diseno.programa.funcion1 DW ?
+recfuncion db "none", 0recfuncion db "none", 0recfuncion db "none", 0auxiliarfuncion.programa.funcion1 DW ?
+recfuncion db "none", 0recfuncion db "none", 0b.programa DD ?
+recfuncion db "none", 0recfuncion db "none", 0recfuncion db "none", 0recfuncion db "none", 0YAC db "YAC", 0 
+recfuncion db "none", 0recfuncion db "none", 0a.programa DD ?
+recfuncion db "none", 0Cadenabienescrita db "Cadenabienescrita", 0 
+recfuncion db "none", 0@aux1 DD ?
 @aux2 DD ?
 
 .CODE
@@ -40,8 +40,12 @@ JL Label2
 invoke MessageBox, NULL, addr, YAC, addr YAC, MB_OK
 MOV diseno.programa, 5
 Label2: 
+CMP recfuncion, "funcion1.programa" 
+JE ERROR_REC_MUTUA
+MOV recfuncion, "funcion1.programa" 
 MOV diseno.programa.funcion1, diseno.programa
 CALL funcion1.programa
+MOV recfuncion, "empty" 
 MOV diseno.programa, @aux2
 END programa
 invoke MessageBox, NULL, addr FIN, NULL, MB_OK

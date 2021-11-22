@@ -109,7 +109,7 @@ public class Main {
 //	            System.out.println("nodo:");
 //	            newParser.imprimirArbol(nodo);
 //	        }
-	        if (a_lex.erroresLex.isEmpty() && newParser.erroresSint.isEmpty())
+	        if (a_lex.erroresLex.isEmpty() && newParser.erroresSint.isEmpty() && newParser.erroresSem.isEmpty())
 	        {
 	        	CodeGenerator cg_assembler = new CodeGenerator((Nodo) newParser.raiz.obj, newParser);
 	        	cg_assembler.run();
@@ -122,6 +122,10 @@ public class Main {
 		        }
 		        System.out.println("\n\nERRORES SINTACTICOS");
 		        for (String s: newParser.erroresSint) {
+		        	System.out.println(s);
+		        }
+		        System.out.println("\n\nERRORES SEMANTICOS");
+		        for (String s: newParser.erroresSem) {
 		        	System.out.println(s);
 		        }
 		        System.out.println("\n\n\nTABLA DE SIMBOLOS");

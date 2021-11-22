@@ -32,3 +32,4 @@ ENDIF;
 diseno:=funcion1(diseno);
 
 END;
+//hola//

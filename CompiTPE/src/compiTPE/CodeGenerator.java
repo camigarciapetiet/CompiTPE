@@ -51,6 +51,8 @@ public class CodeGenerator {
 			auxvars.add("@aux"+number+" DW ?\n");
 		} else if (tipo.compareTo("INT") == 0) {
 			auxvars.add("@aux"+number+" DD ?\n");
+		}else if (tipo.compareTo("cadena") == 0) {
+			auxvars.add("@aux"+number+" DB \"empty\", 0\n");
 		}
 		
 		return ("aux"+number);
@@ -92,6 +94,8 @@ public class CodeGenerator {
 			    {
 			    	this.programa_filename = entry.getKey();
 			    }
+			    this.assembler_code = this.assembler_code + "recfuncion db \"none\", 0"; //PARA CHEQUEO RECURSION MUTUA
+			    		
 			} catch (Exception e) {}
 
 		}
@@ -764,16 +768,17 @@ public class CodeGenerator {
 			nodo_expresion =(Nodo)der.izq.obj;
 		} catch (Exception e) {}
 		
-		//PENDIENTE: Agregar chequeo semantico recursion mutua... wtf? tema f
+		//PENDIENTE: Revisar
+		//Chequeo REC MUTUA
+		this.assembler_code = assembler_code + "CMP recfuncion, \"" + izq.nombre+ "\" \n";
+		this.assembler_code = assembler_code + "JE ERROR_REC_MUTUA\n";
+		this.assembler_code = assembler_code + "MOV recfuncion, \"" + izq.nombre+"\" \n";
+		
 		if (nodo_expresion != null) { //Es una expresion
 			this.generateCode(der);
 		}
 		
-		//Chequeo REC MUTUA
 
-				
-				
-				
 		//parametro: Buscamos getParametro asociado al nombre de la funcion y le asignamos el valor del hijo derecho
 		String funcion = izq.nombre;
 		String parametro = getParametro(izq.nombre);
@@ -785,6 +790,11 @@ public class CodeGenerator {
 			//SI ES FUNC NORMAL directamente salto a la label habiendo asignado el parametro previamente
 			this.assembler_code =this.assembler_code+ "CALL " + funcion + "\n";
 		}
+		
+		//CHEQUEO REC MUTUA
+		this.assembler_code = assembler_code + "MOV recfuncion, \"empty\" \n"; //"DESAPILAR" FUNCION ACTUAL
+		
+		
 		nodo.nombre = "@aux"+this.auxvars.size(); //resultado de la invocacion, es decir el RETURN.
 	}
 	
