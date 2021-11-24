@@ -202,13 +202,13 @@ nodo_condicion : condicion_repeat ';' constante_repeat {$$.obj=new Nodo("condici
 asignacion_repeat : variable_repeat '=' constante_repeat { chequeoS_repeat_tipo_entero($1,"INT"); chequeoS_repeat_tipo_entero($2, "INT"); $$.obj=new Nodo("=", $1, $3);}
 ;
 
-variable_repeat : ID {chequeoS_variable_no_declarada($1); chequeoS_operador_valido($1);$$.obj=new Nodo($1.sval); System.out.println("var repeat "+$$.obj);}
+variable_repeat : ID {chequeoS_variable_no_declarada($1); chequeoS_operador_valido($1);$$.obj=new Nodo($1.sval);}
 ;
 
 condicion_repeat	: id_repeat operador_logico expresion {chequeoS_diferentes_tipos($0, $1, true); this.reglas.add("Condicion_Repeat"); chequeoS_repeat_set_i($1); $$.obj=new Nodo($2.sval, $1, $3);}
 ;
 
-constante_repeat : CTE {$$.obj=new Nodo($1.sval); System.out.println("Cte repeat "+$$.obj);}
+constante_repeat : CTE {$$.obj=new Nodo($1.sval);}
 ;
 
 id_repeat : ID {$$.obj=new Nodo($1.sval);}

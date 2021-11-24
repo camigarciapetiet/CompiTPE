@@ -1,21 +1,24 @@
-null.MODEL small
+.386
+.MODEL  Flat,StdCall
+OPTION  CaseMap:None
+include \masm32\include\windows.inc
+include \masm32\include\kernel32.inc
+include \masm32\include\user32.inc
+includelib \masm32\lib\kernel32.lib
+includelib \masm32\lib\user32.lib
 .STACK 200h
 .DATA
-aux.programa DD ?
-YACYetAnotherChain db "YACYetAnotherChain", 0 
-diseno.programa DW ?
+aux@programa DD ?
+diseno@programa DW ?
+Cadenabienescrita db "Cadenabienescrita", 0 
 recfuncion db "none", 0
 
 .CODE
 programa:
-Label1:
-MOV AX, diseno.programa
-CMP AX, 5
-JAE Label2
-invoke MessageBox, NULL, addr, YACYetAnotherChain, addr YACYetAnotherChain, MB_OK
-ADD diseno.programa, 1
-JMP Label1
-Label2:
+MOV diseno@programa, -999
+FLD 2@33S5
+FSTP aux@programa
+invoke MessageBox, NULL, addr Cadenabienescrita, addr Cadenabienescrita, MB_OK
 END programa
 invoke MessageBox, NULL, addr FIN, NULL, MB_OK
 EXIT:

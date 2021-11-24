@@ -74,12 +74,12 @@ public class Nodo extends ParserVal implements Cloneable {
 	}
 
 	public boolean esRegistro() {
-		// TODO Auto-generated method stub
+		if(this.nombre.compareTo("AX")==0)
+			return true;
 		return false;
 	}
 
 	public String getTipoHijoDer(Nodo n) {
-		System.out.println(n);
 		if (!n.esHoja()) {
 			Nodo nododer=null;
 			Nodo nodoizq=null;
@@ -89,10 +89,8 @@ public class Nodo extends ParserVal implements Cloneable {
 			} catch (Exception e) {}
 			if(nododer!=null)
 				return getTipoHijoDer(nododer);
-			else if(nodoizq!=null)
+			else
 				return getTipoHijoDer(nodoizq);
-			/*else
-				return "";*/
 		}else {
 			return n.nombre;
 		}

@@ -1511,7 +1511,7 @@ case 99:
 break;
 case 100:
 //#line 205 "gramatica.y"
-{chequeoS_variable_no_declarada(val_peek(0)); chequeoS_operador_valido(val_peek(0));yyval.obj=new Nodo(val_peek(0).sval); System.out.println("var repeat "+yyval.obj);}
+{chequeoS_variable_no_declarada(val_peek(0)); chequeoS_operador_valido(val_peek(0));yyval.obj=new Nodo(val_peek(0).sval);}
 break;
 case 101:
 //#line 208 "gramatica.y"
@@ -1519,7 +1519,7 @@ case 101:
 break;
 case 102:
 //#line 211 "gramatica.y"
-{yyval.obj=new Nodo(val_peek(0).sval); System.out.println("Cte repeat "+yyval.obj);}
+{yyval.obj=new Nodo(val_peek(0).sval);}
 break;
 case 103:
 //#line 214 "gramatica.y"
