@@ -34,7 +34,7 @@ sentencia_declarativa	: declaracionDatos
 declaracionDatos : tipo conjunto_declaracion_variables ';' {setPendingTypes($1.sval); this.reglas.add("Declaracion de datos");}
 				 | nombre_typedef conjunto_declaracion_variables ';' {setPendingTypes($1.sval); this.reglas.add("Declaracion de datos TYPEDEF");} //Tema particular 23
 ;
-nombre_typedef	: ID {chequeoS_typedef_existe($1);}
+nombre_typedef	: ID {chequeoS_typedef_existe($1.sval);}
 ;
 
 conjunto_declaracion_variables	: conjunto_declaracion_variables ',' nombre_declaracion
@@ -102,7 +102,7 @@ sentencia_ejecutable	: asignacion {$$= $1;}
 						| sentencia_control_repeat {$$= $1;}
 ;
 
-invocacion_funcion	: nombre_invocacion '(' factor ')' {chequeoS_parametro_funcion($1, $2); $$.obj=new Nodo("invocacion funcion", $1, $3);}
+invocacion_funcion	: nombre_invocacion '(' factor ')' {$$.obj=new Nodo("invocacion funcion", $1, $3);chequeoS_parametro_funcion($1, $2); }
 //Esto es tanto para typedef como funcion!
 ;
 
@@ -341,7 +341,7 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 			if(cadena_dividida.length>1){						//Si tiene S
 				exp=Double.parseDouble(cadena_dividida[1]);
 			}
-			double valor= Math.pow(base, exp);
+			double valor= base * Math.pow(10,exp);
 			if (valor == 0 && base != 0) {
 				analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": constante fuera de rango");
 				fuera_de_rango = true;
@@ -387,8 +387,8 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 			boolean isTypeDef = isTypeDef(getTipoVariable(funcion.sval));
 			if (isTypeDef)
 			{
-				funcion.sval = getTipoVariable(funcion.sval);
-				chequeoS_typedef_existe(funcion);
+				String aux = getTipoVariable(funcion.sval);
+				chequeoS_typedef_existe(aux);
 				return;
 			}
 			try {
@@ -588,7 +588,7 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 		
 	}
 	
-	private void chequeoS_typedef_existe(ParserVal var)
+	private void chequeoS_typedef_existe(String var)
 	{
 		String typedef = getEntradaValidaTS(var);
 		try
@@ -597,7 +597,7 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 			if (uso_typedef.compareTo("typedef") == 0)
 				return;
 		} catch (Exception e){}
-		this.erroresSem.add("error semantico: no existe un typedef de nombre " + var.sval); 
+		this.erroresSem.add("error semantico: no existe un typedef de nombre " + var); 
 		return;
 	}
 	
@@ -621,7 +621,7 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 		try
 		{
 			String uso_operador = analizadorLexico.tabla_simbolos.get(operador).get("uso");
-			if (uso_operador.compareTo("variable") == 0)
+			if (uso_operador.compareTo("variable") == 0 || uso_operador.compareTo("parametro") == 0)
 				return;
 		} catch (Exception e){}
 		this.erroresSem.add("error semantico: operador de asignacion invalido, " + op.sval + " no es una variable.");

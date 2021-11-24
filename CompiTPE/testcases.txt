@@ -1,10 +1,7 @@
 programa
 INT diseno;
-SINGLE aux;
-
 BEGIN
-diseno :=-999 + 400;
-diseno := diseno/0;
-diseno := 5 + 5 + 5 * 5;
+
+diseno := 10/0;
 
 END;

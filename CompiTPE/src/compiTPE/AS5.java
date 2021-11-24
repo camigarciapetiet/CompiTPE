@@ -20,7 +20,7 @@ public class AS5 extends accionSemantica {
 		if(cadena_dividida.length>1){						//Si tiene S
 			exp=Double.parseDouble(cadena_dividida[1]);
 		}
-		double valor= Math.pow(base, Math.pow(10,exp));
+		double valor= base * Math.pow(10,exp);
 		if (valor == 0 && base != 0) {
 			analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": constante fuera de rango");
 			fuera_de_rango = true;

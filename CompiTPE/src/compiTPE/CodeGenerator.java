@@ -20,6 +20,7 @@ public class CodeGenerator {
 	private int contLabels;
 	private LinkedList<String> auxvars;
 	private ArrayList<ParserVal> listFunciones;
+	private LinkedList<String> listFuncionesaux;
 	
 	public CodeGenerator(Nodo raizArbol, Parser analizadorSintactico)
 	{
@@ -29,6 +30,8 @@ public class CodeGenerator {
 		this.contLabels = 0;
 		this.listFunciones = analizadorSintactico.listaFunc;
 		this.auxvars = new LinkedList<String>();
+    	listFuncionesaux = new LinkedList<String>();
+
 	}
 	
 	public void run() throws IOException 
@@ -71,9 +74,26 @@ public class CodeGenerator {
 		for (int i = 0; i < auxvars.size(); i++) {
 			auxs = auxs + auxvars.get(i);
 		}
+		
+		for (int i = 0; i < listFuncionesaux.size(); i++) {
+			auxs = auxs + "@"+listFuncionesaux.get(i)+" DW 0\n";
+		}
+		
+		
 		this.assembler_code = this.assembler_code.replaceAll(";FLAG PARA DECLARAR AUXILIARES", auxs);
 	}
 	
+	private String convertSINGLEtoAssembler(String entrada){
+		String[] cadena_dividida= entrada.split("S", 0);
+		double base= Double.parseDouble(cadena_dividida[0]);
+		double exp = 0;
+		if(cadena_dividida.length>1){						//Si tiene S
+			exp=Double.parseDouble(cadena_dividida[1]);
+		}
+		double valor= base * Math.pow(10,exp);
+		return String.valueOf(valor);
+		
+	}
 	private void declareData()
     {
         this.assembler_code =this.assembler_code+ ".DATA\n";
@@ -93,6 +113,11 @@ public class CodeGenerator {
                         this.assembler_code =this.assembler_code+ entry.getKey().replace(".", "@") + " DD ?\n";
                     } 
                 }
+                else if (analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("constante") == 0 && 
+                		analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("tipo").compareTo("SINGLE") == 0) // CTE
+                {
+                	this.assembler_code = this.assembler_code + "_" + entry.getKey().replace(".", "_") + " DD " + convertSINGLEtoAssembler(entry.getKey()) + "\n";
+                }
                 if (analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("cadena") == 0) //una cadena
                 {
                     this.assembler_code =this.assembler_code+ entry.getKey().replace(" ","") + " db \"" + entry.getKey().replace(" ", "") + "\", 0 \n";
@@ -104,7 +129,9 @@ public class CodeGenerator {
 
             } catch (Exception e) {} 
 }
-        this.assembler_code = this.assembler_code + "recfuncion db \"none\", 0\n"; //PARA CHEQUEO RECURSION MUTUA
+        this.assembler_code = this.assembler_code + "overflow_error db \"error de overflow\", 0\n";
+        this.assembler_code = this.assembler_code + "div_zero db \"error division por cero\", 0\n";
+        this.assembler_code = this.assembler_code + "rec_mutua db \"error recursion mutua\", 0\n";
 
         this.assembler_code =this.assembler_code+ ";FLAG PARA DECLARAR AUXILIARES\n";
     }
@@ -112,9 +139,9 @@ public class CodeGenerator {
 	
 	private void genError() throws IOException {
 		this.assembler_code =this.assembler_code+ "EXIT:\n invoke ExitProcess, 0\n";
-		this.assembler_code =this.assembler_code+ "DIV_CERO:\n invoke MessageBox, NULL, addr DIV_CERO, NULL, MB_OK\n JMP EXIT\n";
-		this.assembler_code =this.assembler_code+ "OVERFLOW_ERROR:\n invoke MessageBox, NULL, addr OVERFLOW_ERROR, NULL, MB_OK\n JMP EXIT\n";
-		this.assembler_code =this.assembler_code+ "ERROR_REC_MUTUA:\n invoke MessageBox, NULL, addr ERROR_REC_MUTUA, NULL, MB_OK\n JMP EXIT\n";
+		this.assembler_code =this.assembler_code+ "DIV_CERO:\n invoke MessageBox, NULL, addr div_zero, NULL, MB_OK\n JMP EXIT\n";
+		this.assembler_code =this.assembler_code+ "OVERFLOW_ERROR:\n invoke MessageBox, NULL, addr overflow_error, NULL, MB_OK\n JMP EXIT\n";
+		this.assembler_code =this.assembler_code+ "ERROR_REC_MUTUA:\n invoke MessageBox, NULL, addr rec_mutua, NULL, MB_OK\n JMP EXIT\n";
 
 
 	}
@@ -134,9 +161,7 @@ public class CodeGenerator {
 			generateCode(der);
 		}
 		
-		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(nodo))).get("tipo"); //PENDIENTE
- //PENDIENTE: agregar campo a los nodos que mantenga los tipos de las variables, para cuando se reemplacen los nodos por auxiliares y tal.
-		//PENDIENTE: Podria ser sacar el tipo del nodo hoja del subarbol derecho antes de generar codigo que deberia corresponder a una entrada de la tabla de simbolos con tipo.
+		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(nodo))).get("tipo"); 
 		//String tipoOP = "INT";
 		
 		// CHEQUEO OVERFLOW
@@ -167,6 +192,8 @@ public class CodeGenerator {
 			}
 			else {
 				if (izq.esRegistro()) {
+					der.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+
 					assembler_code = this.assembler_code+ "ADD " + izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
 					nodo.nombre = izq.nombre.replace(".", "@");
 					
@@ -178,6 +205,7 @@ public class CodeGenerator {
 				else {
 					if (der.esRegistro()){
 						String aux = "@"+ getNextAux(tipoOP);
+						izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
 						assembler_code = this.assembler_code+ "MOV " + aux + ", " + der.nombre.replace(".", "@") + "\n";
 						assembler_code = this.assembler_code+ "MOV " + der.nombre.replace(".", "@") + ", " + izq.nombre.replace(".", "@") + "\n"; // der.nombre.replace(".", "@") es REG
 						assembler_code = this.assembler_code+ "ADD " + izq.nombre.replace(".", "@") + ", " + aux + "\n";
@@ -187,6 +215,10 @@ public class CodeGenerator {
 						nodo.nombre = aux;
 					}
 					else {
+						der.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+
+						izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+						System.out.println(izq.nombre);
 						assembler_code = this.assembler_code+ "MOV " + "AX, " + izq.nombre.replace(".", "@") + "\n";
 						izq.nombre = "AX";
 						assembler_code = this.assembler_code+ "ADD " + izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
@@ -263,6 +295,8 @@ public class CodeGenerator {
 			}
 			else {
 				if (izq.esRegistro()) {
+					der.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+
 					assembler_code = this.assembler_code+ "SUB " + izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
 
 					//Al trabajar con variables auxiliares, el resultado de las operaciones aritmeticas queda en una variable auxiliar.
@@ -272,6 +306,7 @@ public class CodeGenerator {
 				}
 				else {
 					if (der.esRegistro()){
+						izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
 						String aux= "@"+ getNextAux(tipoOP);
 						assembler_code = this.assembler_code+ "MOV " + aux + ", " + der.nombre.replace(".", "@") + "\n";
 						assembler_code = this.assembler_code+ "MOV " + der.nombre.replace(".", "@") + ", " + izq.nombre.replace(".", "@") + "\n";
@@ -281,6 +316,10 @@ public class CodeGenerator {
 						assembler_code = this.assembler_code+ "MOV " + aux + ", " + "AX" + "\n";
 						nodo.nombre = aux;
 					} else {
+						der.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+
+						izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+
 						assembler_code = this.assembler_code+ "MOV " + "AX, " + izq.nombre.replace(".", "@") + "\n";
 						izq.nombre= "AX";
 						assembler_code = this.assembler_code+ "SUB " + izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
@@ -340,8 +379,7 @@ public class CodeGenerator {
 		if(!der.esHoja()) {
 			generateCode(der);
 		}
-		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(nodo))).get("tipo"); //PENDIENTE
- //PENDIENTE: agregar campo a los nodos que mantenga los tipos de las variables, para cuando se reemplacen los nodos por auxiliares y tal.
+		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(nodo))).get("tipo"); 
 		//String tipoOP = "INT";
 		if (tipoOP.compareTo("INT") == 0) {
 			if (izq.esRegistro() && der.esRegistro()) { //Si solo usamos un registro y el resto auxiliares no hace falta la 2da condicion
@@ -354,6 +392,8 @@ public class CodeGenerator {
 			}
 			else {
 				if (izq.esRegistro()) {
+					der.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+
 					assembler_code = this.assembler_code+ "IMUL " + izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
 					nodo.nombre = izq.nombre.replace(".", "@");
 					
@@ -364,6 +404,8 @@ public class CodeGenerator {
 				}
 				else {
 					if (der.esRegistro()){
+						izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+
 						String aux= "@"+ getNextAux(tipoOP);
 						assembler_code = this.assembler_code+ "MOV " + aux + ", " + der.nombre.replace(".", "@") + "\n";
 						assembler_code = this.assembler_code+ "MOV " + der.nombre.replace(".", "@") + ", " + izq.nombre.replace(".", "@") + "\n";
@@ -373,6 +415,10 @@ public class CodeGenerator {
 						assembler_code = this.assembler_code+ "MOV " + aux + ", " + "AX" + "\n";
 						nodo.nombre = aux;	
 					}else {
+						der.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+
+						izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+
 						assembler_code = this.assembler_code+ "MOV " + "AX, " + izq.nombre.replace(".", "@") + "\n";
 						izq.nombre = "AX";
 						assembler_code = this.assembler_code+ "IMUL " + izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
@@ -464,6 +510,8 @@ public class CodeGenerator {
 			}
 			else {
 				if (izq.esRegistro()) {
+					der.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+
 					assembler_code = this.assembler_code + "MOV AX," + izq.nombre.replace(".", "@" + "\n");
 					izq.nombre = "AX";
 					assembler_code = this.assembler_code+ "IDIV " + der.nombre.replace(".", "@") + "\n";
@@ -475,6 +523,8 @@ public class CodeGenerator {
 				}
 				else {
 					if (der.esRegistro()){
+						izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+
 						String aux= "@"+ getNextAux(tipoOP);
 						assembler_code = this.assembler_code+ "MOV " + aux + ", " + der.nombre.replace(".", "@") + "\n";
 						assembler_code = this.assembler_code+ "MOV " + der.nombre.replace(".", "@") + ", " + izq.nombre.replace(".", "@") + "\n";
@@ -485,6 +535,9 @@ public class CodeGenerator {
 						assembler_code = this.assembler_code+ "MOV " + aux + ", " + "AX" + "\n";
 						nodo.nombre = aux;
 					}else { //izq es una variable o un inmediato. No puede ser inmediato!
+						der.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+
+						izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
 						if (analizador.analizadorLexico.tabla_simbolos.get(der.nombre).get("uso").compareTo("constante") == 0) {
 							String auxINM = "@" + getNextAux(tipoOP);
 							assembler_code = this.assembler_code + "MOV "+auxINM+", "+der.nombre+"\n";
@@ -549,12 +602,13 @@ public class CodeGenerator {
 			generateCode(der);
 		}
 		
-		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(nodo))).get("tipo"); //PENDIENTE
-//PENDIENTE
+		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(nodo))).get("tipo"); 
 		//String tipoOP = "INT";
-		if (tipoOP.compareTo("INT") == 0) {
-			this.assembler_code =this.assembler_code+ "MOV AX, " + der.nombre.replace(".", "@") + "\n"; 
-			this.assembler_code =this.assembler_code+ "MOV " + izq.nombre.replace(".", "@") + ", AX\n"; 
+		if (analizador.isTypeDef(analizador.getTipoVariable(izq.nombre))){
+			String auxreg32 = "EAX";
+			this.assembler_code =this.assembler_code+ "MOV " + auxreg32 + ", " + der.nombre.replace(".", "@") + "\n"; 
+			this.assembler_code =this.assembler_code+ "MOV " + izq.nombre.replace(".", "@") + ", " + auxreg32 + "\n"; 
+			this.analizador.analizadorLexico.tabla_simbolos.get(izq.nombre).put("func", der.nombre);
 
 		}
 		else if (tipoOP.compareTo("SINGLE") == 0) { //IZQ siempre es una variable
@@ -566,10 +620,10 @@ public class CodeGenerator {
 				this.assembler_code =this.assembler_code+ "FLD " + der.nombre.replace(".", "@") + "\n"; 
 				this.assembler_code =this.assembler_code+ "FSTP " + izq.nombre.replace(".", "@") + "\n"; 	
 			}
-		} else if (analizador.isTypeDef(analizador.getTipoVariable(izq.nombre.replace(".", "@")))){
-			String auxreg32 = "EAX";
-			this.assembler_code =this.assembler_code+ "MOV " + auxreg32 + ", " + der.nombre.replace(".", "@") + "\n"; 
-			this.assembler_code =this.assembler_code+ "MOV " + izq.nombre.replace(".", "@") + ", " + auxreg32 + "\n"; 
+		} else if (tipoOP.compareTo("INT") == 0) {
+			izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+			this.assembler_code =this.assembler_code+ "MOV AX, " + der.nombre.replace(".", "@") + "\n"; 
+			this.assembler_code =this.assembler_code+ "MOV " + izq.nombre.replace(".", "@") + ", AX\n"; 
 
 		}
 	}
@@ -661,6 +715,7 @@ public class CodeGenerator {
 				assembler_code = this.assembler_code+ "MOV " + aux + ", " + der.nombre.replace(".", "@") + "\n";
 				der.nombre = aux;
 			}
+			izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
 			this.assembler_code =this.assembler_code+ "MOV " + registro + ", " + izq.nombre.replace(".", "@") + "\n";
 			izq.nombre = registro;
 			switch (nodo.nombre) {
@@ -694,13 +749,21 @@ public class CodeGenerator {
 			switch (nodo.nombre) {
 				case "<": {
 					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JL Label" +contLabels+"\n";
+						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JAE Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JL Label" +contLabels+"\n";
+						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JAE Label" +contLabels+"\n";
 					}
 					break;
 				}
 				case "<=": {
+					if (der.nombre.contains(".")) { 
+						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JA Label" +contLabels+"\n";
+					} else {
+						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JA Label" +contLabels+"\n";
+					}
+					break;
+				}
+				case ">": {
 					if (der.nombre.contains(".")) { 
 						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JLE Label" +contLabels+"\n";
 					} else {
@@ -708,35 +771,27 @@ public class CodeGenerator {
 					}
 					break;
 				}
-				case ">": {
-					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JG Label" +contLabels+"\n";
-					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JG Label" +contLabels+"\n";
-					}
-					break;
-				}
 				case ">=": {
 					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JGE Label" +contLabels+"\n";
+						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JL Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JGE Label" +contLabels+"\n";
+						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JLE Label" +contLabels+"\n";
 					}
 					break;
 				}
 				case "!=": {
 					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JNE Label" +contLabels+"\n";
+						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JE Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JNE Label" +contLabels+"\n";
+						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JE Label" +contLabels+"\n";
 					}
 					break;
 				}
 				case "==": {
 					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JE Label" +contLabels+"\n";
+						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JNE Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JE Label" +contLabels+"\n";
+						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JNE Label" +contLabels+"\n";
 					}
 					break;
 				}
@@ -765,7 +820,7 @@ public class CodeGenerator {
 	private String getParametro(String funcion) {
 		//obtener LA variable de TIPO PARAMETRO que sea del formato ???.(ambito).funcion
 		String ambito = funcion.substring(funcion.indexOf(".")) + "." + funcion.substring(0,funcion.indexOf("."));
-		
+
 		Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizador.analizadorLexico.tabla_simbolos.entrySet().iterator();
         while (iterator.hasNext()) 
         {
@@ -793,31 +848,52 @@ public class CodeGenerator {
 			nodo_expresion =(Nodo)der.izq.obj;
 		} catch (Exception e) {}
 		
-		//PENDIENTE: Revisar
-		//Chequeo REC MUTUA
-		this.assembler_code = assembler_code + "CMP recfuncion, \"" + izq.nombre.replace(".", "@")+ "\" \n";
-		this.assembler_code = assembler_code + "JE ERROR_REC_MUTUA\n";
-		this.assembler_code = assembler_code + "MOV recfuncion, \"" + izq.nombre.replace(".", "@")+"\" \n";
+		//variable auxiliar por cada funcion que se crea y cuando una funcion llama a otra se activa la variable, cuando vuelve se desactiva. Entonces cuando hacemos un llamado nos fijamos que la variable de la func a llamar
+		//no este activa
 		
 		if (nodo_expresion != null) { //Es una expresion
 			this.generateCode(der);
 		}
-		
 
 		//parametro: Buscamos getParametro asociado al nombre de la funcion y le asignamos el valor del hijo derecho
-		String funcion = izq.nombre.replace(".", "@");
-		String parametro = getParametro(izq.nombre);
+		String funcion = izq.nombre;
+		String parametro = "";
+		String invocacion = "";
+		if (analizador.isTypeDef(analizador.getTipoVariable(funcion))) {
+			String funcOrig = this.analizador.analizadorLexico.tabla_simbolos.get(funcion).get("func");
+			parametro = getParametro(funcOrig);
+			invocacion = funcOrig;
+		} else {
+			invocacion = funcion;
+			parametro = getParametro(izq.nombre);
+		}
+		//Chequeo REC MUTUA
+		this.assembler_code = assembler_code + ";CHEQUEO RECURSION MUTUA\n";
+		for (int i = 0; i < listFuncionesaux.size(); i++) {
+			if (listFuncionesaux.get(i).equals(invocacion.replace(".", "@"))) {
+				this.assembler_code = assembler_code + "CMP @"+listFuncionesaux.get(i)+", 1\n";
+				this.assembler_code = assembler_code + "JE ERROR_REC_MUTUA\n";
+				this.assembler_code = assembler_code + "MOV @"+listFuncionesaux.get(i)+", 1\n";
+			}
+			else {
+				this.assembler_code = assembler_code + "MOV @"+listFuncionesaux.get(i)+", 0\n";
+			}
+		}
+
+		this.assembler_code = assembler_code + ";END CHEQUEO RECURSION MUTUA\n";
+
+		
 		this.assembler_code =this.assembler_code+ "MOV " + parametro.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
 		if (analizador.isTypeDef(analizador.getTipoVariable(funcion))) {
+
 			//funcion realmente es la variable typedef almacenando la direccion de memoria de la funcion, al ponerla en [] funciona como puntero a la func
-			this.assembler_code =this.assembler_code+ "CALL [" + funcion + "]\n";
+			this.assembler_code =this.assembler_code+ "CALL [" + funcion.replace(".", "@") + "]\n";
 		} else {
 			//SI ES FUNC NORMAL directamente salto a la label habiendo asignado el parametro previamente
-			this.assembler_code =this.assembler_code+ "CALL " + funcion + "\n";
+			this.assembler_code =this.assembler_code+ "CALL " + funcion.replace(".", "@") + "\n";
 		}
 		
 		//CHEQUEO REC MUTUA
-		this.assembler_code = assembler_code + "MOV recfuncion, \"empty\" \n"; //"DESAPILAR" FUNCION ACTUAL
 		
 		
 		nodo.nombre = "@aux"+this.auxvars.size(); //resultado de la invocacion, es decir el RETURN.
@@ -825,7 +901,7 @@ public class CodeGenerator {
 	
 	private void setREPEAT(Nodo nodo)throws IOException
 	{
-		// PENDIENTE
+		this.assembler_code = assembler_code + ";REPEAT\n";
 		Nodo izq = null;
 		Nodo der = null;
 		try {
@@ -833,24 +909,23 @@ public class CodeGenerator {
 			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
 		
+		//genero codigo de la inicializacion
+		this.setAsignacionRepeat((Nodo)izq.izq.obj);
 		contLabels++;
 		this.pilaLabels.addLast(this.contLabels);	
 		this.assembler_code =this.assembler_code+ "Label" + contLabels + ":\n"; 
 		Nodo varControl =  (Nodo)((Nodo)((Nodo)izq.izq.obj).izq.obj).izq.obj;
+		
 		this.generateCode(izq); //genero codigo de la condicion
 		
 		String cmpLabel= "Label" + this.pilaLabels.pollLast();
 		String repeatLabel = "Label" + this.pilaLabels.pollLast() ; //Desapilo y guardo el salto el inicio del repeat
 		//agregar label en caso que no se cumpla la condicion
-
-		
 		this.generateCode(der);
-		
-		
 		Nodo aumento= (Nodo)((Nodo)izq.der.obj).der.obj;
 		this.assembler_code = this.assembler_code + "ADD " + varControl.nombre.replace(".", "@") +", " + aumento.nombre + "\n";
 		//primero label con jump al repeat y despues label en caso que no se cumpla mas la sentencia del repeat
-		this.assembler_code =this.assembler_code+ "JMP " + repeatLabel + "\n"; //PENDIENTE agregar el tipo de jump
+		this.assembler_code =this.assembler_code+ "JMP " + repeatLabel + "\n";
 		this.assembler_code =this.assembler_code+ cmpLabel + ":\n"; 
 
 	}
@@ -863,7 +938,7 @@ public class CodeGenerator {
 			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
 			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
-		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(izq))).get("tipo"); //PENDIENTE
+		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(izq))).get("tipo"); 
 		this.generateCode(izq);
 		//Al trabajar con variables auxiliares, el resultado de las operaciones aritmeticas queda en una variable auxiliar.
 		String aux= "@"+ getNextAux(tipoOP);
@@ -891,7 +966,6 @@ public class CodeGenerator {
 			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
 		
-		this.generateCode(izq);
 		this.generateCode(der);
 		
 	}
@@ -914,7 +988,7 @@ public class CodeGenerator {
 			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
 		
-		this.generateCode(izq);
+		this.setASG(izq);
 	}
 
 
@@ -951,6 +1025,7 @@ public class CodeGenerator {
 		// Las funciones:
         for (int i = 0; i < listFunciones.size(); i++) {
         	Nodo nodo = (Nodo) listFunciones.get(i).obj;
+        	listFuncionesaux.add(nodo.nombre.replace(".","@"));
     		Nodo izq = null;
     		Nodo der = null;
     		try {
@@ -959,7 +1034,10 @@ public class CodeGenerator {
     		} catch (Exception e) {}
    			this.assembler_code =this.assembler_code+ nodo.nombre.replace(".", "@") +":\n";
    			boolean precondicion = false;
-   			Nodo nodo_precondicion = (Nodo) izq.izq.obj;
+   			Nodo nodo_precondicion = null;
+   			try {
+   	   			nodo_precondicion = (Nodo) izq.izq.obj;
+   			} catch(Exception e) {}
    			if (nodo_precondicion != null)
    			{
    				if (nodo_precondicion.nombre.compareTo("PRE") == 0) //izq es precondicion, der es cuerpo de la funcion con precondicion

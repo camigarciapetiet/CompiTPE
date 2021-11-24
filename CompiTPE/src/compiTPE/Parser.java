@@ -641,7 +641,7 @@ final static String yyrule[] = {
 			if(cadena_dividida.length>1){						//Si tiene S
 				exp=Double.parseDouble(cadena_dividida[1]);
 			}
-			double valor= Math.pow(base, exp);
+			double valor= base * Math.pow(10,exp);
 			if (valor == 0 && base != 0) {
 				analizadorLexico.erroresLex.add("Error en la linea "+ analizadorLexico.contadorLineas + ": constante fuera de rango");
 				fuera_de_rango = true;
@@ -687,8 +687,8 @@ final static String yyrule[] = {
 			boolean isTypeDef = isTypeDef(getTipoVariable(funcion.sval));
 			if (isTypeDef)
 			{
-				funcion.sval = getTipoVariable(funcion.sval);
-				chequeoS_typedef_existe(funcion);
+				String aux = getTipoVariable(funcion.sval);
+				chequeoS_typedef_existe(aux);
 				return;
 			}
 			try {
@@ -888,7 +888,7 @@ final static String yyrule[] = {
 		
 	}
 	
-	private void chequeoS_typedef_existe(ParserVal var)
+	private void chequeoS_typedef_existe(String var)
 	{
 		String typedef = getEntradaValidaTS(var);
 		try
@@ -897,7 +897,7 @@ final static String yyrule[] = {
 			if (uso_typedef.compareTo("typedef") == 0)
 				return;
 		} catch (Exception e){}
-		this.erroresSem.add("error semantico: no existe un typedef de nombre " + var.sval); 
+		this.erroresSem.add("error semantico: no existe un typedef de nombre " + var); 
 		return;
 	}
 	
@@ -921,7 +921,7 @@ final static String yyrule[] = {
 		try
 		{
 			String uso_operador = analizadorLexico.tabla_simbolos.get(operador).get("uso");
-			if (uso_operador.compareTo("variable") == 0)
+			if (uso_operador.compareTo("variable") == 0 || uso_operador.compareTo("parametro") == 0)
 				return;
 		} catch (Exception e){}
 		this.erroresSem.add("error semantico: operador de asignacion invalido, " + op.sval + " no es una variable.");
@@ -1167,7 +1167,7 @@ case 11:
 break;
 case 12:
 //#line 37 "gramatica.y"
-{chequeoS_typedef_existe(val_peek(0));}
+{chequeoS_typedef_existe(val_peek(0).sval);}
 break;
 case 15:
 //#line 44 "gramatica.y"
@@ -1299,7 +1299,7 @@ case 46:
 break;
 case 47:
 //#line 105 "gramatica.y"
-{chequeoS_parametro_funcion(val_peek(3), val_peek(2)); yyval.obj=new Nodo("invocacion funcion", val_peek(3), val_peek(1));}
+{yyval.obj=new Nodo("invocacion funcion", val_peek(3), val_peek(1));chequeoS_parametro_funcion(val_peek(3), val_peek(2)); }
 break;
 case 48:
 //#line 109 "gramatica.y"
