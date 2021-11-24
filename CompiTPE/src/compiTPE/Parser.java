@@ -809,6 +809,28 @@ final static String yyrule[] = {
 		this.erroresSem.add("error semantico: " + id1.sval +"("+tipo_1+ ") y " + id2.sval +"("+tipo_2+") son de tipos incompatibles para la operacion."); 
 	}
 	
+	public String getEntradaValidaTS(String entrada)
+	{
+		//Esta funcion devuelve una referencia a la tabla de simbolos valida (de existir) de una entrada (en el alcance de su ambito), tanto ID como CTE.
+		String iterador_entrada = entrada;
+		boolean no_quedan_ambitos = false;
+		while (!no_quedan_ambitos)
+		{
+			try {
+				String entrada_actual_uso = analizadorLexico.tabla_simbolos.get(iterador_entrada).get("uso");
+				if (entrada_actual_uso != null)
+					{return iterador_entrada;}
+			}
+			catch (Exception e) { }
+			
+			int ambito_index = iterador_entrada.lastIndexOf('.');
+			if (ambito_index > 0) {
+				iterador_entrada = iterador_entrada.substring(0,ambito_index);
+			} else {no_quedan_ambitos = true;}
+		}
+		return null;
+	}
+	
 	private void setLastFuncType (ParserVal func) //Tanto typedef como funcion
 	{
 		lastFuncType = func.sval;
@@ -965,7 +987,7 @@ final static String yyrule[] = {
 	
 	
 	
-//#line 897 "Parser.java"
+//#line 919 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
 //###############################################################
@@ -1461,7 +1483,7 @@ case 92:
 break;
 case 93:
 //#line 188 "gramatica.y"
-{yyval.obj= new Nodo("BREAK");}
+{yyval.obj= new Nodo("S", val_peek(1), null);}
 break;
 case 94:
 //#line 189 "gramatica.y"
@@ -1481,7 +1503,7 @@ case 97:
 break;
 case 98:
 //#line 199 "gramatica.y"
-{yyval.obj=new Nodo("condicion", val_peek(2), val_peek(0));}
+{yyval.obj=new Nodo("condicion repeat", val_peek(2), val_peek(0));}
 break;
 case 99:
 //#line 202 "gramatica.y"
@@ -1503,7 +1525,7 @@ case 103:
 //#line 214 "gramatica.y"
 {yyval.obj=new Nodo(val_peek(0).sval);}
 break;
-//#line 1430 "Parser.java"
+//#line 1452 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####

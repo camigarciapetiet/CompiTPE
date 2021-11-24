@@ -62,6 +62,12 @@ public class Nodo extends ParserVal implements Cloneable {
 	}
 	
 	public boolean esHoja() {
+		Nodo izq = null;
+		Nodo der = null;
+		try {
+			izq = (Nodo)this.izq.obj; //Cast de OBJ a nodo
+			der = (Nodo)this.der.obj; //Cast de OBJ a nodo
+		} catch (Exception e) {}
 		if (der==null && izq==null)
 			return true;
 		return false;
@@ -72,4 +78,24 @@ public class Nodo extends ParserVal implements Cloneable {
 		return false;
 	}
 
+	public String getTipoHijoDer(Nodo n) {
+		System.out.println(n);
+		if (!n.esHoja()) {
+			Nodo nododer=null;
+			Nodo nodoizq=null;
+			try {
+				nododer = (Nodo)n.der.obj; //Cast de OBJ a nodo
+				nodoizq = (Nodo)n.izq.obj; //Cast de OBJ a nodo
+			} catch (Exception e) {}
+			if(nododer!=null)
+				return getTipoHijoDer(nododer);
+			else if(nodoizq!=null)
+				return getTipoHijoDer(nodoizq);
+			/*else
+				return "";*/
+		}else {
+			return n.nombre;
+		}
+			
+	}
 }

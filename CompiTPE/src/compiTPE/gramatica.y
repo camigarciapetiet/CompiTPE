@@ -185,7 +185,7 @@ cadena_cuerpo : CADENA {$$.obj=new Nodo($1.sval);}
 sentencia_control_repeat	: REPEAT '(' declaracion_repeat ')' BEGIN conjunto_sentencias_repeat END ';'  {this.reglas.add("Sentencia Ejecutable REPEAT - Chequeo Semantico"); $$.obj=new Nodo("Repeat", $3, $6);}
 ;		
 
-conjunto_sentencias_repeat	: BREAK ';' {$$.obj= new Nodo("BREAK");}
+conjunto_sentencias_repeat	: BREAK ';' {$$.obj= new Nodo("S", $1, null);}
 							| sentencia_ejecutable {$$.obj= new Nodo("S", $1, null);}
 							| sentencia_ejecutable conjunto_sentencias_repeat {$$.obj= new Nodo("S", $1, $2);}
 ;
@@ -196,7 +196,7 @@ declaracion_repeat :  nodo_asignacion ';' nodo_condicion {chequeoS_repeat_check_
 nodo_asignacion : asignacion_repeat { $$.obj=new Nodo("asignacion_repeat", $1,null);}
 ;
 
-nodo_condicion : condicion_repeat ';' constante_repeat {$$.obj=new Nodo("condicion", $1, $3);}
+nodo_condicion : condicion_repeat ';' constante_repeat {$$.obj=new Nodo("condicion repeat", $1, $3);}
 ;
 
 asignacion_repeat : variable_repeat '=' constante_repeat { chequeoS_repeat_tipo_entero($1,"INT"); chequeoS_repeat_tipo_entero($2, "INT"); $$.obj=new Nodo("=", $1, $3);}
@@ -507,6 +507,28 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 		}
 
 		this.erroresSem.add("error semantico: " + id1.sval +"("+tipo_1+ ") y " + id2.sval +"("+tipo_2+") son de tipos incompatibles para la operacion."); 
+	}
+	
+	public String getEntradaValidaTS(String entrada)
+	{
+		//Esta funcion devuelve una referencia a la tabla de simbolos valida (de existir) de una entrada (en el alcance de su ambito), tanto ID como CTE.
+		String iterador_entrada = entrada;
+		boolean no_quedan_ambitos = false;
+		while (!no_quedan_ambitos)
+		{
+			try {
+				String entrada_actual_uso = analizadorLexico.tabla_simbolos.get(iterador_entrada).get("uso");
+				if (entrada_actual_uso != null)
+					{return iterador_entrada;}
+			}
+			catch (Exception e) { }
+			
+			int ambito_index = iterador_entrada.lastIndexOf('.');
+			if (ambito_index > 0) {
+				iterador_entrada = iterador_entrada.substring(0,ambito_index);
+			} else {no_quedan_ambitos = true;}
+		}
+		return null;
 	}
 	
 	private void setLastFuncType (ParserVal func) //Tanto typedef como funcion

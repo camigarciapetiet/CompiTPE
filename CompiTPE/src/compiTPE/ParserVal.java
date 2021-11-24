@@ -6,8 +6,7 @@
  * BYACC/J Semantic Value for parser: Parser
  * This class provides some of the functionality
  * of the yacc/C 'union' directive
- */
-package compiTPE;
+ */package compiTPE;
 public class ParserVal
 {
 /**

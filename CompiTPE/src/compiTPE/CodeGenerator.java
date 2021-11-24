@@ -68,40 +68,39 @@ public class CodeGenerator {
 	}
 	
 	private void declareData()
-	{
-		this.assembler_code =this.assembler_code+ ".DATA\n";
-		//recorrer la tabla de simbolos y declarar todo lo que haga falta
-		for (Map.Entry<String, HashMap<String,String>> entry : analizador.analizadorLexico.tabla_simbolos.entrySet()) {
-			try {
-			    if (analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("variable") == 0 || 
-			    	analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("parametro") == 0 )
-			    {
-				    String tipo = analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("tipo");
-				    if (tipo.compareTo("INT") == 0)
-				    {
-				    	this.assembler_code =this.assembler_code+ entry.getKey() + " DW ?\n";
-				    } else if (tipo.compareTo("SINGLE") == 0) {
-				    	this.assembler_code =this.assembler_code+ entry.getKey() + " DD ?\n";
-				    } else { //Es TYPEDEF
-				    	this.assembler_code =this.assembler_code+ entry.getKey() + " DD ?\n";
-				    } 
-			    }
-			    if (analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("cadena") == 0) //una cadena
-			    {
-			    	this.assembler_code =this.assembler_code+ entry.getKey().replace(" ","") + " db \"" + entry.getKey().replace(" ", "") + "\", 0 \n";
-			    }
-			    if (analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("programa") == 0) //nombre del programa / label MAIN
-			    {
-			    	this.programa_filename = entry.getKey();
-			    }
-			    this.assembler_code = this.assembler_code + "recfuncion db \"none\", 0"; //PARA CHEQUEO RECURSION MUTUA
-			    		
-			} catch (Exception e) {}
+    {
+        this.assembler_code =this.assembler_code+ ".DATA\n";
+        //recorrer la tabla de simbolos y declarar todo lo que haga falta
+        for (Map.Entry<String, HashMap<String,String>> entry : analizador.analizadorLexico.tabla_simbolos.entrySet()) {
+            try {
+                if (analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("variable") == 0 || 
+                    analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("parametro") == 0 )
+                {
+                    String tipo = analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("tipo");
+                    if (tipo.compareTo("INT") == 0)
+                    {
+                        this.assembler_code =this.assembler_code+ entry.getKey() + " DW ?\n";
+                    } else if (tipo.compareTo("SINGLE") == 0) {
+                        this.assembler_code =this.assembler_code+ entry.getKey() + " DD ?\n";
+                    } else { //Es TYPEDEF
+                        this.assembler_code =this.assembler_code+ entry.getKey() + " DD ?\n";
+                    } 
+                }
+                if (analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("cadena") == 0) //una cadena
+                {
+                    this.assembler_code =this.assembler_code+ entry.getKey().replace(" ","") + " db \"" + entry.getKey().replace(" ", "") + "\", 0 \n";
+                }
+                if (analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("programa") == 0) //nombre del programa / label MAIN
+                {
+                    this.programa_filename = entry.getKey();
+                }
 
-		}
-		
-		this.assembler_code =this.assembler_code+ ";FLAG PARA DECLARAR AUXILIARES\n";
-	}
+            } catch (Exception e) {} 
+}
+        this.assembler_code = this.assembler_code + "recfuncion db \"none\", 0\n"; //PARA CHEQUEO RECURSION MUTUA
+
+        this.assembler_code =this.assembler_code+ ";FLAG PARA DECLARAR AUXILIARES\n";
+    }
 	
 	
 	private void genError() throws IOException {
@@ -128,9 +127,11 @@ public class CodeGenerator {
 		if(!der.esHoja()) {
 			generateCode(der);
 		}
-		String tipoOP = "INT"; //PENDIENTE: agregar campo a los nodos que mantenga los tipos de las variables, para cuando se reemplacen los nodos por auxiliares y tal.
-		//PENDIENTE: Podria ser sacar el tipo del nodo hoja del subarbol derecho antes de generar codigo que deberia corresponder a una entrada de la tabla de simbolos con tipo.
 		
+		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(nodo))).get("tipo"); //PENDIENTE
+ //PENDIENTE: agregar campo a los nodos que mantenga los tipos de las variables, para cuando se reemplacen los nodos por auxiliares y tal.
+		//PENDIENTE: Podria ser sacar el tipo del nodo hoja del subarbol derecho antes de generar codigo que deberia corresponder a una entrada de la tabla de simbolos con tipo.
+		//String tipoOP = "INT";
 		
 		// CHEQUEO OVERFLOW
 		if (tipoOP.compareTo("INT") == 0) {
@@ -333,7 +334,9 @@ public class CodeGenerator {
 		if(!der.esHoja()) {
 			generateCode(der);
 		}
-		String tipoOP = "INT"; //PENDIENTE: agregar campo a los nodos que mantenga los tipos de las variables, para cuando se reemplacen los nodos por auxiliares y tal.
+		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(nodo))).get("tipo"); //PENDIENTE
+ //PENDIENTE: agregar campo a los nodos que mantenga los tipos de las variables, para cuando se reemplacen los nodos por auxiliares y tal.
+		//String tipoOP = "INT";
 		if (tipoOP.compareTo("INT") == 0) {
 			if (izq.esRegistro() && der.esRegistro()) { //Si solo usamos un registro y el resto auxiliares no hace falta la 2da condicion
 				assembler_code =this.assembler_code+ "IMUL " + izq.nombre + ", " + der.nombre + "\n";
@@ -424,8 +427,9 @@ public class CodeGenerator {
 		if(!der.esHoja()) {
 			generateCode(der);
 		}
-		String tipoOP = "INT"; //PENDIENTE: agregar campo a los nodos que mantenga los tipos de las variables, para cuando se reemplacen los nodos por auxiliares y tal.
-		
+		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(nodo))).get("tipo"); //PENDIENTE
+ //PENDIENTE: agregar campo a los nodos que mantenga los tipos de las variables, para cuando se reemplacen los nodos por auxiliares y tal.
+		//String tipoOP = "INT";
 		//CHEQUEO IDIVISION POR CERO:
 		if (tipoOP.compareTo("INT") == 0) {
 			String registroAux = "BX"; //16	 bits
@@ -525,7 +529,9 @@ public class CodeGenerator {
 			generateCode(der);
 		}
 		
-		String tipoOP = "INT"; //PENDIENTE
+		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(nodo))).get("tipo"); //PENDIENTE
+//PENDIENTE
+		//String tipoOP = "INT";
 		if (tipoOP.compareTo("INT") == 0) {
 			this.assembler_code =this.assembler_code+ "MOV " + izq.nombre + ", " + der.nombre + "\n"; 
 		}
@@ -631,7 +637,7 @@ public class CodeGenerator {
 		this.contLabels++;
 		this.pilaLabels.addLast(this.contLabels);
 		String registro = "AX";
-		String tipoOP = "INT"; //PENDIENTE
+		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(nodo))).get("tipo");
 		if (tipoOP.compareTo("INT") == 0) {
 			if (der.esRegistro()){ //Como guardare la comparacion en un registro a la izquierda, si mi derecha es un registro debo liberarlo para no pisarlo
 				String aux="@"+ getNextAux(tipoOP);
@@ -642,27 +648,27 @@ public class CodeGenerator {
 			izq.nombre = registro;
 			switch (nodo.nombre) {
 				case "<": {
-					this.assembler_code = this.assembler_code + "CMP " +  izq.nombre + ", " + der.nombre + "\n" + "JL Label"+contLabels + "\n";
+					this.assembler_code = this.assembler_code + "CMP " +  izq.nombre + ", " + der.nombre + "\n" + "JAE Label"+contLabels + "\n";
 					break;
 				}
 				case "<=": {
-					this.assembler_code = this.assembler_code + "CMP " +  izq.nombre + ", " + der.nombre + "\n" + "JLE Label"+contLabels + "\n";
+					this.assembler_code = this.assembler_code + "CMP " +  izq.nombre + ", " + der.nombre + "\n" + "JA Label"+contLabels + "\n";
 					break;
 				}
 				case ">": {
-					this.assembler_code = "CMP " +  izq.nombre + ", " + der.nombre + "\n" + "JG Label"+contLabels + "\n";
+					this.assembler_code = "CMP " +  izq.nombre + ", " + der.nombre + "\n" + "JLE Label"+contLabels + "\n";
 					break;
 				}
 				case ">=": {
-					this.assembler_code = "CMP " +  izq.nombre + ", " + der.nombre + "\n" + "JGE Label"+contLabels + "\n";
+					this.assembler_code = "CMP " +  izq.nombre + ", " + der.nombre + "\n" + "JL Label"+contLabels + "\n";
 					break;
 				}
-				case "!=": {
-					this.assembler_code = "CMP " +  izq.nombre + ", " + der.nombre + "\n" + "JNE Label"+contLabels + "\n";
+				case "<>": {
+					this.assembler_code = "CMP " +  izq.nombre + ", " + der.nombre + "\n" + "JE Label"+contLabels + "\n";
 					break;
 				}
 				case "==": {
-					this.assembler_code = "CMP " +  izq.nombre + ", " + der.nombre + "\n" + "JE Label"+contLabels + "\n";
+					this.assembler_code = "CMP " +  izq.nombre + ", " + der.nombre + "\n" + "JNE Label"+contLabels + "\n";
 					break;
 				}
 			}
@@ -731,9 +737,13 @@ public class CodeGenerator {
 			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
 		
-		this.generateCode(izq);
-		if (nodo.der != null) {
+		if (izq != null) {
+			this.generateCode(izq);
+			System.out.println(izq.nombre);
+		}
+		if (der != null) {
 			this.generateCode(der);
+			System.out.println(der.nombre);
 		}
 	}
 	
@@ -798,9 +808,36 @@ public class CodeGenerator {
 		nodo.nombre = "@aux"+this.auxvars.size(); //resultado de la invocacion, es decir el RETURN.
 	}
 	
-	private void setREPEAT(Nodo nodo)
+	private void setREPEAT(Nodo nodo)throws IOException
 	{
 		// PENDIENTE
+		Nodo izq = null;
+		Nodo der = null;
+		try {
+			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
+			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
+		} catch (Exception e) {}
+		
+		contLabels++;
+		this.pilaLabels.addLast(this.contLabels);	
+		this.assembler_code =this.assembler_code+ "Label" + contLabels + ":\n"; 
+		Nodo varControl =  (Nodo)((Nodo)((Nodo)izq.izq.obj).izq.obj).izq.obj;
+		this.generateCode(izq); //genero codigo de la condicion
+		
+		String cmpLabel= "Label" + this.pilaLabels.pollLast();
+		String repeatLabel = "Label" + this.pilaLabels.pollLast() ; //Desapilo y guardo el salto el inicio del repeat
+		//agregar label en caso que no se cumpla la condicion
+
+		
+		this.generateCode(der);
+		
+		
+		Nodo aumento= (Nodo)((Nodo)izq.der.obj).der.obj;
+		this.assembler_code = this.assembler_code + "ADD " + varControl.nombre +", " + aumento.nombre + "\n";
+		//primero label con jump al repeat y despues label en caso que no se cumpla mas la sentencia del repeat
+		this.assembler_code =this.assembler_code+ "JMP " + repeatLabel + "\n"; //PENDIENTE agregar el tipo de jump
+		this.assembler_code =this.assembler_code+ cmpLabel + ":\n"; 
+
 	}
 	
 	private void setRETURN(Nodo nodo) throws IOException
@@ -811,10 +848,10 @@ public class CodeGenerator {
 			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
 			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
-		
+		System.out.println();
+		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(nodo))).get("tipo"); //PENDIENTE
 		this.generateCode(izq);
 		//Al trabajar con variables auxiliares, el resultado de las operaciones aritmeticas queda en una variable auxiliar.
-		String tipoOP = "INT"; //PENDIENTE
 		String aux= "@"+ getNextAux(tipoOP);
 		assembler_code = this.assembler_code+ "MOV " + aux + ", " + izq.nombre + "\n";
 		nodo.nombre = aux;
@@ -831,6 +868,44 @@ public class CodeGenerator {
 		this.generateCode(izq);
 		nodo.nombre = izq.nombre;
 	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	private void setDeclaracionRepeat(Nodo nodo) throws IOException {
+		Nodo izq = null;
+		Nodo der = null;
+		try {
+			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
+			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
+		} catch (Exception e) {}
+		
+		this.generateCode(izq);
+		this.generateCode(der);
+		
+	}
+	
+	private void setCondicionRepeat(Nodo nodo) throws IOException {
+		Nodo izq = null;
+		Nodo der = null;
+		try {
+			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
+			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
+		} catch (Exception e) {}
+		
+		this.setCMP(izq);
+		
+	}
+	
+	private void setAsignacionRepeat(Nodo nodo) throws IOException {
+		Nodo izq = null;
+		try {
+			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
+		} catch (Exception e) {}
+		
+		this.generateCode(izq);
+	}
+
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private void generateCode(Nodo nodo) throws IOException
 	{
@@ -844,9 +919,12 @@ public class CodeGenerator {
 			case "S": {setSENT(nodo); break;}
 			case "IF": {setIF(nodo); break;}
 			case "PRINT": {setPRINT(nodo,false); break;}
-			case "REPEAT": {setREPEAT(nodo); break;}
+			case "Repeat": {setREPEAT(nodo); break;}
 			case "RETURN": {setRETURN(nodo); break;}
 			case "condicion": {setCondicion(nodo); break;}
+			case "declaracion_repeat": {setDeclaracionRepeat(nodo); break;}
+			case "condicion repeat": {setCondicionRepeat(nodo); break;}
+			case "asignacion_repeat": {setAsignacionRepeat(nodo); break;}
 		}
 	}
 	
