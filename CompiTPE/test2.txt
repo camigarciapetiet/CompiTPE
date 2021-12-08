@@ -1,0 +1,13 @@
+test2
+INT diseno;
+
+BEGIN
+
+diseno := 2;
+
+IF (diseno+5/3*2< 5) THEN
+	BEGIN
+		PRINT(%YAC%);
+	END;
+ENDIF;
+END;

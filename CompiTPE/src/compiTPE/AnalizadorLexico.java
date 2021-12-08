@@ -128,7 +128,24 @@ public class AnalizadorLexico {
 				}
 				else {
 					if (tipo_token.valor == 1) { //es una palabra predefinida
-						yylval.sval = token_actual.valor; 
+						switch (token_actual.valor) {
+							case ">=": {
+								break;
+							}
+							case "<=": {
+								break;
+							}
+							case "==": {
+								break;
+							}
+							case "||": {
+								break;
+							}
+							case "&&": {
+								break;
+							}
+							default: yylval.sval = token_actual.valor; 
+						}
 						informeTokens.add("Palabra predefinida "+token_actual.valor);
 						return this.getCodigoPP(token_actual.valor); //null
 					}

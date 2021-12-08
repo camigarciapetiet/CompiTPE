@@ -607,9 +607,9 @@ final static String yyrule[] = {
 		if (var != null)
 		{
 			try {
-				if (analizadorLexico.tabla_simbolos.get(var).get("uso").compareTo("variable") == 0)
+				if (analizadorLexico.tabla_simbolos.get(var).get("uso").length() > 0)
 				{
-					this.erroresSem.add("error semantico: variable " + variable.sval + " ya declarada");
+					this.erroresSem.add("error semantico: variable o funcion " + variable.sval + " ya declarada");
 					return;
 				}
 			} catch (Exception e) {}
@@ -705,27 +705,22 @@ final static String yyrule[] = {
 	
 	private void chequeoS_redeclaracion_funcion (ParserVal funcion)
 	{
-		boolean funcion_redeclarada = false;
-		// buscar en la tabla de simbolos si esta (no hace falta por campo uso sino que no pertenezcan al mismo ambito y listo)
-		// pero si hay que verificar que 'uso' no sea null porque sino, no esta declarada.
-
-			Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();
-	        while (iterator.hasNext()) 
-	        {
-	            Map.Entry<String, HashMap<String,String>> entry = iterator.next();
-	            if (entry.getKey().compareTo(funcion.sval) == 0 && analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso") != null)  
-	            {
-	            	if (analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("funcion") == 0)
-	                	funcion_redeclarada = true;
-	            }
-	        }
-		
-		if (funcion_redeclarada)
-		{
-			this.erroresSem.add("error semantico: funcion " + funcion.sval + " ya declarada");
-		}	
-	}
 	
+				
+		String var = getEntradaValidaTS(funcion);
+		if (var != null)
+		{
+			try {
+				if (analizadorLexico.tabla_simbolos.get(var).get("uso").length() > 0)
+				{
+					this.erroresSem.add("error semantico: variable o funcion " + funcion.sval + " ya declarada");
+					return;
+				}
+			} catch (Exception e) {}
+		}
+		return;
+	}
+
 	private void addPendingTypeList(String identificador)
 	{
 		pendingTypeList.add(identificador);
@@ -959,7 +954,6 @@ final static String yyrule[] = {
 	{
 		if (aux_i.sval.compareTo(i.sval) != 0)
 		{
-			System.out.println("CHECK:" + i.sval);
 			this.erroresSem.add("error semantico: en una sentencia repeat se debe comparar usando la variable de control");
 		}
 		return;
@@ -987,7 +981,7 @@ final static String yyrule[] = {
 	
 	
 	
-//#line 919 "Parser.java"
+//#line 913 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
 //###############################################################
@@ -1447,7 +1441,7 @@ case 83:
 break;
 case 84:
 //#line 171 "gramatica.y"
-{yyval.sval="<=";}
+{yyval.sval="<";}
 break;
 case 85:
 //#line 172 "gramatica.y"
@@ -1483,7 +1477,7 @@ case 92:
 break;
 case 93:
 //#line 188 "gramatica.y"
-{yyval.obj= new Nodo("S", val_peek(1), null);}
+{yyval.obj= new Nodo("BREAK", val_peek(1), null);}
 break;
 case 94:
 //#line 189 "gramatica.y"
@@ -1525,7 +1519,7 @@ case 103:
 //#line 214 "gramatica.y"
 {yyval.obj=new Nodo(val_peek(0).sval);}
 break;
-//#line 1452 "Parser.java"
+//#line 1446 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####

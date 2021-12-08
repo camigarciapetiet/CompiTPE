@@ -21,6 +21,7 @@ public class CodeGenerator {
 	private LinkedList<String> auxvars;
 	private ArrayList<ParserVal> listFunciones;
 	private LinkedList<String> listFuncionesaux;
+	private LinkedList<Integer> breakRepeatLabels;
 	
 	public CodeGenerator(Nodo raizArbol, Parser analizadorSintactico)
 	{
@@ -30,8 +31,8 @@ public class CodeGenerator {
 		this.contLabels = 0;
 		this.listFunciones = analizadorSintactico.listaFunc;
 		this.auxvars = new LinkedList<String>();
-    	listFuncionesaux = new LinkedList<String>();
-
+    	this.listFuncionesaux = new LinkedList<String>();
+    	this.breakRepeatLabels = new LinkedList<Integer>();
 	}
 	
 	public void run() throws IOException 
@@ -215,10 +216,14 @@ public class CodeGenerator {
 						nodo.nombre = aux;
 					}
 					else {
-						der.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
-
-						izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
-						System.out.println(izq.nombre);
+						if (!der.nombre.contains("@aux"))
+						{
+							der.nombre = analizador.getEntradaValidaTS(der.nombre.replace("@", "."));
+						}
+						if (!izq.nombre.contains("@aux"))
+						{
+							izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+						}
 						assembler_code = this.assembler_code+ "MOV " + "AX, " + izq.nombre.replace(".", "@") + "\n";
 						izq.nombre = "AX";
 						assembler_code = this.assembler_code+ "ADD " + izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
@@ -316,9 +321,14 @@ public class CodeGenerator {
 						assembler_code = this.assembler_code+ "MOV " + aux + ", " + "AX" + "\n";
 						nodo.nombre = aux;
 					} else {
-						der.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
-
-						izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+						if (!der.nombre.contains("@aux"))
+						{
+							der.nombre = analizador.getEntradaValidaTS(der.nombre.replace("@", "."));
+						}
+						if (!izq.nombre.contains("@aux"))
+						{
+							izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+						}
 
 						assembler_code = this.assembler_code+ "MOV " + "AX, " + izq.nombre.replace(".", "@") + "\n";
 						izq.nombre= "AX";
@@ -415,9 +425,14 @@ public class CodeGenerator {
 						assembler_code = this.assembler_code+ "MOV " + aux + ", " + "AX" + "\n";
 						nodo.nombre = aux;	
 					}else {
-						der.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
-
-						izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+						if (!der.nombre.contains("@aux"))
+						{
+							der.nombre = analizador.getEntradaValidaTS(der.nombre.replace("@", "."));
+						}
+						if (!izq.nombre.contains("@aux"))
+						{
+							izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+						}
 
 						assembler_code = this.assembler_code+ "MOV " + "AX, " + izq.nombre.replace(".", "@") + "\n";
 						izq.nombre = "AX";
@@ -535,7 +550,7 @@ public class CodeGenerator {
 						assembler_code = this.assembler_code+ "MOV " + aux + ", " + "AX" + "\n";
 						nodo.nombre = aux;
 					}else { //izq es una variable o un inmediato. No puede ser inmediato!
-						der.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+						der.nombre = analizador.getEntradaValidaTS(der.nombre.replace("@", "."));
 
 						izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
 						if (analizador.analizadorLexico.tabla_simbolos.get(der.nombre).get("uso").compareTo("constante") == 0) {
@@ -660,7 +675,6 @@ public class CodeGenerator {
 		 if (nodo_else != null) {
 			if (nodo_else.nombre.compareTo("ELSE") == 0){
 				this.setCuerpoIfElse((Nodo)((Nodo)der.izq.obj).izq.obj); //der.izq es THEn, der.izq.izq es S
-				System.out.println(nodo_else);
 				this.setElse(nodo_else); //der.der es ELSE, der.der.izq es S
 			}
 		}
@@ -692,6 +706,8 @@ public class CodeGenerator {
 	}
 	
 	private void setCMP(Nodo nodo) throws IOException {
+		System.out.println(nodo.nombre);
+
 		Nodo izq = null;
 		Nodo der = null;
 		try {
@@ -699,12 +715,16 @@ public class CodeGenerator {
 			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
 		
+		System.out.println("der: " + der.nombre);
+		System.out.println("izq: " + izq.nombre);
 		if (!izq.esHoja()) {
 			generateCode(izq);
 		}
 		if(!der.esHoja()) {
 			generateCode(der);
 		}
+		System.out.println("izqGenerado: " + izq.nombre);
+
 		this.contLabels++;
 		this.pilaLabels.addLast(this.contLabels);
 		String registro = "AX";
@@ -715,7 +735,8 @@ public class CodeGenerator {
 				assembler_code = this.assembler_code+ "MOV " + aux + ", " + der.nombre.replace(".", "@") + "\n";
 				der.nombre = aux;
 			}
-			izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
+			System.out.println("izq: " + izq.nombre);
+			//izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
 			this.assembler_code =this.assembler_code+ "MOV " + registro + ", " + izq.nombre.replace(".", "@") + "\n";
 			izq.nombre = registro;
 			switch (nodo.nombre) {
@@ -875,15 +896,14 @@ public class CodeGenerator {
 				this.assembler_code = assembler_code + "JE ERROR_REC_MUTUA\n";
 				this.assembler_code = assembler_code + "MOV @"+listFuncionesaux.get(i)+", 1\n";
 			}
-			else {
-				this.assembler_code = assembler_code + "MOV @"+listFuncionesaux.get(i)+", 0\n";
-			}
 		}
 
 		this.assembler_code = assembler_code + ";END CHEQUEO RECURSION MUTUA\n";
 
+		this.assembler_code = this.assembler_code + "MOV AX," + der.nombre.replace(".", "@") + "\n";
+		this.assembler_code =this.assembler_code+ "MOV " + parametro.replace(".", "@") + ", AX\n";
 		
-		this.assembler_code =this.assembler_code+ "MOV " + parametro.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
+		
 		if (analizador.isTypeDef(analizador.getTipoVariable(funcion))) {
 
 			//funcion realmente es la variable typedef almacenando la direccion de memoria de la funcion, al ponerla en [] funciona como puntero a la func
@@ -893,8 +913,10 @@ public class CodeGenerator {
 			this.assembler_code =this.assembler_code+ "CALL " + funcion.replace(".", "@") + "\n";
 		}
 		
-		//CHEQUEO REC MUTUA
-		
+		//CHEQUEO REC MUTUA, desapilar
+		for (int i = 0; i < listFuncionesaux.size(); i++) {
+			this.assembler_code = assembler_code + "MOV @"+listFuncionesaux.get(i)+", 0\n";
+		}
 		
 		nodo.nombre = "@aux"+this.auxvars.size(); //resultado de la invocacion, es decir el RETURN.
 	}
@@ -918,6 +940,10 @@ public class CodeGenerator {
 		
 		this.generateCode(izq); //genero codigo de la condicion
 		
+		//breakRepeatLabels.addLast(this.pilaLabels.getLast());
+		//int lastBreak = this.breakRepeatLabels.getLast();
+		
+		
 		String cmpLabel= "Label" + this.pilaLabels.pollLast();
 		String repeatLabel = "Label" + this.pilaLabels.pollLast() ; //Desapilo y guardo el salto el inicio del repeat
 		//agregar label en caso que no se cumpla la condicion
@@ -933,25 +959,22 @@ public class CodeGenerator {
 	private void setRETURN(Nodo nodo) throws IOException
 	{
 		Nodo izq = null;
-		Nodo der = null;
 		try {
 			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
-			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
 		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(izq))).get("tipo"); 
 		this.generateCode(izq);
 		//Al trabajar con variables auxiliares, el resultado de las operaciones aritmeticas queda en una variable auxiliar.
 		String aux= "@"+ getNextAux(tipoOP);
-		assembler_code = this.assembler_code+ "MOV " + aux + ", " + izq.nombre.replace(".", "@") + "\n";
+		assembler_code = this.assembler_code + "MOV " + "AX, " + izq.nombre.replace(".", "@") + "\n"; 
+		assembler_code = this.assembler_code+ "MOV " + aux + ", AX \n";
 		nodo.nombre = aux;
 	}
 	
 	private void setCondicion(Nodo nodo) throws IOException {
 		Nodo izq = null;
-		Nodo der = null;
 		try {
 			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
-			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
 		
 		this.generateCode(izq);
@@ -959,10 +982,8 @@ public class CodeGenerator {
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private void setDeclaracionRepeat(Nodo nodo) throws IOException {
-		Nodo izq = null;
 		Nodo der = null;
 		try {
-			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
 			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
 		
@@ -972,10 +993,8 @@ public class CodeGenerator {
 	
 	private void setCondicionRepeat(Nodo nodo) throws IOException {
 		Nodo izq = null;
-		Nodo der = null;
 		try {
 			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
-			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
 		
 		this.setCMP(izq);
@@ -1005,6 +1024,7 @@ public class CodeGenerator {
 			case ":=": {setASG(nodo); break;}
 			case "invocacion funcion": {setINV(nodo); break;}
 			case "S": {setSENT(nodo); break;}
+			case "BREAK": {setBREAK(nodo); break;}
 			case "IF": {setIF(nodo); break;}
 			case "PRINT": {setPRINT(nodo,false); break;}
 			case "Repeat": {setREPEAT(nodo); break;}
@@ -1016,6 +1036,11 @@ public class CodeGenerator {
 		}
 	}
 	
+	private void setBREAK(Nodo nodo) {
+		// TODO Auto-generated method stub
+		this.assembler_code =this.assembler_code+ "JMP Label" + this.breakRepeatLabels.pollLast() + "\n";
+	}
+
 	private void compile() throws IOException
 	{
 		this.assembler_code =this.assembler_code+ ".CODE\n";
@@ -1060,7 +1085,7 @@ public class CodeGenerator {
    				//this.setPRINT((Nodo)izq.der.obj); //mensaje NO, este es el CUERPO de la funcion.
    				Nodo print = (Nodo)nodo_precondicion.der.obj;
    				this.setPRINT(print,true);
-   				this.assembler_code =this.assembler_code+ "ret\n";
+   				this.assembler_code =this.assembler_code+ "JMP EXIT\n"; //Aborta el programa en vez de retornar
    			}
         }
 
@@ -1080,7 +1105,7 @@ public class CodeGenerator {
 		System.out.println(this.assembler_code);
 		PrintWriter out;
 		try {
-			out = new PrintWriter(programa_filename +".txt");
+			out = new PrintWriter(programa_filename +".asm");
 			out.println(assembler_code);
 			out.close();
 		} catch (FileNotFoundException e) {

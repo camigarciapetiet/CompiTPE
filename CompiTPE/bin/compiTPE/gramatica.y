@@ -168,7 +168,7 @@ operador_logico	: '||' {$$.sval="||";}
 				| '&&' {$$.sval="&&";}
 				| '<>' {$$.sval="<>";}
 				| '==' {$$.sval="==";}
-				| '<=' {$$.sval="<=";}
+				| '<=' {$$.sval="<";}
 				| '>=' {$$.sval=">=";}
 				| '>' {$$.sval=">";}
 				| '<' {$$.sval="<";}
@@ -185,7 +185,7 @@ cadena_cuerpo : CADENA {$$.obj=new Nodo($1.sval);}
 sentencia_control_repeat	: REPEAT '(' declaracion_repeat ')' BEGIN conjunto_sentencias_repeat END ';'  {this.reglas.add("Sentencia Ejecutable REPEAT - Chequeo Semantico"); $$.obj=new Nodo("Repeat", $3, $6);}
 ;		
 
-conjunto_sentencias_repeat	: BREAK ';' {$$.obj= new Nodo("S", $1, null);}
+conjunto_sentencias_repeat	: BREAK ';' {$$.obj= new Nodo("BREAK", $1, null);}
 							| sentencia_ejecutable {$$.obj= new Nodo("S", $1, null);}
 							| sentencia_ejecutable conjunto_sentencias_repeat {$$.obj= new Nodo("S", $1, $2);}
 ;
@@ -307,9 +307,9 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 		if (var != null)
 		{
 			try {
-				if (analizadorLexico.tabla_simbolos.get(var).get("uso").compareTo("variable") == 0)
+				if (analizadorLexico.tabla_simbolos.get(var).get("uso").length() > 0)
 				{
-					this.erroresSem.add("error semantico: variable " + variable.sval + " ya declarada");
+					this.erroresSem.add("error semantico: variable o funcion " + variable.sval + " ya declarada");
 					return;
 				}
 			} catch (Exception e) {}
@@ -405,27 +405,22 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 	
 	private void chequeoS_redeclaracion_funcion (ParserVal funcion)
 	{
-		boolean funcion_redeclarada = false;
-		// buscar en la tabla de simbolos si esta (no hace falta por campo uso sino que no pertenezcan al mismo ambito y listo)
-		// pero si hay que verificar que 'uso' no sea null porque sino, no esta declarada.
-
-			Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizadorLexico.tabla_simbolos.entrySet().iterator();
-	        while (iterator.hasNext()) 
-	        {
-	            Map.Entry<String, HashMap<String,String>> entry = iterator.next();
-	            if (entry.getKey().compareTo(funcion.sval) == 0 && analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso") != null)  
-	            {
-	            	if (analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("funcion") == 0)
-	                	funcion_redeclarada = true;
-	            }
-	        }
-		
-		if (funcion_redeclarada)
-		{
-			this.erroresSem.add("error semantico: funcion " + funcion.sval + " ya declarada");
-		}	
-	}
 	
+				
+		String var = getEntradaValidaTS(funcion);
+		if (var != null)
+		{
+			try {
+				if (analizadorLexico.tabla_simbolos.get(var).get("uso").length() > 0)
+				{
+					this.erroresSem.add("error semantico: variable o funcion " + funcion.sval + " ya declarada");
+					return;
+				}
+			} catch (Exception e) {}
+		}
+		return;
+	}
+
 	private void addPendingTypeList(String identificador)
 	{
 		pendingTypeList.add(identificador);
@@ -659,7 +654,6 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 	{
 		if (aux_i.sval.compareTo(i.sval) != 0)
 		{
-			System.out.println("CHECK:" + i.sval);
 			this.erroresSem.add("error semantico: en una sentencia repeat se debe comparar usando la variable de control");
 		}
 		return;

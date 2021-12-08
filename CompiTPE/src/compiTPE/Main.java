@@ -1,7 +1,9 @@
 package compiTPE;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class Main {
@@ -80,35 +82,49 @@ public class Main {
 	        Parser newParser = new Parser(a_lex);
 	        newParser.run();
 	        
-//	        System.out.println("\n\nINFORME TOKENS");
-//	        for (String s: a_lex.informeTokens) {
-//	        	System.out.print(s+ ", ");
-//	        }
-//	        System.out.println("\n\nINFORME REGLAS");
-//	        for (String s: newParser.reglas) {
-//	        	System.out.print(s + ", ");
-//	        }
-//	        System.out.println("\n\nERRORES LEXICOS");
-//	        for (String s: a_lex.erroresLex) {
-//	        	System.out.println(s);
-//	        }
-//	        System.out.println("\n\nERRORES SINTACTICOS");
-//	        for (String s: newParser.erroresSint) {
-//	        	System.out.println(s);
-//	        }
-//	        System.out.println("\n\n\nTABLA DE SIMBOLOS");
-//	        System.out.println(a_lex.tabla_simbolos);
-//	        System.out.println("\nPalabras Predefinidas");
-//	        System.out.println(a_lex.palabras_predefinidas);
-//	        
-//			System.out.println("\n\nARBOL");
-//	        newParser.imprimirArbol(newParser.raiz);
-//
-//	        System.out.println("\n\nLISTA FUNCIONES");
-//	        for(ParserVal nodo : newParser.listaFunc) {
-//	            System.out.println("nodo:");
-//	            newParser.imprimirArbol(nodo);
-//	        }
+	        String estructuras;
+	        estructuras = "INFORME TOKENS\n";
+	        for (String s: a_lex.informeTokens) {
+	        	estructuras = estructuras + " " + s+ ", ";
+	        }
+	        estructuras = estructuras + "\n\nINFORME REGLAS\n";
+	        for (String s: newParser.reglas) {
+	        	estructuras = estructuras + " " + s+ ", ";
+	        }
+	        estructuras = estructuras + "\n\nERRORES LEXICOS\n";
+	        for (String s: a_lex.erroresLex) {
+	        	estructuras = estructuras + " " + s + "\n";
+	        }
+	        estructuras = estructuras + "\n\nERRORES SINTACTICOS\n";
+	        for (String s: newParser.erroresSint) {
+	        	estructuras = estructuras + " " + s + "\n";
+	        }
+	        estructuras = estructuras + "\n\nTABLA DE SIMBOLOS\n";
+	        estructuras = estructuras + a_lex.tabla_simbolos.toString();
+	        estructuras = estructuras + "\nPalabras Predefinidas\n";
+	        estructuras = estructuras + a_lex.palabras_predefinidas.toString();
+	        
+	        
+	      //PENDIENTE PASAR A STRING TODO EL IMPRIMIR ARBOL
+			System.out.println("\n\nARBOL\n");
+	        newParser.imprimirArbol(newParser.raiz); //PENDIENTE PASAR A STRING
+	        
+	        System.out.println("\n\nLISTA FUNCIONES");
+	        for(ParserVal nodo : newParser.listaFunc) {
+	            System.out.println("nodo:");
+	            newParser.imprimirArbol(nodo);
+	        }
+	        PrintWriter out;
+			try {
+				out = new PrintWriter("estructuras.txt");
+				out.println(estructuras);
+				out.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
 	        if (a_lex.erroresLex.isEmpty() && newParser.erroresSint.isEmpty() && newParser.erroresSem.isEmpty())
 	        {
 	        	CodeGenerator cg_assembler = new CodeGenerator((Nodo) newParser.raiz.obj, newParser);
