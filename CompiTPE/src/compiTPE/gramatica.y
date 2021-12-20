@@ -144,9 +144,9 @@ tipo		: INT {this.reglas.add("tipo INT");}
 			| SINGLE {this.reglas.add("tipo SINGLE");}
 ;
 
-clausula_seleccion_if : IF '('condicion')' cuerpo_if ENDIF ';' {$$.obj= new Nodo("IF", $3, $5);}
-					  | IF condicion')'  cuerpo_if ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); this.reglas.add("clausula IF"); $$.obj= new Nodo("IF", $2, $4);}
-					  | IF '('condicion  cuerpo_if ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); this.reglas.add("clausula IF"); $$.obj= new Nodo("IF", $3, $4);}
+clausula_seleccion_if : IF '('condicion_intermedia')' cuerpo_if ENDIF ';' {$$.obj= new Nodo("IF", $3, $5);}
+					  | IF condicion_intermedia')'  cuerpo_if ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); this.reglas.add("clausula IF"); $$.obj= new Nodo("IF", $2, $4);}
+					  | IF '('condicion_intermedia  cuerpo_if ENDIF ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); this.reglas.add("clausula IF"); $$.obj= new Nodo("IF", $3, $4);}
 ;
 
 cuerpo_if : cuerpo_then {$$.obj= new Nodo("cuerpo", $1, null);}
@@ -160,13 +160,22 @@ cuerpo_then : THEN bloque_sentencias_ejecutables {$$.obj= new Nodo("THEN", $2, n
 cuerpo_else : ELSE bloque_sentencias_ejecutables {$$.obj= new Nodo("ELSE", $2, null);}
 ;
 
-condicion	: expresion {$$.obj=new Nodo("condicion", $1, null);}
-			| condicion operador_logico expresion {chequeoS_diferentes_tipos($0, $1, false); $$.obj= new Nodo($2.sval, $1, $3);}
+condicion_intermedia : condicion_compuesta {$$.obj=new Nodo("condicion", $1, null);}
 ;
 
-operador_logico	: '||' {$$.sval="||";}
-				| '&&' {$$.sval="&&";}
-				| '<>' {$$.sval="<>";}
+condicion_compuesta : condicion_compuesta operador_booleano condicion {$$.obj= new Nodo($2.sval, $1, $3);}
+					| condicion {$$=$1;}
+;
+
+condicion	: expresion {$$=$1;}
+			| condicion operador_logico expresion {chequeoS_diferentes_tipos($1, $3, false); $$.obj= new Nodo($2.sval, $1, $3);}
+;
+
+operador_booleano :  '||' {$$.sval="||";}
+				   | '&&' {$$.sval="&&";}
+;
+
+operador_logico	: '<>' {$$.sval="<>";}
 				| '==' {$$.sval="==";}
 				| '<=' {$$.sval="<";}
 				| '>=' {$$.sval=">=";}

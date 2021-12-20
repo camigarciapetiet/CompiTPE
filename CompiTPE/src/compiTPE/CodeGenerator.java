@@ -665,7 +665,7 @@ public class CodeGenerator {
 		Nodo izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
 		Nodo der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 
-		this.setCMP(izq);
+		this.generateCode((Nodo)izq.izq.obj);
 		Nodo nodo_else = null;
 		
 		try {
@@ -706,7 +706,7 @@ public class CodeGenerator {
 	}
 	
 	private void setCMP(Nodo nodo) throws IOException {
-		System.out.println(nodo.nombre);
+		//System.out.println(nodo.nombre);
 
 		Nodo izq = null;
 		Nodo der = null;
@@ -715,15 +715,15 @@ public class CodeGenerator {
 			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
 		
-		System.out.println("der: " + der.nombre);
-		System.out.println("izq: " + izq.nombre);
+		//System.out.println("der: " + der.nombre);
+		//System.out.println("izq: " + izq.nombre);
 		if (!izq.esHoja()) {
 			generateCode(izq);
 		}
 		if(!der.esHoja()) {
 			generateCode(der);
 		}
-		System.out.println("izqGenerado: " + izq.nombre);
+		//System.out.println("izqGenerado: " + izq.nombre);
 
 		this.contLabels++;
 		this.pilaLabels.addLast(this.contLabels);
@@ -735,7 +735,7 @@ public class CodeGenerator {
 				assembler_code = this.assembler_code+ "MOV " + aux + ", " + der.nombre.replace(".", "@") + "\n";
 				der.nombre = aux;
 			}
-			System.out.println("izq: " + izq.nombre);
+			//System.out.println("izq: " + izq.nombre);
 			//izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
 			this.assembler_code =this.assembler_code+ "MOV " + registro + ", " + izq.nombre.replace(".", "@") + "\n";
 			izq.nombre = registro;
@@ -749,19 +749,19 @@ public class CodeGenerator {
 					break;
 				}
 				case ">": {
-					this.assembler_code = "CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JLE Label"+contLabels + "\n";
+					this.assembler_code = this.assembler_code +"CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JLE Label"+contLabels + "\n";
 					break;
 				}
 				case ">=": {
-					this.assembler_code = "CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JL Label"+contLabels + "\n";
+					this.assembler_code = this.assembler_code +"CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JL Label"+contLabels + "\n";
 					break;
 				}
 				case "<>": {
-					this.assembler_code = "CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JE Label"+contLabels + "\n";
+					this.assembler_code = this.assembler_code +"CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JE Label"+contLabels + "\n";
 					break;
 				}
 				case "==": {
-					this.assembler_code = "CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JNE Label"+contLabels + "\n";
+					this.assembler_code = this.assembler_code +"CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JNE Label"+contLabels + "\n";
 					break;
 				}
 			}
@@ -770,49 +770,49 @@ public class CodeGenerator {
 			switch (nodo.nombre) {
 				case "<": {
 					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JAE Label" +contLabels+"\n";
+						this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JAE Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JAE Label" +contLabels+"\n";
+						this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JAE Label" +contLabels+"\n";
 					}
 					break;
 				}
 				case "<=": {
 					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JA Label" +contLabels+"\n";
+						this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JA Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JA Label" +contLabels+"\n";
+						this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JA Label" +contLabels+"\n";
 					}
 					break;
 				}
 				case ">": {
 					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JLE Label" +contLabels+"\n";
+						this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JLE Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JLE Label" +contLabels+"\n";
+						this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JLE Label" +contLabels+"\n";
 					}
 					break;
 				}
 				case ">=": {
 					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JL Label" +contLabels+"\n";
+						this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JL Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JLE Label" +contLabels+"\n";
+						this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JLE Label" +contLabels+"\n";
 					}
 					break;
 				}
 				case "!=": {
 					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JE Label" +contLabels+"\n";
+						this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JE Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JE Label" +contLabels+"\n";
+						this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JE Label" +contLabels+"\n";
 					}
 					break;
 				}
 				case "==": {
 					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JNE Label" +contLabels+"\n";
+						this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JNE Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JNE Label" +contLabels+"\n";
+						this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JNE Label" +contLabels+"\n";
 					}
 					break;
 				}
@@ -1033,8 +1033,83 @@ public class CodeGenerator {
 			case "declaracion_repeat": {setDeclaracionRepeat(nodo); break;}
 			case "condicion repeat": {setCondicionRepeat(nodo); break;}
 			case "asignacion_repeat": {setAsignacionRepeat(nodo); break;}
+			case "&&": {setAND(nodo); break;}
+			case "||": {setOR(nodo); break;}
 		}
 	}
+	
+	private void setAND(Nodo nodo) throws IOException {
+		Nodo izq = null;
+		Nodo der = null;
+		try {
+			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
+			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
+		} catch (Exception e) {}
+		
+		//generar var aux inicializadas en 0
+		String aux1= "@"+ getNextAux(izq.getTipoHijoDer(izq));
+		String aux2= "@"+ getNextAux( der.getTipoHijoDer(der));
+		this.assembler_code =this.assembler_code+ "MOV "+ aux1 + ", 0\n";
+		this.assembler_code =this.assembler_code+ "MOV "+ aux2 + ", 0\n";
+		
+
+		if(!izq.esHoja()) {
+			this.setCMP(izq);
+		}
+
+		this.assembler_code =this.assembler_code+ "MOV "+ aux1 + ", 1\n";
+		this.assembler_code =this.assembler_code+ "Label"+this.pilaLabels.pollLast()+":\n";
+
+		if(!der.esHoja()) {
+			this.setCMP(der);
+		}
+
+		this.assembler_code =this.assembler_code+ "MOV "+ aux2 + ", 1\n";
+		this.assembler_code =this.assembler_code+ "Label"+this.pilaLabels.pollLast()+":\n";
+
+		this.assembler_code =this.assembler_code+ "AND "+ aux1 + ", " +aux2 +"\n";
+		this.contLabels++;
+		this.pilaLabels.addLast(this.contLabels);
+		this.assembler_code =this.assembler_code+ "JNZ Label"+ this.pilaLabels.getLast()+"\n";
+		
+	}
+	
+	private void setOR(Nodo nodo) throws IOException {
+		Nodo izq = null;
+		Nodo der = null;
+		try {
+			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
+			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
+		} catch (Exception e) {}
+		
+		//generar var aux inicializadas en 0
+		String aux1= "@"+ getNextAux(izq.getTipoHijoDer(izq));
+		String aux2= "@"+ getNextAux( der.getTipoHijoDer(der));
+		
+		this.assembler_code =this.assembler_code+ "MOV "+ aux1 + ", 0\n";
+		this.assembler_code =this.assembler_code+ "MOV "+ aux2 + ", 0\n";
+		
+
+		if(!izq.esHoja()) {
+			this.setCMP(izq);
+		}
+
+		this.assembler_code =this.assembler_code+ "MOV "+ aux1 + ", 1\n";
+		this.assembler_code =this.assembler_code+ "Label"+this.pilaLabels.pollLast()+":\n";
+
+		if(!der.esHoja()) {
+			this.setCMP(der);
+		}
+
+		this.assembler_code =this.assembler_code+ "MOV "+ aux2 + ", 1\n";
+		this.assembler_code =this.assembler_code+ "Label"+this.pilaLabels.pollLast()+":\n";
+
+		this.assembler_code =this.assembler_code+ "OR "+ aux1 + ", " +aux2 +"\n";
+		this.contLabels++;
+		this.pilaLabels.addLast(this.contLabels);
+		this.assembler_code =this.assembler_code+ "JNZ Label"+ this.pilaLabels.getLast()+"\n";
+	}
+
 	
 	private void setBREAK(Nodo nodo) {
 		// TODO Auto-generated method stub
