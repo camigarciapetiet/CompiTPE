@@ -1,0 +1,35 @@
+programa
+INT diseno;
+INT FUNC funcion2 (INT parametro)
+	INT aux;
+	BEGIN
+		PRINT(%funciones hermanas%);
+		RETURN (parametro);
+	END;
+
+INT FUNC funcion1 (INT diseno)
+	INT auxiliarfuncion;
+	INT FUNC funcadentro (INT diseno)
+		INT auxfuncadentro;
+		BEGIN
+			PRINT(%funcadentro de funcion1%);
+			diseno:=3;
+			//diseno:= funcion2(10);//
+			RETURN (5);
+		END;
+	BEGIN
+		diseno:=funcadentro(diseno);
+		diseno:= funcion2(5);
+		RETURN (diseno);
+	END;
+
+	
+BEGIN
+	PRINT(%hola%);
+	diseno:=funcion1(diseno);
+	IF (diseno == 5) THEN
+	BEGIN
+		PRINT(%parametro perfecto%);
+	END;
+	ENDIF;
+END;

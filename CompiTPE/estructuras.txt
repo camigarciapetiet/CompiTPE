@@ -1,8 +1,8 @@
 INFORME TOKENS
- Identificador test2,  Palabra predefinida INT,  Identificador diseno.test2,  ;,  Palabra predefinida BEGIN,  Identificador diseno.test2,  Palabra predefinida :=,  Constante 2,  ;,  Palabra predefinida IF,  (,  Identificador diseno.test2,  +,  Constante 5,  /,  Constante 3,  *,  Constante 2,  <,  Constante 5,  ),  Palabra predefinida THEN,  Palabra predefinida BEGIN,  Palabra predefinida PRINT,  (,  Cadena YAC,  ),  ;,  Palabra predefinida END,  ;,  Palabra predefinida ENDIF,  ;,  Palabra predefinida END,  ;, 
+ Identificador test2,  Palabra predefinida INT,  Identificador diseno.test2,  ;,  Palabra predefinida BEGIN,  Identificador diseno.test2,  Palabra predefinida :=,  -,  Constante 32767,  ;,  Identificador diseno.test2,  Palabra predefinida :=,  Identificador diseno.test2,  +,  -,  Constante 500,  ;,  Palabra predefinida PRINT,  (,  Cadena termino,  ),  ;,  Palabra predefinida END,  ;, 
 
 INFORME REGLAS
- tipo INT,  Declaracion de datos,  Factor CTE,  Asignacion,  factor ID,  Factor CTE,  Factor CTE,  Factor CTE,  Factor CTE,  clausula PRINT,  bloque de sentencias BEGIN-END,  Sentencia START programa, 
+ tipo INT,  Declaracion de datos,  Asignacion,  factor ID,  Asignacion,  clausula PRINT,  Sentencia START programa, 
 
 ERRORES LEXICOS
 
@@ -11,6 +11,6 @@ ERRORES SINTACTICOS
 
 
 TABLA DE SIMBOLOS
-{test2={uso=programa}, 2={uso=constante, tipo=INT}, 3={uso=constante, tipo=INT}, 5={uso=constante, tipo=INT}, YAC={uso=cadena}, diseno.test2={uso=variable, tipo=INT}}
+{test2={uso=programa}, 500={uso=constante, tipo=INT}, termino={uso=cadena}, -32767={uso=constante, tipo=INT}, -500={uso=constante, tipo=INT}, diseno.test2={uso=variable, tipo=INT}, 32767={uso=constante, tipo=INT}}
 Palabras Predefinidas
 {PRINT=264, ||=276, &&=277, <==280, PRE=273, <>=278, SINGLE=271, :==275, REPEAT=272, BEGIN=267, INT=270, RETURN=266, BREAK=269, ELSE=262, TYPEDEF=274, CADENA=259, ID=257, IF=260, ===279, FUNC=265, ENDIF=263, CTE=258, THEN=261, END=268, >==281}

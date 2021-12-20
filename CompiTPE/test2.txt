@@ -1,13 +1,33 @@
 test2
-INT diseno;
-
+SINGLE diseno;
+SINGLE aux;
 BEGIN
 
-diseno := 2;
+diseno:=1.0 + 1.0;
 
-IF (diseno+5/3*2< 5) THEN
-	BEGIN
-		PRINT(%YAC%);
-	END;
+IF (diseno < 3.0) THEN
+BEGIN
+	PRINT(%funciona menor%);
+END;
 ENDIF;
+
+diseno:= 2.0;
+aux:= 2.0;
+diseno := diseno/aux;
+IF (diseno == 1.0) THEN
+BEGIN
+	PRINT(%funciona igual%);
+END;
+ENDIF;
+
+diseno:= 2.0*3.0;
+IF (diseno <= 6.0) THEN
+BEGIN
+	PRINT(%menor o igual a 6%);
+END;
+ENDIF;
+
+diseno:= 5.0/0.0; //error//
+
+PRINT(%termino%);
 END;

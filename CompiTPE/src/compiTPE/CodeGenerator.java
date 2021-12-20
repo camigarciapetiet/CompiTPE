@@ -21,7 +21,7 @@ public class CodeGenerator {
 	private LinkedList<String> auxvars;
 	private ArrayList<ParserVal> listFunciones;
 	private LinkedList<String> listFuncionesaux;
-	private LinkedList<Integer> breakRepeatLabels;
+	private LinkedList<String> breakRepeatLabels;
 	
 	public CodeGenerator(Nodo raizArbol, Parser analizadorSintactico)
 	{
@@ -32,7 +32,7 @@ public class CodeGenerator {
 		this.listFunciones = analizadorSintactico.listaFunc;
 		this.auxvars = new LinkedList<String>();
     	this.listFuncionesaux = new LinkedList<String>();
-    	this.breakRepeatLabels = new LinkedList<Integer>();
+    	this.breakRepeatLabels = new LinkedList<String>();
 	}
 	
 	public void run() throws IOException 
@@ -139,10 +139,10 @@ public class CodeGenerator {
 	
 	
 	private void genError() throws IOException {
-		this.assembler_code =this.assembler_code+ "EXIT:\n invoke ExitProcess, 0\n";
-		this.assembler_code =this.assembler_code+ "DIV_CERO:\n invoke MessageBox, NULL, addr div_zero, NULL, MB_OK\n JMP EXIT\n";
-		this.assembler_code =this.assembler_code+ "OVERFLOW_ERROR:\n invoke MessageBox, NULL, addr overflow_error, NULL, MB_OK\n JMP EXIT\n";
-		this.assembler_code =this.assembler_code+ "ERROR_REC_MUTUA:\n invoke MessageBox, NULL, addr rec_mutua, NULL, MB_OK\n JMP EXIT\n";
+		this.assembler_code =this.assembler_code+ "EXIT:\ninvoke ExitProcess, 0\n";
+		this.assembler_code =this.assembler_code+ "DIV_CERO:\ninvoke MessageBox, NULL, addr div_zero, NULL, MB_OK\nJMP EXIT\n";
+		this.assembler_code =this.assembler_code+ "OVERFLOW_ERROR:\ninvoke MessageBox, NULL, addr overflow_error, NULL, MB_OK\nJMP EXIT\n";
+		this.assembler_code =this.assembler_code+ "ERROR_REC_MUTUA:\ninvoke MessageBox, NULL, addr rec_mutua, NULL, MB_OK\nJMP EXIT\n";
 
 
 	}
@@ -167,12 +167,12 @@ public class CodeGenerator {
 		
 		// CHEQUEO OVERFLOW
 		if (tipoOP.compareTo("INT") == 0) {
-			String registroAux = "BX"; //16	 bits
+			String registroAux = "AX"; //16	 bits
 			assembler_code = this.assembler_code+ "MOV " + registroAux + ", " + der.nombre.replace(".", "@") + "\n";
-			assembler_code = this.assembler_code+ "CMP " + registroAux + ", "  + izq.nombre.replace(".", "@") + "\n";
+			assembler_code = this.assembler_code+ "ADC " + registroAux + ", "  + izq.nombre.replace(".", "@") + "\n";
 			registroAux = "";
+			this.assembler_code =this.assembler_code+ "JO OVERFLOW_ERROR\n";
 		} 	
-		this.assembler_code =this.assembler_code+ "JO OVERFLOW_ERROR\n";
 		
 		/*else if (tipoOP.compareTo("SINGLE") == 0) { NO HACIA FALTA CHEQUEO DE OVERFLOW SINGLE
 			assembler_code = this.assembler_code+ "FLDZ \n";
@@ -183,7 +183,7 @@ public class CodeGenerator {
 		if (tipoOP.compareTo("INT") == 0) {
 
 			if (izq.esRegistro() && der.esRegistro()) {//Si solo usamos un registro y el resto auxiliares no hace falta la 2da condicion
-				assembler_code =this.assembler_code+ "ADD " + izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
+				assembler_code =this.assembler_code+ "ADC " + izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
 				der.nombre = ""; //vacio el registro ya que no lo necesito (para futuras comparaciones)
 				
 				//Al trabajar con variables auxiliares, el resultado de las operaciones aritmeticas queda en una variable auxiliar.
@@ -195,7 +195,7 @@ public class CodeGenerator {
 				if (izq.esRegistro()) {
 					der.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
 
-					assembler_code = this.assembler_code+ "ADD " + izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
+					assembler_code = this.assembler_code+ "ADC " + izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
 					nodo.nombre = izq.nombre.replace(".", "@");
 					
 					//Al trabajar con variables auxiliares, el resultado de las operaciones aritmeticas queda en una variable auxiliar.
@@ -209,7 +209,7 @@ public class CodeGenerator {
 						izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
 						assembler_code = this.assembler_code+ "MOV " + aux + ", " + der.nombre.replace(".", "@") + "\n";
 						assembler_code = this.assembler_code+ "MOV " + der.nombre.replace(".", "@") + ", " + izq.nombre.replace(".", "@") + "\n"; // der.nombre.replace(".", "@") es REG
-						assembler_code = this.assembler_code+ "ADD " + izq.nombre.replace(".", "@") + ", " + aux + "\n";
+						assembler_code = this.assembler_code+ "ADC " + izq.nombre.replace(".", "@") + ", " + aux + "\n";
 						
 						//Al trabajar con variables auxiliares, el resultado de las operaciones aritmeticas queda en una variable auxiliar.
 						assembler_code = this.assembler_code+ "MOV " + aux + ", " + "AX" + "\n";
@@ -226,7 +226,7 @@ public class CodeGenerator {
 						}
 						assembler_code = this.assembler_code+ "MOV " + "AX, " + izq.nombre.replace(".", "@") + "\n";
 						izq.nombre = "AX";
-						assembler_code = this.assembler_code+ "ADD " + izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
+						assembler_code = this.assembler_code+ "ADC " + izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n";
 
 						//Al trabajar con variables auxiliares, el resultado de las operaciones aritmeticas queda en una variable auxiliar.
 						String aux= "@"+ getNextAux(tipoOP);
@@ -237,27 +237,35 @@ public class CodeGenerator {
 			}
 		}
 		else if (tipoOP.compareTo("SINGLE") == 0) {
-            if (der.nombre.contains(".") && izq.nombre.contains(".")) {
+			
+			//cambiar condiciones del IF ya que el ambito se basa en ".". Podria buscar en la tabla de simbolos tipoder y tipoizq, si son CTE o VAR y comparar asi.
+			//O MEJOR STARTSWITH LETRA VS NUMERO!!!
+            //if (der.nombre.contains(".") && izq.nombre.contains(".")) 
+    		if (Character.isDigit(der.nombre.charAt(0)) && Character.isDigit(izq.nombre.charAt(0))) {
                 String aux = "@"+ this.getNextAux(tipoOP);
+                this.assembler_code = assembler_code + ";CASO DOS CONSTANTES\n";
                 this.assembler_code =this.assembler_code+"FLD " + "_" + izq.nombre.replace(".", "_")+ "\n";
-                this.assembler_code =this.assembler_code+"FADD " + "_" + izq.nombre.replace(".", "_")+ "\n";
+                this.assembler_code =this.assembler_code+"FADD " + "_" + der.nombre.replace(".", "_")+ "\n";
                 this.assembler_code =this.assembler_code+"FSTP " + aux+ "\n";
                 nodo.nombre = aux;
 	            } else {
-	                if (der.nombre.contains(".")) { //DER ES EXPONENCIAL
+	                if (Character.isDigit(der.nombre.charAt(0))) { //DER ES EXPONENCIAL
+	                    this.assembler_code = assembler_code + ";CASO DERECHA ES CONSTANTE\n";
 	                    String aux = "@"+ this.getNextAux(tipoOP);
 	                    this.assembler_code =this.assembler_code+ "FLD " + izq.nombre.replace(".", "@") + "\n";
 	                    this.assembler_code =this.assembler_code+ "FADD " + "_" + der.nombre.replace(".", "_")+ "\n";
 	                    this.assembler_code =this.assembler_code+ "FSTP " + aux + "\n";
 	                    nodo.nombre = aux;
 	                } else {
-	                	if (izq.nombre.contains(".")) {
+	                	if (Character.isDigit(izq.nombre.charAt(0))) { //IZQ ES CONSTANTE
+	                        this.assembler_code = assembler_code + ";CASO IZQ ES CONSTANTE\n";
 	    	                String aux = "@"+ this.getNextAux(tipoOP);
 	    	                this.assembler_code =this.assembler_code+ "FLD " + "_" + izq.nombre.replace(".", "_")+ "\n";
 	    	                this.assembler_code =this.assembler_code+ "FADD " +  der.nombre.replace(".", "@") + "\n";
 	    	                this.assembler_code =this.assembler_code+ "FSTP " + aux + "\n";
 	    	                nodo.nombre = aux;
 	                    } else {
+	                        this.assembler_code = assembler_code + ";CASO NINGUNA ES CONSTANTE\n";
 	                        String aux = "@"+ this.getNextAux(tipoOP);
 	                        this.assembler_code =this.assembler_code+"FLD " +izq.nombre.replace(".", "@")+ "\n";
 	                        this.assembler_code =this.assembler_code+"FADD "+ der.nombre.replace(".", "@")+ "\n";
@@ -285,7 +293,7 @@ public class CodeGenerator {
 		if(!der.esHoja()) {
 			generateCode(der);
 		}
-		String tipoOP = "INT"; //agregar campo a los nodos que mantenga los tipos de las variables, para cuando se reemplacen los nodos por auxiliares y tal.
+		String tipoOP = analizador.analizadorLexico.tabla_simbolos.get(analizador.getEntradaValidaTS(nodo.getTipoHijoDer(nodo))).get("tipo"); 
 		
 		if (tipoOP.compareTo("INT") == 0) {
 			if (izq.esRegistro() && der.esRegistro()) { //Si solo usamos un registro y el resto auxiliares no hace falta la 2da condicion
@@ -343,21 +351,21 @@ public class CodeGenerator {
 			}
 		}
 		else if (tipoOP.compareTo("SINGLE") == 0) {
-            if (der.nombre.contains(".") && izq.nombre.contains(".")) {
+            if ((Character.isDigit(der.nombre.charAt(0)) && Character.isDigit(izq.nombre.charAt(0)))) {
                 String aux = "@"+ this.getNextAux(tipoOP);
                 this.assembler_code =this.assembler_code+"FLD " + "_" + izq.nombre.replace(".", "_")+ "\n";
-                this.assembler_code =this.assembler_code+"FSUB " + "_" + izq.nombre.replace(".", "_")+ "\n";
+                this.assembler_code =this.assembler_code+"FSUB " + "_" + der.nombre.replace(".", "_")+ "\n";
                 this.assembler_code =this.assembler_code+"FSTP " + aux+ "\n";
                 nodo.nombre = aux;
 	            } else {
-	                if (der.nombre.contains(".")) {
+	                if (Character.isDigit(der.nombre.charAt(0))) {
 	                    String aux = "@"+ this.getNextAux(tipoOP);
 	                    this.assembler_code =this.assembler_code+ "FLD " + izq.nombre.replace(".", "@") + "\n";
 	                    this.assembler_code =this.assembler_code+ "FSUB " + "_" + der.nombre.replace(".", "_")+ "\n";
 	                    this.assembler_code =this.assembler_code+ "FSTP " + aux + "\n";
 	                    nodo.nombre = aux;
 	                } else {
-	                	if (izq.nombre.contains(".")) {
+	                	if (Character.isDigit(izq.nombre.charAt(0))) {
 	    	                String aux = "@"+ this.getNextAux(tipoOP);
 	    	                this.assembler_code =this.assembler_code+ "FLD " + "_" + izq.nombre.replace(".", "_") + "\n";
 	    	                this.assembler_code =this.assembler_code+ "FSUB " +  der.nombre.replace(".", "@") + "\n";
@@ -447,30 +455,30 @@ public class CodeGenerator {
 			}
 		}
 		else if (tipoOP.compareTo("SINGLE") == 0) {
-            if (der.nombre.contains(".") && izq.nombre.contains(".")) {
+			 if ((Character.isDigit(der.nombre.charAt(0)) && Character.isDigit(izq.nombre.charAt(0)))) {
                 String aux = "@"+ this.getNextAux(tipoOP);
                 this.assembler_code =this.assembler_code+"FLD " + "_" + izq.nombre.replace(".", "_")+ "\n";
-                this.assembler_code =this.assembler_code+"FIMUL " + "_" + izq.nombre.replace(".", "_")+ "\n";
+                this.assembler_code =this.assembler_code+"FMUL " + "_" + der.nombre.replace(".", "_")+ "\n";
                 this.assembler_code =this.assembler_code+"FSTP " + aux+ "\n";
                 nodo.nombre = aux;
 	            } else {
-	                if (der.nombre.contains(".")) {
+	                if (Character.isDigit(der.nombre.charAt(0))) {
 	                    String aux = "@"+ this.getNextAux(tipoOP);
 	                    this.assembler_code =this.assembler_code+ "FLD " + izq.nombre.replace(".", "@") + "\n";
-	                    this.assembler_code =this.assembler_code+ "FIMUL " + "_" + der.nombre.replace(".", "_")+ "\n";
+	                    this.assembler_code =this.assembler_code+ "FMUL " + "_" + der.nombre.replace(".", "_")+ "\n";
 	                    this.assembler_code =this.assembler_code+ "FSTP " + aux + "\n";
 	                    nodo.nombre = aux;
 	                } else {
-	                	if (izq.nombre.contains(".")) {
+	                	if (Character.isDigit(izq.nombre.charAt(0))) {
 	    	                String aux = "@"+ this.getNextAux(tipoOP);
 	    	                this.assembler_code =this.assembler_code+ "FLD " + "_" + izq.nombre.replace(".", "_")+ "\n";
-	    	                this.assembler_code =this.assembler_code+ "FIMUL" + der.nombre.replace(".", "@") + "\n";
+	    	                this.assembler_code =this.assembler_code+ "FMUL" + der.nombre.replace(".", "@") + "\n";
 	    	                this.assembler_code =this.assembler_code+ "FSTP " + aux + "\n";
 	    	                nodo.nombre = aux;
 	                    } else {
 	                        String aux = "@"+ this.getNextAux(tipoOP);
 	                        this.assembler_code =this.assembler_code+"FLD " +izq.nombre.replace(".", "@")+ "\n";
-	                        this.assembler_code =this.assembler_code+"FIMUL "+ der.nombre.replace(".", "@")+ "\n";
+	                        this.assembler_code =this.assembler_code+"FMUL "+ der.nombre.replace(".", "@")+ "\n";
 	                        this.assembler_code =this.assembler_code+"FSTP " + aux+ "\n";
 	                        nodo.nombre =aux;
 	                    }
@@ -504,14 +512,14 @@ public class CodeGenerator {
 			registroAux = "";
 		} else if (tipoOP.compareTo("SINGLE") == 0) {
 			assembler_code = this.assembler_code+ "FLDZ \n";
-			if (der.nombre.contains("."))
+			if (Character.isDigit(der.nombre.charAt(0)))
 			{
-				assembler_code = this.assembler_code+ "FCOM " + "_"+der.nombre.replace(".", "_");
+				assembler_code = this.assembler_code+ "FCOM " + "_"+der.nombre.replace(".", "_")+"\nFSTSW AX\nSAHF\n";
 			} else
-				assembler_code = this.assembler_code+ "FCOM " + "_"+der.nombre.replace(".", "@");
+				assembler_code = this.assembler_code+ "FCOM " + der.nombre.replace(".", "@")+"\nFSTSW AX\nSAHF\n";
 		}
 		this.assembler_code =this.assembler_code+ "JE DIV_CERO\n";
-		
+
 		if (tipoOP.compareTo("INT") == 0) {
 			if (izq.esRegistro() && der.esRegistro()) { //Si solo usamos un registro y el resto auxiliares no hace falta la 2da condicion
 				assembler_code = this.assembler_code + "MOV AX," + izq.nombre.replace(".", "@" + "\n");
@@ -572,30 +580,30 @@ public class CodeGenerator {
 			}
 		}
 		else if (tipoOP.compareTo("SINGLE") == 0) {
-            if (der.nombre.contains(".") && izq.nombre.contains(".")) { //Los DOS son CTE
+			if (Character.isDigit(der.nombre.charAt(0)) && Character.isDigit(izq.nombre.charAt(0))) { //Los DOS son CTE
                 String aux = "@"+ this.getNextAux(tipoOP);
                 this.assembler_code =this.assembler_code+"FLD " + "_" + izq.nombre.replace(".", "_")+ "\n";
-                this.assembler_code =this.assembler_code+"FIDIV " + "_" + izq.nombre.replace(".", "_")+ "\n";
+                this.assembler_code =this.assembler_code+"FDIV " + "_" + der.nombre.replace(".", "_")+ "\n";
                 this.assembler_code =this.assembler_code+"FSTP " + aux+ "\n";
                 nodo.nombre = aux;
 	            } else {
-	                if (der.nombre.contains(".")) { //DER es CTE
+	                if (Character.isDigit(der.nombre.charAt(0))) { //DER es CTE
 	                    String aux = "@"+ this.getNextAux(tipoOP);
 	                    this.assembler_code =this.assembler_code+ "FLD " + izq.nombre.replace(".", "@") + "\n";
-	                    this.assembler_code =this.assembler_code+ "FIDIV " + "_" + der.nombre.replace(".", "_")+ "\n";
+	                    this.assembler_code =this.assembler_code+ "FDIV " + "_" + der.nombre.replace(".", "_")+ "\n";
 	                    this.assembler_code =this.assembler_code+ "FSTP " + aux + "\n";
 	                    nodo.nombre = aux;
 	                } else {
-	                	if (izq.nombre.contains(".")) { //IZQ es CTE
+	                	if (Character.isDigit(izq.nombre.charAt(0))) { //IZQ es CTE
 	    	                String aux = "@"+ this.getNextAux(tipoOP);
 	    	                this.assembler_code =this.assembler_code+ "FLD " + "_" + izq.nombre.replace(".", "_")+ "\n";
-	    	                this.assembler_code =this.assembler_code+ "FIDIV " + der.nombre.replace(".", "@") + "\n";
+	    	                this.assembler_code =this.assembler_code+ "FDIV " + der.nombre.replace(".", "@") + "\n";
 	    	                this.assembler_code =this.assembler_code+ "FSTP " + aux + "\n";
 	    	                nodo.nombre = aux;
 	                    } else { //Las dos son VARIABLES
 	                        String aux = "@"+ this.getNextAux(tipoOP);
 	                        this.assembler_code =this.assembler_code+"FLD " +izq.nombre.replace(".", "@")+ "\n";
-	                        this.assembler_code =this.assembler_code+"FIDIV " + der.nombre.replace(".", "@")+ "\n";
+	                        this.assembler_code =this.assembler_code+"FDIV " + der.nombre.replace(".", "@")+ "\n";
 	                        this.assembler_code =this.assembler_code+"FSTP " + aux+ "\n";
 	                        nodo.nombre =aux;
 	                    }
@@ -627,7 +635,7 @@ public class CodeGenerator {
 
 		}
 		else if (tipoOP.compareTo("SINGLE") == 0) { //IZQ siempre es una variable
-			if (der.nombre.contains(".")) { //tiene parte exponencial
+			if (Character.isDigit(der.nombre.charAt(0))) { //tiene parte exponencial
 				this.assembler_code =this.assembler_code+ "FLD _" + der.nombre.replace(".","_") + "\n"; 
 				this.assembler_code =this.assembler_code+ "FSTP " + izq.nombre.replace(".", "@") + "\n"; 
 			}
@@ -645,10 +653,9 @@ public class CodeGenerator {
 	
 	private void setPRINT(Nodo nodo, boolean precondicion) throws IOException
 	{
-		Nodo izq = null;
+		Nodo izq = null; 
 		try {
 			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
-
 		} catch (Exception e) {}
 		if (precondicion)
 		{
@@ -706,7 +713,6 @@ public class CodeGenerator {
 	}
 	
 	private void setCMP(Nodo nodo) throws IOException {
-		System.out.println(nodo.nombre);
 
 		Nodo izq = null;
 		Nodo der = null;
@@ -715,15 +721,12 @@ public class CodeGenerator {
 			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
 		
-		System.out.println("der: " + der.nombre);
-		System.out.println("izq: " + izq.nombre);
 		if (!izq.esHoja()) {
 			generateCode(izq);
 		}
 		if(!der.esHoja()) {
 			generateCode(der);
 		}
-		System.out.println("izqGenerado: " + izq.nombre);
 
 		this.contLabels++;
 		this.pilaLabels.addLast(this.contLabels);
@@ -735,7 +738,6 @@ public class CodeGenerator {
 				assembler_code = this.assembler_code+ "MOV " + aux + ", " + der.nombre.replace(".", "@") + "\n";
 				der.nombre = aux;
 			}
-			System.out.println("izq: " + izq.nombre);
 			//izq.nombre = analizador.getEntradaValidaTS(izq.nombre.replace("@", "."));
 			this.assembler_code =this.assembler_code+ "MOV " + registro + ", " + izq.nombre.replace(".", "@") + "\n";
 			izq.nombre = registro;
@@ -749,70 +751,96 @@ public class CodeGenerator {
 					break;
 				}
 				case ">": {
-					this.assembler_code = "CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JLE Label"+contLabels + "\n";
+					this.assembler_code = this.assembler_code + "CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JLE Label"+contLabels + "\n";
 					break;
 				}
 				case ">=": {
-					this.assembler_code = "CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JL Label"+contLabels + "\n";
+					this.assembler_code = this.assembler_code + "CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JL Label"+contLabels + "\n";
 					break;
 				}
 				case "<>": {
-					this.assembler_code = "CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JE Label"+contLabels + "\n";
+					this.assembler_code = this.assembler_code +"CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JE Label"+contLabels + "\n";
 					break;
 				}
 				case "==": {
-					this.assembler_code = "CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JNE Label"+contLabels + "\n";
+					this.assembler_code = this.assembler_code +"CMP " +  izq.nombre.replace(".", "@") + ", " + der.nombre.replace(".", "@") + "\n" + "JNE Label"+contLabels + "\n";
 					break;
 				}
 			}
 		}
 		if (tipoOP.compareTo("SINGLE") == 0) {
+
 			switch (nodo.nombre) {
 				case "<": {
-					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JAE Label" +contLabels+"\n";
+					if (Character.isDigit(der.nombre.charAt(0))) { 
+						if (Character.isDigit(izq.nombre.charAt(0))) {
+							this.assembler_code = this.assembler_code +"FLD _"+izq.nombre.replace(".", "_")+"\nFCOM _"+der.nombre.replace(".","_")+"\nFSTSW AX\nSAHF \nJAE Label" +contLabels+"\n";
+						} else this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\nFCOM _"+der.nombre.replace(".","_")+"\nFSTSW AX\nSAHF \nJAE Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JAE Label" +contLabels+"\n";
+						if (Character.isDigit(izq.nombre.charAt(0))) {
+							this.assembler_code = this.assembler_code +"FLD _"+izq.nombre.replace(".", "_")+"\nFCOM "+der.nombre.replace(".", "@")+"\nFSTSW AX\nSAHF \nJAE Label" +contLabels+"\n";
+						} else this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\nFCOM "+der.nombre.replace(".", "@")+"\nFSTSW AX\nSAHF \nJAE Label" +contLabels+"\n";
 					}
 					break;
 				}
 				case "<=": {
-					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JA Label" +contLabels+"\n";
+					if (Character.isDigit(der.nombre.charAt(0))) { 
+						if (Character.isDigit(izq.nombre.charAt(0))) {
+							this.assembler_code = this.assembler_code +"FLD _"+izq.nombre.replace(".", "_")+"\nFCOM _"+der.nombre.replace(".","_")+"\nFSTSW AX\nSAHF \nJA Label" +contLabels+"\n";
+						} else this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\nFCOM _"+der.nombre.replace(".","_")+"\nFSTSW AX\nSAHF \nJA Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JA Label" +contLabels+"\n";
+						if (Character.isDigit(izq.nombre.charAt(0))) {
+							this.assembler_code = this.assembler_code +"FLD _"+izq.nombre.replace(".", "_")+"\nFCOM _"+der.nombre.replace(".", "@")+"\nFSTSW AX\nSAHF \nJA Label" +contLabels+"\n";
+						} else this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\nFCOM "+der.nombre.replace(".", "@")+"\nFSTSW AX\nSAHF \nJA Label" +contLabels+"\n";
 					}
 					break;
 				}
 				case ">": {
-					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JLE Label" +contLabels+"\n";
+
+					if (Character.isDigit(der.nombre.charAt(0))) { 
+						if (Character.isDigit(izq.nombre.charAt(0))) {
+							this.assembler_code = this.assembler_code +"FLD _"+izq.nombre.replace(".", "_")+"\nFCOM _"+der.nombre.replace(".","_")+"\nFSTSW AX\nSAHF \nJLE Label" +contLabels+"\n";
+						} else this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\nFCOM _"+der.nombre.replace(".","_")+"\nFSTSW AX\nSAHF \nJLE Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JLE Label" +contLabels+"\n";
+						if (Character.isDigit(izq.nombre.charAt(0))) {
+							this.assembler_code = this.assembler_code +"FLD _"+izq.nombre.replace(".", "_")+"\nFCOM _"+der.nombre.replace(".", "@")+"\nFSTSW AX\nSAHF \nJLE Label" +contLabels+"\n";
+						} else this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\nFCOM "+der.nombre.replace(".", "@")+"\nFSTSW AX\nSAHF \nJLE Label" +contLabels+"\n";
 					}
 					break;
 				}
 				case ">=": {
-					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JL Label" +contLabels+"\n";
+					if (Character.isDigit(der.nombre.charAt(0))) { 
+						if (Character.isDigit(izq.nombre.charAt(0))) {
+							this.assembler_code = this.assembler_code +"FLD _"+izq.nombre.replace(".", "_")+"\nFCOM _"+der.nombre.replace(".","_")+"\nFSTSW AX\nSAHF \nJL Label" +contLabels+"\n";
+						} else this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\nFCOM _"+der.nombre.replace(".","_")+"\nFSTSW AX\nSAHF \nJL Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JLE Label" +contLabels+"\n";
+						if (Character.isDigit(izq.nombre.charAt(0))) {
+							this.assembler_code = this.assembler_code +"FLD _"+izq.nombre.replace(".", "_")+"\nFCOM _"+der.nombre.replace(".", "@")+"\nFSTSW AX\nSAHF \nJL Label" +contLabels+"\n";
+						} else this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\nFCOM "+der.nombre.replace(".", "@")+"\nFSTSW AX\nSAHF \nJL Label" +contLabels+"\n";
 					}
 					break;
 				}
-				case "!=": {
-					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JE Label" +contLabels+"\n";
+				case "<>": {
+					if (Character.isDigit(der.nombre.charAt(0))) { 
+						if (Character.isDigit(izq.nombre.charAt(0))) {
+							this.assembler_code = this.assembler_code +"FLD _"+izq.nombre.replace(".", "_")+"\nFCOM _"+der.nombre.replace(".","_")+"\nFSTSW AX\nSAHF \nJE Label" +contLabels+"\n";
+						} else this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\nFCOM _"+der.nombre.replace(".","_")+"\nFSTSW AX\nSAHF \nJE Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JE Label" +contLabels+"\n";
+						if (Character.isDigit(izq.nombre.charAt(0))) {
+							this.assembler_code = this.assembler_code +"FLD _"+izq.nombre.replace(".", "_")+"\nFCOM _"+der.nombre.replace(".", "@")+"\nFSTSW AX\nSAHF \nJE Label" +contLabels+"\n";
+						} else this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\nFCOM "+der.nombre.replace(".", "@")+"\nFSTSW AX\nSAHF \nJE Label" +contLabels+"\n";
 					}
 					break;
 				}
 				case "==": {
-					if (der.nombre.contains(".")) { 
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP _"+der.nombre.replace(".","_")+"\n FSTSW AX\n SAHF \n JNE Label" +contLabels+"\n";
+					if (Character.isDigit(der.nombre.charAt(0))) { 
+						if (Character.isDigit(izq.nombre.charAt(0))) {
+							this.assembler_code = this.assembler_code +"FLD _"+izq.nombre.replace(".", "_")+"\nFCOM _"+der.nombre.replace(".","_")+"\nFSTSW AX\nSAHF \nJNE Label" +contLabels+"\n";
+						} else this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\nFCOM _"+der.nombre.replace(".","_")+"\nFSTSW AX\nSAHF \nJNE Label" +contLabels+"\n";
 					} else {
-						this.assembler_code = "FLD "+izq.nombre.replace(".", "@")+"\n FCOMP "+der.nombre.replace(".", "@")+"\n FSTSW AX\n SAHF \n JNE Label" +contLabels+"\n";
+						if (Character.isDigit(izq.nombre.charAt(0))) {
+							this.assembler_code = this.assembler_code +"FLD _"+izq.nombre.replace(".", "_")+"\nFCOM _"+der.nombre.replace(".", "@")+"\nFSTSW AX\nSAHF \nJNE Label" +contLabels+"\n";
+						} else this.assembler_code = this.assembler_code +"FLD "+izq.nombre.replace(".", "@")+"\nFCOM "+der.nombre.replace(".", "@")+"\nFSTSW AX\nSAHF \nJNE Label" +contLabels+"\n";
 					}
 					break;
 				}
@@ -828,6 +856,7 @@ public class CodeGenerator {
 		try {
 			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
 			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
+
 		} catch (Exception e) {}
 		
 		if (izq != null) {
@@ -878,6 +907,10 @@ public class CodeGenerator {
 
 		//parametro: Buscamos getParametro asociado al nombre de la funcion y le asignamos el valor del hijo derecho
 		String funcion = izq.nombre;
+		
+		// 19/12/2021
+		funcion = analizador.getEntradaValidaTS(funcion);
+
 		String parametro = "";
 		String invocacion = "";
 		if (analizador.isTypeDef(analizador.getTipoVariable(funcion))) {
@@ -886,10 +919,10 @@ public class CodeGenerator {
 			invocacion = funcOrig;
 		} else {
 			invocacion = funcion;
-			parametro = getParametro(izq.nombre);
+			parametro = getParametro(invocacion);
 		}
 		//Chequeo REC MUTUA
-		this.assembler_code = assembler_code + ";CHEQUEO RECURSION MUTUA\n";
+		this.assembler_code = this.assembler_code + ";CHEQUEO RECURSION MUTUA\n";
 		for (int i = 0; i < listFuncionesaux.size(); i++) {
 			if (listFuncionesaux.get(i).equals(invocacion.replace(".", "@"))) {
 				this.assembler_code = assembler_code + "CMP @"+listFuncionesaux.get(i)+", 1\n";
@@ -898,13 +931,13 @@ public class CodeGenerator {
 			}
 		}
 
-		this.assembler_code = assembler_code + ";END CHEQUEO RECURSION MUTUA\n";
+		this.assembler_code = this.assembler_code + ";END CHEQUEO RECURSION MUTUA\n";
 
 		this.assembler_code = this.assembler_code + "MOV AX," + der.nombre.replace(".", "@") + "\n";
 		this.assembler_code =this.assembler_code+ "MOV " + parametro.replace(".", "@") + ", AX\n";
 		
 		
-		if (analizador.isTypeDef(analizador.getTipoVariable(funcion))) {
+		if (analizador.isTypeDef(analizador.getTipoVariable(funcion))){
 
 			//funcion realmente es la variable typedef almacenando la direccion de memoria de la funcion, al ponerla en [] funciona como puntero a la func
 			this.assembler_code =this.assembler_code+ "CALL [" + funcion.replace(".", "@") + "]\n";
@@ -915,7 +948,7 @@ public class CodeGenerator {
 		
 		//CHEQUEO REC MUTUA, desapilar
 		for (int i = 0; i < listFuncionesaux.size(); i++) {
-			this.assembler_code = assembler_code + "MOV @"+listFuncionesaux.get(i)+", 0\n";
+			this.assembler_code = this.assembler_code + "MOV @"+listFuncionesaux.get(i)+", 0\n";
 		}
 		
 		nodo.nombre = "@aux"+this.auxvars.size(); //resultado de la invocacion, es decir el RETURN.
@@ -923,7 +956,7 @@ public class CodeGenerator {
 	
 	private void setREPEAT(Nodo nodo)throws IOException
 	{
-		this.assembler_code = assembler_code + ";REPEAT\n";
+		this.assembler_code = this.assembler_code + ";REPEAT\n";
 		Nodo izq = null;
 		Nodo der = null;
 		try {
@@ -945,14 +978,16 @@ public class CodeGenerator {
 		
 		
 		String cmpLabel= "Label" + this.pilaLabels.pollLast();
+		this.breakRepeatLabels.add("JMP " + cmpLabel);
 		String repeatLabel = "Label" + this.pilaLabels.pollLast() ; //Desapilo y guardo el salto el inicio del repeat
 		//agregar label en caso que no se cumpla la condicion
 		this.generateCode(der);
 		Nodo aumento= (Nodo)((Nodo)izq.der.obj).der.obj;
-		this.assembler_code = this.assembler_code + "ADD " + varControl.nombre.replace(".", "@") +", " + aumento.nombre + "\n";
+		this.assembler_code = this.assembler_code + "ADC " + varControl.nombre.replace(".", "@") +", " + aumento.nombre + "\n";
 		//primero label con jump al repeat y despues label en caso que no se cumpla mas la sentencia del repeat
 		this.assembler_code =this.assembler_code+ "JMP " + repeatLabel + "\n";
 		this.assembler_code =this.assembler_code+ cmpLabel + ":\n"; 
+		this.breakRepeatLabels.pollLast();
 
 	}
 	
@@ -978,7 +1013,7 @@ public class CodeGenerator {
 		} catch (Exception e) {}
 		
 		this.generateCode(izq);
-		nodo.nombre = izq.nombre.replace(".", "@");
+		nodo.nombre = izq.nombre;//.replace(".", "@");
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private void setDeclaracionRepeat(Nodo nodo) throws IOException {
@@ -1033,12 +1068,15 @@ public class CodeGenerator {
 			case "declaracion_repeat": {setDeclaracionRepeat(nodo); break;}
 			case "condicion repeat": {setCondicionRepeat(nodo); break;}
 			case "asignacion_repeat": {setAsignacionRepeat(nodo); break;}
+			
+			case "cuerpo": {setSENT(nodo); break;}
 		}
 	}
 	
 	private void setBREAK(Nodo nodo) {
 		// TODO Auto-generated method stub
-		this.assembler_code =this.assembler_code+ "JMP Label" + this.breakRepeatLabels.pollLast() + "\n";
+		this.assembler_code = this.assembler_code + ";BREAK\n";
+		this.assembler_code =this.assembler_code + this.breakRepeatLabels.getLast()+"\n";
 	}
 
 	private void compile() throws IOException
@@ -1071,8 +1109,10 @@ public class CodeGenerator {
    	   				this.setCMP((Nodo) nodo_precondicion.izq.obj); //Apilara un Label y escribira la instruccion de salto
    	   				this.generateCode((Nodo) izq.der.obj);
    	   			} else {
-   	   				generateCode((Nodo) izq.der.obj); //derecha del cuerpo, si no tiene precondicion nodo.izq.izq es null
+   	   				generateCode((Nodo) izq.der.obj); //derecha del cuerpo, si no tiene precondicion nodo.izq.izq es null - 19/12/2021 DEPRECATED PORQUE ES NULL ENTONCES NUNCA ENTRA
    	   			}
+   			} else {//19/12/2021
+   				generateCode((Nodo) izq.der.obj);
    			}
    			
    			if (der != null) {

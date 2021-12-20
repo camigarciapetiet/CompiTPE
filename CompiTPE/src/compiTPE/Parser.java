@@ -769,17 +769,17 @@ final static String yyrule[] = {
 
 	private void chequeoS_diferentes_tipos(ParserVal id1, ParserVal id2, boolean condicion_repeat)
 	{
-		
-		
-		String tipo_1 = getTipoVariable(id1.sval);
-		String tipo_2 = getTipoVariable(id2.sval);
-		
+		String ident1 = getEntradaValidaTS(id1.sval);
+		String ident2 = getEntradaValidaTS(id2.sval);
+
+		String tipo_1 = getTipoVariable(ident1);
+		String tipo_2 = getTipoVariable(ident2);
 		
 		
 		if (getTipoVariable(tipo_1) != "nulo") //es typedef
 		{
 			tipo_1 = getTipoVariable(tipo_1);
-			if (!isFuncion(id2.sval))
+			if (!isFuncion(ident2))
 				this.erroresSem.add("error semantico: " + id2.sval +"("+tipo_2+ ") debe ser una funcion de retorno " + tipo_1); 
 		}
 		if (getTipoVariable(tipo_2) != "nulo") //es typedef
@@ -802,6 +802,40 @@ final static String yyrule[] = {
 		}
 
 		this.erroresSem.add("error semantico: " + id1.sval +"("+tipo_1+ ") y " + id2.sval +"("+tipo_2+") son de tipos incompatibles para la operacion."); 
+//		String ident1 = getEntradaValidaTS(id1.sval);
+//		String ident2 = getEntradaValidaTS(id2.sval);
+//
+//		String tipo_1 = getTipoVariable(id1.sval);
+//		String tipo_2 = getTipoVariable(id2.sval);
+//		
+//		
+//		
+//		if (getTipoVariable(tipo_1) != "nulo") //es typedef
+//		{
+//			tipo_1 = getTipoVariable(tipo_1);
+//			if (!isFuncion(id2.sval))
+//				this.erroresSem.add("error semantico: " + id2.sval +"("+tipo_2+ ") debe ser una funcion de retorno " + tipo_1); 
+//		}
+//		if (getTipoVariable(tipo_2) != "nulo") //es typedef
+//		{
+//			tipo_2 = getTipoVariable(tipo_2);
+//		}
+//		
+//		if (condicion_repeat == true) // CONDICION REPEAT DEBEN SER DE TIPO ENTERO
+//		{
+//			if (tipo_1.compareTo("INT") != 0 || tipo_2.compareTo("INT") != 0)
+//			{
+//				this.erroresSem.add("error semantico: en una sentencia repeat, los datos de condicion deben ser de tipo entero (INT)");
+//				return;
+//			}
+//		}
+//		
+//		if (tipo_1.compareTo(tipo_2) == 0 && tipo_1 != "nulo")
+//		{
+//			return;
+//		}
+//
+//		this.erroresSem.add("error semantico: " + id1.sval +"("+tipo_1+ ") y " + id2.sval +"("+tipo_2+") son de tipos incompatibles para la operacion."); 
 	}
 	
 	public String getEntradaValidaTS(String entrada)
@@ -1441,7 +1475,7 @@ case 83:
 break;
 case 84:
 //#line 171 "gramatica.y"
-{yyval.sval="<";}
+{yyval.sval="<=";}
 break;
 case 85:
 //#line 172 "gramatica.y"

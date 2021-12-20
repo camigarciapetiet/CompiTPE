@@ -1,0 +1,9 @@
+test2
+INT diseno;
+BEGIN
+
+diseno:= -32767;
+diseno:= diseno + -500;
+
+PRINT(%termino%);
+END;
