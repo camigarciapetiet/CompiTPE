@@ -1047,8 +1047,8 @@ public class CodeGenerator {
 		} catch (Exception e) {}
 		
 		//generar var aux inicializadas en 0
-		String aux1= "@"+ getNextAux(izq.getTipoHijoDer(izq));
-		String aux2= "@"+ getNextAux( der.getTipoHijoDer(der));
+		String aux1= "@"+ getNextAux("INT");
+		String aux2= "@"+ getNextAux( "INT");
 		this.assembler_code =this.assembler_code+ "MOV "+ aux1 + ", 0\n";
 		this.assembler_code =this.assembler_code+ "MOV "+ aux2 + ", 0\n";
 		
@@ -1067,10 +1067,11 @@ public class CodeGenerator {
 		this.assembler_code =this.assembler_code+ "MOV "+ aux2 + ", 1\n";
 		this.assembler_code =this.assembler_code+ "Label"+this.pilaLabels.pollLast()+":\n";
 
-		this.assembler_code =this.assembler_code+ "AND "+ aux1 + ", " +aux2 +"\n";
+		this.assembler_code =this.assembler_code+ "MOV AX, "+ aux1 +"\n";
+		this.assembler_code =this.assembler_code+ "AND AX, " +aux2 +"\n";
 		this.contLabels++;
 		this.pilaLabels.addLast(this.contLabels);
-		this.assembler_code =this.assembler_code+ "JNZ Label"+ this.pilaLabels.getLast()+"\n";
+		this.assembler_code =this.assembler_code+ "JZ Label"+ this.pilaLabels.getLast()+"\n";
 		
 	}
 	
@@ -1083,8 +1084,8 @@ public class CodeGenerator {
 		} catch (Exception e) {}
 		
 		//generar var aux inicializadas en 0
-		String aux1= "@"+ getNextAux(izq.getTipoHijoDer(izq));
-		String aux2= "@"+ getNextAux( der.getTipoHijoDer(der));
+		String aux1= "@"+ getNextAux("INT");
+		String aux2= "@"+ getNextAux("INT");
 		
 		this.assembler_code =this.assembler_code+ "MOV "+ aux1 + ", 0\n";
 		this.assembler_code =this.assembler_code+ "MOV "+ aux2 + ", 0\n";
@@ -1104,10 +1105,12 @@ public class CodeGenerator {
 		this.assembler_code =this.assembler_code+ "MOV "+ aux2 + ", 1\n";
 		this.assembler_code =this.assembler_code+ "Label"+this.pilaLabels.pollLast()+":\n";
 
-		this.assembler_code =this.assembler_code+ "OR "+ aux1 + ", " +aux2 +"\n";
+		
+		this.assembler_code =this.assembler_code+ "MOV AX, "+ aux1 +"\n";
+		this.assembler_code =this.assembler_code+ "OR AX, " +aux2 +"\n";
 		this.contLabels++;
 		this.pilaLabels.addLast(this.contLabels);
-		this.assembler_code =this.assembler_code+ "JNZ Label"+ this.pilaLabels.getLast()+"\n";
+		this.assembler_code =this.assembler_code+ "JZ Label"+ this.pilaLabels.getLast()+"\n";
 	}
 
 	
