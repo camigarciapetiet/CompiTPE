@@ -1,4 +1,4 @@
-programa
+test3
 INT diseno;
 INT FUNC funcion2 (INT parametro)
 	INT aux;

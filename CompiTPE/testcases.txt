@@ -1,4 +1,4 @@
-programa
+testcases
 INT diseno;
 SINGLE aux;
 TYPEDEF m = INT FUNC (INT);

@@ -672,7 +672,7 @@ public class CodeGenerator {
 		Nodo izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
 		Nodo der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
 
-		this.setCMP(izq);
+		this.generateCode((Nodo)izq.izq.obj); //this.setCMP(izq); 20/12/2021
 		Nodo nodo_else = null;
 		
 		try {
@@ -1070,7 +1070,85 @@ public class CodeGenerator {
 			case "asignacion_repeat": {setAsignacionRepeat(nodo); break;}
 			
 			case "cuerpo": {setSENT(nodo); break;}
+			
+			case "&&": {setAND(nodo); break;} //20/12/2021
+			case "||": {setOR(nodo); break;}
 		}
+	}
+	
+	private void setAND(Nodo nodo) throws IOException {
+		Nodo izq = null;
+		Nodo der = null;
+		try {
+			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
+			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
+		} catch (Exception e) {}
+		
+		//generar var aux inicializadas en 0
+		String aux1= "@"+ getNextAux("INT");
+		String aux2= "@"+ getNextAux( "INT");
+		this.assembler_code =this.assembler_code+ "MOV "+ aux1 + ", 0\n";
+		this.assembler_code =this.assembler_code+ "MOV "+ aux2 + ", 0\n";
+		
+
+		if(!izq.esHoja()) {
+			this.setCMP(izq);
+		}
+
+		this.assembler_code =this.assembler_code+ "MOV "+ aux1 + ", 1\n";
+		this.assembler_code =this.assembler_code+ "Label"+this.pilaLabels.pollLast()+":\n";
+
+		if(!der.esHoja()) {
+			this.setCMP(der);
+		}
+
+		this.assembler_code =this.assembler_code+ "MOV "+ aux2 + ", 1\n";
+		this.assembler_code =this.assembler_code+ "Label"+this.pilaLabels.pollLast()+":\n";
+
+		this.assembler_code =this.assembler_code+ "MOV AX, "+ aux1 +"\n";
+		this.assembler_code =this.assembler_code+ "AND AX, " +aux2 +"\n";
+		this.contLabels++;
+		this.pilaLabels.addLast(this.contLabels);
+		this.assembler_code =this.assembler_code+ "JZ Label"+ this.pilaLabels.getLast()+"\n";
+		
+	}
+	
+	private void setOR(Nodo nodo) throws IOException {
+		Nodo izq = null;
+		Nodo der = null;
+		try {
+			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
+			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
+		} catch (Exception e) {}
+		
+		//generar var aux inicializadas en 0
+		String aux1= "@"+ getNextAux("INT");
+		String aux2= "@"+ getNextAux("INT");
+		
+		this.assembler_code =this.assembler_code+ "MOV "+ aux1 + ", 0\n";
+		this.assembler_code =this.assembler_code+ "MOV "+ aux2 + ", 0\n";
+		
+
+		if(!izq.esHoja()) {
+			this.setCMP(izq);
+		}
+
+		this.assembler_code =this.assembler_code+ "MOV "+ aux1 + ", 1\n";
+		this.assembler_code =this.assembler_code+ "Label"+this.pilaLabels.pollLast()+":\n";
+
+		if(!der.esHoja()) {
+			this.setCMP(der);
+		}
+
+		this.assembler_code =this.assembler_code+ "MOV "+ aux2 + ", 1\n";
+		this.assembler_code =this.assembler_code+ "Label"+this.pilaLabels.pollLast()+":\n";
+
+		
+		this.assembler_code =this.assembler_code+ "MOV AX, "+ aux1 +"\n";
+		this.assembler_code =this.assembler_code+ "OR AX, " +aux2 +"\n";
+		this.contLabels++;
+		this.pilaLabels.addLast(this.contLabels);
+		this.assembler_code =this.assembler_code+ "JZ Label"+ this.pilaLabels.getLast()+"\n";
 	}
 	
 	private void setBREAK(Nodo nodo) {
@@ -1142,7 +1220,7 @@ public class CodeGenerator {
 	
 	private void save() 
 	{
-		System.out.println(this.assembler_code);
+		System.out.println("\n\n"+this.assembler_code);
 		PrintWriter out;
 		try {
 			out = new PrintWriter(programa_filename +".asm");

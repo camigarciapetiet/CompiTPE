@@ -14,7 +14,7 @@ ENDIF;
 diseno:= 2.0;
 aux:= 2.0;
 diseno := diseno/aux;
-IF (diseno == 1.0) THEN
+IF (diseno == 1.0+1.0) THEN
 BEGIN
 	PRINT(%funciona igual%);
 END;
