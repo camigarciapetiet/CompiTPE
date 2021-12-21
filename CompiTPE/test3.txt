@@ -14,7 +14,6 @@ INT FUNC funcion1 (INT diseno)
 		BEGIN
 			PRINT(%funcadentro de funcion1%);
 			diseno:=3;
-			//diseno:= funcion2(10);//
 			RETURN (5);
 		END;
 	BEGIN

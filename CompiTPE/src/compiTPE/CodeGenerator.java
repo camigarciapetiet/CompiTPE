@@ -670,9 +670,11 @@ public class CodeGenerator {
 	
 	private void setIF(Nodo nodo) throws IOException { 
 		Nodo izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
-		Nodo der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
-
-		this.generateCode((Nodo)izq.izq.obj); //this.setCMP(izq); 20/12/2021
+		Nodo der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo		
+		
+		//this.generateCode((Nodo)izq.izq.obj); 
+		this.generateCode(izq); //20/12/2021
+		//this.setCondicion(izq);s
 		Nodo nodo_else = null;
 		
 		try {
@@ -870,17 +872,20 @@ public class CodeGenerator {
 	private String getParametro(String funcion) {
 		//obtener LA variable de TIPO PARAMETRO que sea del formato ???.(ambito).funcion
 		String ambito = funcion.substring(funcion.indexOf(".")) + "." + funcion.substring(0,funcion.indexOf("."));
-
+		System.out.println(ambito);
 		Iterator<Map.Entry<String, HashMap<String,String>>>iterator = analizador.analizadorLexico.tabla_simbolos.entrySet().iterator();
         while (iterator.hasNext()) 
         {
             Map.Entry<String, HashMap<String,String>> entry = iterator.next();
-            if (entry.getKey().endsWith(ambito)) //tiene que terminar con el ambito, ya que si solo lo contiene podriamos estar accediendo a una subfuncion con el ambito mas largo  
-            {
-            	if (analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("parametro") == 0)
-                	return entry.getKey();
+            try {
+                if (entry.getKey().endsWith(ambito)) //tiene que terminar con el ambito, ya que si solo lo contiene podriamos estar accediendo a una subfuncion con el ambito mas largo  
+                {
+                	if (analizador.analizadorLexico.tabla_simbolos.get(entry.getKey()).get("uso").compareTo("parametro") == 0)
+                    	return entry.getKey();
+                }
             }
-        }
+            catch (Exception e) {}
+         }
         return null; //nunca deberia llegar aca
 	}
 	
@@ -919,6 +924,8 @@ public class CodeGenerator {
 			invocacion = funcOrig;
 		} else {
 			invocacion = funcion;
+			System.out.println("FUNCION:" + funcion);
+			System.out.println(analizador.analizadorLexico.tabla_simbolos);
 			parametro = getParametro(invocacion);
 		}
 		//Chequeo REC MUTUA
@@ -1012,7 +1019,19 @@ public class CodeGenerator {
 			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
 		} catch (Exception e) {}
 		
-		this.generateCode(izq);
+		//this.generateCode(izq);
+		switch (izq.nombre) 
+		{
+		case "||": {this.setOR(izq);break;}
+		case "&&": {this.setAND(izq);break;}
+		case "<": {this.setCMP(izq);break;}
+		case ">": {this.setCMP(izq);break;}
+		case "<=": {this.setCMP(izq);break;}
+		case ">=": {this.setCMP(izq);break;}
+		case "<>": {this.setCMP(izq);break;}
+		case "==": {this.setCMP(izq);break;}
+		default: {this.generateCode(izq);break;}
+		}
 		nodo.nombre = izq.nombre;//.replace(".", "@");
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1090,7 +1109,7 @@ public class CodeGenerator {
 		this.assembler_code =this.assembler_code+ "MOV "+ aux1 + ", 0\n";
 		this.assembler_code =this.assembler_code+ "MOV "+ aux2 + ", 0\n";
 		
-
+		
 		if(!izq.esHoja()) {
 			this.setCMP(izq);
 		}
@@ -1184,6 +1203,7 @@ public class CodeGenerator {
    				if (nodo_precondicion.nombre.compareTo("PRE") == 0) //izq es precondicion, der es cuerpo de la funcion con precondicion
    	   			{
    					precondicion=true;
+   					System.out.println("aaaaaaaaaaaaaaaaaaaa");
    	   				this.setCMP((Nodo) nodo_precondicion.izq.obj); //Apilara un Label y escribira la instruccion de salto
    	   				this.generateCode((Nodo) izq.der.obj);
    	   			} else {
