@@ -702,7 +702,6 @@ public class CodeGenerator {
 	
 	private void setCuerpoIfElse(Nodo nodo) throws IOException { 
 		generateCode(nodo);
-		System.out.println("Salio de generate code de if-then");
 		nodo.nombre = ""; //Libero su valor por si ocupa un REG
 		contLabels++;
 		this.pilaLabels.addLast(this.contLabels);	
@@ -713,7 +712,6 @@ public class CodeGenerator {
 	{
 		
 		String elseLabel = "Label" + this.pilaLabels.pollLast() +":\n"; //Desapilo y guardo el salto hacia fuera del else
-		System.out.println("Se entro a setElse + Label para fuera del else: " + elseLabel);
 		this.assembler_code =this.assembler_code+ "Label" + this.pilaLabels.pollLast()+":\n"; //Desapilo el salto que tenia si CMP era falso y genero el ELSE
 		this.generateCode((Nodo)nodo.izq.obj); //genero el codigo dentro de ELSE
 		this.assembler_code =this.assembler_code+ elseLabel; 
