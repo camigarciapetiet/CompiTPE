@@ -678,14 +678,16 @@ public class CodeGenerator {
 		Nodo nodo_else = null;
 		
 		try {
-			nodo_else = (Nodo)((Nodo)der.der.obj).izq.obj;
+			nodo_else = (Nodo)der.der.obj;//nodo_else = (Nodo)((Nodo)der.der.obj).izq.obj;
 		} catch (Exception e) {}
-		
+
+
 		 if (nodo_else != null) {
 			if (nodo_else.nombre.compareTo("ELSE") == 0){
 				this.setCuerpoIfElse((Nodo)((Nodo)der.izq.obj).izq.obj); //der.izq es THEn, der.izq.izq es S
 				this.setElse(nodo_else); //der.der es ELSE, der.der.izq es S
 			}
+
 		}
 		else {
 			this.setCuerpoIf((Nodo)((Nodo)der.izq.obj).izq.obj); // der.izq es THEN, der.izq.izq es S
@@ -700,6 +702,7 @@ public class CodeGenerator {
 	
 	private void setCuerpoIfElse(Nodo nodo) throws IOException { 
 		generateCode(nodo);
+		System.out.println("Salio de generate code de if-then");
 		nodo.nombre = ""; //Libero su valor por si ocupa un REG
 		contLabels++;
 		this.pilaLabels.addLast(this.contLabels);	
@@ -708,9 +711,11 @@ public class CodeGenerator {
 	
 	private void setElse(Nodo nodo) throws IOException
 	{
+		
 		String elseLabel = "Label" + this.pilaLabels.pollLast() +":\n"; //Desapilo y guardo el salto hacia fuera del else
+		System.out.println("Se entro a setElse + Label para fuera del else: " + elseLabel);
 		this.assembler_code =this.assembler_code+ "Label" + this.pilaLabels.pollLast()+":\n"; //Desapilo el salto que tenia si CMP era falso y genero el ELSE
-		this.generateCode(nodo); //genero el codigo dentro de ELSE
+		this.generateCode((Nodo)nodo.izq.obj); //genero el codigo dentro de ELSE
 		this.assembler_code =this.assembler_code+ elseLabel; 
 	}
 	
@@ -1064,8 +1069,6 @@ public class CodeGenerator {
 		this.setASG(izq);
 	}
 
-
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private void generateCode(Nodo nodo) throws IOException
@@ -1203,7 +1206,6 @@ public class CodeGenerator {
    				if (nodo_precondicion.nombre.compareTo("PRE") == 0) //izq es precondicion, der es cuerpo de la funcion con precondicion
    	   			{
    					precondicion=true;
-   					System.out.println("aaaaaaaaaaaaaaaaaaaa");
    	   				this.setCMP((Nodo) nodo_precondicion.izq.obj); //Apilara un Label y escribira la instruccion de salto
    	   				this.generateCode((Nodo) izq.der.obj);
    	   			} else {

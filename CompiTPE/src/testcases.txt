@@ -1,0 +1,20 @@
+programa
+INT a;
+INT b;
+BEGIN
+a:=4;
+b:=6;
+
+IF (a==2+2 && b>50) THEN
+	BEGIN
+		PRINT(%YAC%);
+	END;
+ELSE
+	BEGIN	
+		PRINT(%YAC ELSE%);
+		b:=51;
+		PRINT(%b es 51%);
+	END;
+ENDIF;
+
+END;
