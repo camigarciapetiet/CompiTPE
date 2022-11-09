@@ -8,7 +8,6 @@ includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\user32.lib
 .STACK 200h
 .DATA
-bes51 db "bes51", 0 
 b@programa DW ?
 YAC db "YAC", 0 
 YACELSE db "YACELSE", 0 
@@ -64,7 +63,6 @@ Label3:
 invoke MessageBox, NULL, addr YACELSE, addr YACELSE, MB_OK
 MOV AX, 51
 MOV b@programa, AX
-invoke MessageBox, NULL, addr bes51, addr bes51, MB_OK
 Label4:
 END programa
 invoke MessageBox, NULL, addr FIN, NULL, MB_OK

@@ -3,7 +3,7 @@ package compiTPE;
 import java.util.*;
 %}
 
-%token ID CTE CADENA IF THEN ELSE ENDIF PRINT FUNC RETURN BEGIN END BREAK INT SINGLE REPEAT PRE TYPEDEF ':=' '||' '&&' '<>' '==' '<=' '>='
+%token ID CTE CADENA IF THEN ELSE ENDIF PRINT FUNC RETURN BEGIN END BREAK INT SINGLE REPEAT PRE TYPEDEF TRY CATCH ':=' '||' '&&' '<>' '==' '<=' '>='
 %start programa
 
 %left '||'
@@ -16,7 +16,7 @@ programa	: nombre_programa bloque_sentencias_declarativas BEGIN conjunto_sentenc
 			| error ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": error en el programa"); }
 ;
 
-nombre_programa	: ID {apilar_ambito($1); set_campo($1,"uso","programa"); $$.obj= new Nodo($1.sval);}
+nombre_programa	: ID {apilar_ambito($1); set_campo($1,"uso","programa"); $$.obj= new Nodo($1.sval); System.out.println("asignacionnnnnn");}
 ;
 
 nombre_ambito	: ID {chequeoS_redeclaracion_funcion($1); apilar_ambito($1); set_campo($1,"uso","funcion"); setLastFuncType($1); $$.sval=$1.sval;} 
@@ -63,6 +63,8 @@ pre_condicion	: PRE ':' '('condicion')' ',' cadena_cuerpo ';' {this.reglas.add("
 				| PRE ':' condicion')' ',' cadena_cuerpo ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); this.reglas.add("pre-condicion");$$.obj=new Nodo("PRE", $3, $6);}
 				| PRE ':' '('condicion ',' cadena_cuerpo ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); this.reglas.add("pre-condicion");$$.obj=new Nodo("PRE", $4, $6);}
 				| PRE ':' '('condicion')'  cadena_cuerpo ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de ')'"); this.reglas.add("pre-condicion");$$.obj=new Nodo("PRE", $4, $6);}
+				| PRE ':' '('condicion')' ';'
+
 ;
 
 parametro	: '('tipo nombre_parametro')' {setPendingTypes($2.sval);}
@@ -92,14 +94,15 @@ bloque_sentencias_ejecutables	: sentencia_ejecutable {$$.obj= new Nodo("S", $1, 
 								| error ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": error en bloque de sentencias ejecutables");}
 ;
 
-conjunto_sentencia_ejecutable	: sentencia_ejecutable {$$.obj= new Nodo("S", $1, null);}
+conjunto_sentencia_ejecutable	: sentencia_ejecutable {$$.obj= new Nodo("S", $1, null); }
 								| sentencia_ejecutable conjunto_sentencia_ejecutable  {$$.obj= new Nodo("S", $1, $2);}
 ;
 
-sentencia_ejecutable	: asignacion {$$= $1;}
+sentencia_ejecutable	: asignacion {$$= $1; }
 						| mensaje_pantalla {$$= $1;}
 						| clausula_seleccion_if {$$= $1;}
 						| sentencia_control_repeat {$$= $1;}
+						| sentencia_try_catch
 ;
 
 invocacion_funcion	: nombre_invocacion '(' factor ')' {$$.obj=new Nodo("invocacion funcion", $1, $3);chequeoS_parametro_funcion($1, $2); }

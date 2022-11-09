@@ -4,7 +4,6 @@ INT b;
 BEGIN
 a:=4;
 b:=6;
-
 IF (a==2+2 && b>50) THEN
 	BEGIN
 		PRINT(%YAC%);

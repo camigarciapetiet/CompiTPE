@@ -1,8 +1,8 @@
 INFORME TOKENS
- Identificador programa,  Palabra predefinida INT,  Identificador a.programa,  ;,  Palabra predefinida INT,  Identificador b.programa,  ;,  Palabra predefinida BEGIN,  Identificador a.programa,  Palabra predefinida :=,  Constante 4,  ;,  Identificador b.programa,  Palabra predefinida :=,  Constante 6,  ;,  Palabra predefinida IF,  (,  Identificador a.programa,  Palabra predefinida ==,  Constante 2,  +,  Constante 2,  Palabra predefinida &&,  Identificador b.programa,  >,  Constante 50,  ),  Palabra predefinida THEN,  Palabra predefinida BEGIN,  Palabra predefinida PRINT,  (,  Cadena YAC,  ),  ;,  Palabra predefinida END,  ;,  Palabra predefinida ELSE,  Palabra predefinida BEGIN,  Palabra predefinida PRINT,  (,  Cadena YAC ELSE,  ),  ;,  Identificador b.programa,  Palabra predefinida :=,  Constante 51,  ;,  Palabra predefinida PRINT,  (,  Cadena b es 51,  ),  ;,  Palabra predefinida END,  ;,  Palabra predefinida ENDIF,  ;,  Palabra predefinida END,  ;, 
+ Identificador programa,  Palabra predefinida INT,  Identificador a.programa,  ;,  Palabra predefinida INT,  Identificador b.programa,  ;,  Palabra predefinida BEGIN,  Identificador a.programa,  Palabra predefinida :=,  Constante 4,  ;,  Identificador b.programa,  Palabra predefinida :=,  Constante 6,  ;,  Palabra predefinida IF,  (,  Identificador a.programa,  Palabra predefinida ==,  Constante 2,  +,  Constante 2,  Palabra predefinida &&,  Identificador b.programa,  >,  Constante 50,  ),  Palabra predefinida THEN,  Palabra predefinida BEGIN,  Palabra predefinida PRINT,  (,  Cadena YAC,  ),  ;,  Palabra predefinida END,  ;,  Palabra predefinida ELSE,  Palabra predefinida BEGIN,  Palabra predefinida PRINT,  (,  Cadena YAC ELSE,  ),  ;,  Identificador b.programa,  Palabra predefinida :=,  Constante 51,  ;,  Palabra predefinida END,  ;,  Palabra predefinida ENDIF,  ;,  Palabra predefinida END,  ;, 
 
 INFORME REGLAS
- tipo INT,  Declaracion de datos,  tipo INT,  Declaracion de datos,  Factor CTE,  Asignacion,  Factor CTE,  Asignacion,  factor ID,  Factor CTE,  Factor CTE,  factor ID,  Factor CTE,  clausula PRINT,  bloque de sentencias BEGIN-END,  clausula PRINT,  Factor CTE,  Asignacion,  clausula PRINT,  bloque de sentencias BEGIN-END,  Sentencia START programa, 
+ tipo INT,  Declaracion de datos,  tipo INT,  Declaracion de datos,  Factor CTE,  Asignacion,  Factor CTE,  Asignacion,  factor ID,  Factor CTE,  Factor CTE,  factor ID,  Factor CTE,  clausula PRINT,  bloque de sentencias BEGIN-END,  clausula PRINT,  Factor CTE,  Asignacion,  bloque de sentencias BEGIN-END,  Sentencia START programa, 
 
 ERRORES LEXICOS
 
@@ -11,6 +11,6 @@ ERRORES SINTACTICOS
 
 
 TABLA DE SIMBOLOS
-{b es 51={uso=cadena}, 2={uso=constante, tipo=INT}, b.programa={uso=variable, tipo=INT}, 4={uso=constante, tipo=INT}, 6={uso=constante, tipo=INT}, programa={uso=programa}, YAC={uso=cadena}, 50={uso=constante, tipo=INT}, YAC ELSE={uso=cadena}, 51={uso=constante, tipo=INT}, a.programa={uso=variable, tipo=INT}}
+{2={uso=constante, tipo=INT}, b.programa={uso=variable, tipo=INT}, 4={uso=constante, tipo=INT}, 6={uso=constante, tipo=INT}, programa={uso=programa}, YAC={uso=cadena}, 50={uso=constante, tipo=INT}, YAC ELSE={uso=cadena}, 51={uso=constante, tipo=INT}, a.programa={uso=variable, tipo=INT}}
 Palabras Predefinidas
-{PRINT=264, ||=276, &&=277, <==280, PRE=273, <>=278, SINGLE=271, :==275, REPEAT=272, BEGIN=267, INT=270, RETURN=266, BREAK=269, ELSE=262, TYPEDEF=274, CADENA=259, ID=257, IF=260, ===279, FUNC=265, ENDIF=263, CTE=258, THEN=261, END=268, >==281}
+{PRINT=264, ||=278, &&=279, <==282, PRE=273, <>=280, SINGLE=271, :==277, REPEAT=272, BEGIN=267, INT=270, RETURN=266, CATCH=276, BREAK=269, ELSE=262, TYPEDEF=274, TRY=275, CADENA=259, ID=257, IF=260, ===281, FUNC=265, ENDIF=263, CTE=258, THEN=261, END=268, >==283}
