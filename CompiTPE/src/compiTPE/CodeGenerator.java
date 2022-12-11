@@ -22,6 +22,7 @@ public class CodeGenerator {
 	private ArrayList<ParserVal> listFunciones;
 	private LinkedList<String> listFuncionesaux;
 	private LinkedList<String> breakRepeatLabels;
+	private boolean inTry;
 	
 	public CodeGenerator(Nodo raizArbol, Parser analizadorSintactico)
 	{
@@ -33,6 +34,7 @@ public class CodeGenerator {
 		this.auxvars = new LinkedList<String>();
     	this.listFuncionesaux = new LinkedList<String>();
     	this.breakRepeatLabels = new LinkedList<String>();
+    	this.inTry=false;
 	}
 	
 	public void run() throws IOException 
@@ -130,11 +132,15 @@ public class CodeGenerator {
 
             } catch (Exception e) {} 
 }
+        
         this.assembler_code = this.assembler_code + "overflow_error db \"error de overflow\", 0\n";
         this.assembler_code = this.assembler_code + "div_zero db \"error division por cero\", 0\n";
         this.assembler_code = this.assembler_code + "rec_mutua db \"error recursion mutua\", 0\n";
-
+        
+        this.assembler_code =this.assembler_code+ "@auxpre DW ?\n";
         this.assembler_code =this.assembler_code+ ";FLAG PARA DECLARAR AUXILIARES\n";
+        
+        
     }
 	
 	
@@ -956,11 +962,23 @@ public class CodeGenerator {
 			this.assembler_code =this.assembler_code+ "CALL " + funcion.replace(".", "@") + "\n";
 		}
 		
+		
 		//CHEQUEO REC MUTUA, desapilar
 		for (int i = 0; i < listFuncionesaux.size(); i++) {
 			this.assembler_code = this.assembler_code + "MOV @"+listFuncionesaux.get(i)+", 0\n";
 		}
 		
+		//chequeo si se encuentra dentro del try-catch y si cumple o no la precondicion
+		
+				if(inTry) {
+					this.assembler_code =this.assembler_code+ "CMP @auxpre, 0 \n" ;
+					this.assembler_code =this.assembler_code+ "JE Label"+ this.pilaLabels.peekLast()+"\n" ;
+				}else {
+					this.assembler_code =this.assembler_code+ "JMP EXIT" ;
+				}
+				
+		//////////////////
+				
 		nodo.nombre = "@aux"+this.auxvars.size(); //resultado de la invocacion, es decir el RETURN.
 	}
 	
@@ -1093,9 +1111,44 @@ public class CodeGenerator {
 			
 			case "&&": {setAND(nodo); break;} //20/12/2021
 			case "||": {setOR(nodo); break;}
+			
+			case "TRY": {setTRY(nodo); break;}//extension para cursada
 		}
 	}
 	
+	private void setTRY(Nodo nodo) throws IOException {
+		
+		Nodo izq = null;
+		Nodo der = null;
+		try {
+			izq = (Nodo)nodo.izq.obj; //Cast de OBJ a nodo
+			der = (Nodo)nodo.der.obj; //Cast de OBJ a nodo
+		} catch (Exception e) {}
+		
+		inTry=true;
+		
+		this.contLabels++;
+		this.pilaLabels.addLast(this.contLabels);
+		
+		if(izq!=null) {  //genera codigo para sentencia dentro del try
+			generateCode(izq);
+			//se apila un label para luego del catch
+			this.contLabels++;
+			this.pilaLabels.addLast(this.contLabels);
+		}
+		
+		Integer aux_label=this.pilaLabels.pollLast();
+		this.assembler_code =this.assembler_code+ "JMP Label"+aux_label+"\n";
+		
+		if(der!=null) {  //agrega un label y genera codigo para catch
+			this.assembler_code =this.assembler_code+ "Label"+this.pilaLabels.pollLast()+":\n";
+			generateCode((Nodo) der.izq.obj); 
+		}
+		
+		this.assembler_code =this.assembler_code+ "Label"+aux_label+":\n";
+		inTry=false;
+	}
+
 	private void setAND(Nodo nodo) throws IOException {
 		Nodo izq = null;
 		Nodo der = null;
@@ -1205,7 +1258,9 @@ public class CodeGenerator {
    	   			{
    					precondicion=true;
    	   				this.setCMP((Nodo) nodo_precondicion.izq.obj); //Apilara un Label y escribira la instruccion de salto
+   	   				
    	   				this.generateCode((Nodo) izq.der.obj);
+   	   				
    	   			} else {
    	   				generateCode((Nodo) izq.der.obj); //derecha del cuerpo, si no tiene precondicion nodo.izq.izq es null - 19/12/2021 DEPRECATED PORQUE ES NULL ENTONCES NUNCA ENTRA
    	   			}
@@ -1216,15 +1271,23 @@ public class CodeGenerator {
    			if (der != null) {
    				generateCode(der); //Return
    			}
+   			this.assembler_code = this.assembler_code + "MOV @auxpre, 1 "+ "\n" ; //auxpre contiene un 1 ya que se cumple la precondicion
    			this.assembler_code =this.assembler_code+ "ret\n";
    			if (precondicion)
    			{
    				this.assembler_code =this.assembler_code+ "Label"+this.pilaLabels.pollLast()+":\n"; //Desapilara un label
    				//this.setPRINT((Nodo)izq.der.obj); //mensaje NO, este es el CUERPO de la funcion.
-   				Nodo print = (Nodo)nodo_precondicion.der.obj;
-   				this.setPRINT(print,true);
-   				this.assembler_code =this.assembler_code+ "JMP EXIT\n"; //Aborta el programa en vez de retornar
-   			}
+   				Nodo print = null;
+   				try {
+   					print = (Nodo)nodo_precondicion.der.obj;
+   				}catch (Exception e) {};
+   				if(print!=null) {	//si es null, representa el caso de pre sin cadena
+   					this.setPRINT(print,true);
+   				}
+   				
+   				
+   				this.assembler_code =this.assembler_code+ "MOV @auxpre, 0\n";
+					this.assembler_code =this.assembler_code+ "ret\n";}
         }
 
 		this.assembler_code =this.assembler_code+ programa_filename +":\n";

@@ -16,7 +16,7 @@ programa	: nombre_programa bloque_sentencias_declarativas BEGIN conjunto_sentenc
 			| error ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": error en el programa"); }
 ;
 
-nombre_programa	: ID {apilar_ambito($1); set_campo($1,"uso","programa"); $$.obj= new Nodo($1.sval); System.out.println("asignacionnnnnn");}
+nombre_programa	: ID {apilar_ambito($1); set_campo($1,"uso","programa"); $$.obj= new Nodo($1.sval);}
 ;
 
 nombre_ambito	: ID {chequeoS_redeclaracion_funcion($1); apilar_ambito($1); set_campo($1,"uso","funcion"); setLastFuncType($1); $$.sval=$1.sval;} 
@@ -63,7 +63,7 @@ pre_condicion	: PRE ':' '('condicion')' ',' cadena_cuerpo ';' {this.reglas.add("
 				| PRE ':' condicion')' ',' cadena_cuerpo ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": '(' esperado antes de condicion"); this.reglas.add("pre-condicion");$$.obj=new Nodo("PRE", $3, $6);}
 				| PRE ':' '('condicion ',' cadena_cuerpo ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ')' esperado despues de condicion"); this.reglas.add("pre-condicion");$$.obj=new Nodo("PRE", $4, $6);}
 				| PRE ':' '('condicion')'  cadena_cuerpo ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ',' esperado despues de ')'"); this.reglas.add("pre-condicion");$$.obj=new Nodo("PRE", $4, $6);}
-				| PRE ':' '('condicion')' ';'
+				| PRE ':' '('condicion')' ';'  {this.reglas.add("pre-condicion"); $$.obj=new Nodo("PRE", $4, null);}
 
 ;
 
@@ -94,25 +94,41 @@ bloque_sentencias_ejecutables	: sentencia_ejecutable {$$.obj= new Nodo("S", $1, 
 								| error ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": error en bloque de sentencias ejecutables");}
 ;
 
-conjunto_sentencia_ejecutable	: sentencia_ejecutable {$$.obj= new Nodo("S", $1, null); }
+conjunto_sentencia_ejecutable	: sentencia_ejecutable {$$.obj= new Nodo("S", $1, null);}
 								| sentencia_ejecutable conjunto_sentencia_ejecutable  {$$.obj= new Nodo("S", $1, $2);}
 ;
 
-sentencia_ejecutable	: asignacion {$$= $1; }
+sentencia_ejecutable	: sentencia_try_catch{$$=$1;}
 						| mensaje_pantalla {$$= $1;}
 						| clausula_seleccion_if {$$= $1;}
 						| sentencia_control_repeat {$$= $1;}
-						| sentencia_try_catch
+						| asignacion {$$= $1; }
 ;
 
-invocacion_funcion	: nombre_invocacion '(' factor ')' {$$.obj=new Nodo("invocacion funcion", $1, $3);chequeoS_parametro_funcion($1, $2); }
+sentencia_try_catch		: sentencia_try sentencia_ejecutable_try_catch CATCH cuerpo_catch';' {this.reglas.add("Sentencia TRY-CATCH"); $$.obj= new Nodo("TRY",$2, $4); chequeoS_invocacion_trycatch();}
+;
+
+sentencia_try	:	TRY {this.hayInvocacion=false;} 
+;
+
+cuerpo_catch	: BEGIN bloque_sentencias_ejecutable_try_catch END {$$.obj= new Nodo("CATCH",$2, null); }
+;
+
+bloque_sentencias_ejecutable_try_catch	: sentencia_ejecutable_try_catch {$$.obj= new Nodo("S", $1, null);}
+										| sentencia_ejecutable_try_catch bloque_sentencias_ejecutable_try_catch {$$.obj= new Nodo("S", $1, $2);}
+;
+
+sentencia_ejecutable_try_catch	: asignacion {$$= $1;}
+;
+
+invocacion_funcion	: nombre_invocacion '(' factor ')' {$$.obj=new Nodo("invocacion funcion", $1, $3);chequeoS_parametro_funcion($1, $2); this.hayInvocacion=true;}
 //Esto es tanto para typedef como funcion!
 ;
 
 nombre_invocacion : ID {chequeoS_funcion_no_declarada($1); $$.obj=new Nodo ($1.sval);}
 ;
 
-asignacion	: operador_asignacion ':=' expresioncompuesta ';' {chequeoS_diferentes_tipos($1, $3, false); this.reglas.add("Asignacion"); $$.obj= new Nodo(":=", $1, $3);}
+asignacion	: operador_asignacion ':=' expresioncompuesta ';' {chequeoS_diferentes_tipos($1, $3, false); this.reglas.add("Asignacion"); $$.obj= new Nodo(":=", $1, $3); }
 		  	| operador_asignacion expresioncompuesta ';' {this.erroresSint.add("Error en la linea "+ analizadorLexico.contadorLineas + ": ':=' esperado despues de ID"); this.reglas.add("Asignacion"); $$.obj= new Nodo(":=", $1, $2);}		  
 ;
 
@@ -226,6 +242,9 @@ constante_repeat : CTE {$$.obj=new Nodo($1.sval);}
 id_repeat : ID {$$.obj=new Nodo($1.sval);}
 ;
 
+
+
+
 %%
 	public AnalizadorLexico analizadorLexico;
 	public List<String> erroresSint;
@@ -237,6 +256,8 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 	public List<String> erroresSem;
 	public ParserVal aux_i; //para mantener constancia del repeat
 	public ParserVal aux_m; // para mantener constancia del repeat
+	public boolean hayInvocacion; //para chequear si dentro del TRY hay una invocacion
+
 	
 	private int yylex() 
 	{
@@ -251,6 +272,7 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
 		this.pendingTypeList = new ArrayList<String>();
 		this.listaFunc= new ArrayList<ParserVal>();
 		this.erroresSem = new ArrayList<String>();
+		this.hayInvocacion=false;
 	}
 	
 	public void yyerror(String error)
@@ -690,6 +712,13 @@ id_repeat : ID {$$.obj=new Nodo($1.sval);}
         }
 	}
 	
-	
+	public void chequeoS_invocacion_trycatch(){
+		if (!hayInvocacion)
+			this.erroresSem.add("error semantico: la sentencia TRY no contiene una invocacion de una funcion");
+		this.hayInvocacion=false;
+	}
+
+
+
 	
 	

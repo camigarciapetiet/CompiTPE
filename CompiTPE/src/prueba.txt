@@ -1,17 +1,41 @@
 programa
 INT a;
 INT b;
+INT FUNC f2(INT a)
+    INT aux1;
+    BEGIN  
+        PRE: (a<1), %cadena precondicion f2%;
+        aux1:=5+a;
+        RETURN (aux1);
+    END;
+INT FUNC f1(INT a)
+    INT aux1;
+    BEGIN  
+        PRE: (a<1), %cadena1%;
+        TRY
+            aux1:=f2(3);
+        CATCH
+        BEGIN
+            aux1:=10;
+        END;
+        RETURN (aux1);
+    END;
+
+
 BEGIN
-a:=4;
-b:=6;
-IF (a==2+2 && b>50) THEN   
-    BEGIN
-        PRINT(%YAC%);
-    END;
-ELSE    
-    BEGIN
-        PRINT(%YAC ELSE%);
-        b:=51;
-    END;
+a:=2;
+IF (a == 2) THEN
+BEGIN
+	PRINT(%a es igual a 2%);
+END;
 ENDIF;
+b:=6;
+
+TRY
+    b:=f1(0);
+CATCH
+BEGIN
+    b:=10;
+END;
+
 END;
