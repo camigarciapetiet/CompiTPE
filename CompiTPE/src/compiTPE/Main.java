@@ -77,7 +77,7 @@ public class Main {
 			program_exists = false;
 		}
 		if (program_exists) {
-			AnalizadorLexico a_lex = new AnalizadorLexico("palabras_predefinidas.txt", matrizTransicionEstados, matrizAS, e_h);
+			AnalizadorLexico a_lex = new AnalizadorLexico("/resources" + File.separator + "palabras_predefinidas.txt", matrizTransicionEstados, matrizAS, e_h);
 	        a_lex.setPrograma(programtext);
 	        Parser newParser = new Parser(a_lex);
 	        newParser.run();

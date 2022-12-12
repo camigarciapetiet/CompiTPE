@@ -19,7 +19,6 @@ public class AnalizadorLexico {
 	public List<String> warningsLex;
 	public int estado_actual;
 	public List<String> informeTokens;
-	
 	//tp3
 	public String ambito;
 	
@@ -36,7 +35,8 @@ public class AnalizadorLexico {
 		this.tabla_simbolos = new HashMap<String,HashMap<String,String>>();
 		BufferedReader reader;
 		try {
-			reader = new BufferedReader(new FileReader(filename));
+			InputStream in = getClass().getResourceAsStream(filename);
+		    reader = new BufferedReader(new InputStreamReader(in));
 			String line = reader.readLine();
 			while (line != null) {
 				this.palabras_predefinidas.put(line, this.codigoIndex);
@@ -45,6 +45,8 @@ public class AnalizadorLexico {
 			}
 			reader.close();
 		} catch (IOException e) {
+			System.out.println(filename);
+		    System.out.println("Working Directory = " + System.getProperty("user.dir"));
 			e.printStackTrace();
 		}
 		this.palabras_predefinidas.put("ID", codigoIdentificador);
