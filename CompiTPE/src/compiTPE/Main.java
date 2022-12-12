@@ -149,8 +149,8 @@ public class Main {
 		        System.out.println("\nPalabras Predefinidas");
 		        System.out.println(a_lex.palabras_predefinidas);
 	        }
-		}
 
-	}
+		
 
+		}}
 }
